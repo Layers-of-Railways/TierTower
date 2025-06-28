@@ -1,0 +1,49 @@
+{
+	"schemaVersion": 1,
+	"id": "tier_tower",
+	"version": "${version}",
+	"name": "Tier Tower",
+	"description": "Lorem Ipsum",
+	"authors": [
+		"Slimeist",
+		"Vivian Inkwell",
+		"charon"
+	],
+	"contact": {
+		"sources": "https://github.com/techno-sam/TierTower",
+		"issues": "https://github.com/techno-sam/TierTower/issues",
+		"homepage": "https://modrinth.com/mod/tier-tower"
+	},
+	"license": "LGPL v3.0",
+	"icon": "assets/tier_tower/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.slimeistdev.tier_tower.TierTower"
+		],
+		"client": [
+			"io.github.slimeistdev.tier_tower.TierTowerClient"
+		],
+		"fabric-datagen": [
+			"io.github.slimeistdev.tier_tower.TierTowerDatagen"
+		]
+	},
+	"accessWidener": "tier_tower.accesswidener",
+	"mixins": [
+		"tier_tower.mixins.json"
+	],
+	"depends": {
+		"minecraft": "${minecraft_version}",
+		"fabricloader": ">=${fabric_loader_version}",
+		"fabric-api": ">=${fabric_api_version}",
+		"java": ">=17",
+		"fabric-permissions-api-v0": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"Modrinth": "https://modrinth.com/mod/tier-tower"
+			}
+		}
+	}
+}
