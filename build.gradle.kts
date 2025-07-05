@@ -8,6 +8,7 @@ plugins {
     id("fabric-loom") version "1.7-SNAPSHOT"
     id("me.modmuss50.mod-publish-plugin") version "0.3.4" // https://github.com/modmuss50/mod-publish-plugin
     id("dev.ithundxr.silk") version "0.11.15" // https://github.com/IThundxr/silk
+    id("net.kyori.blossom") version "2.1.0" // https://github.com/KyoriPowered/blossom
 }
 
 println("Tier Tower v${"mod_version"()}")
@@ -99,6 +100,8 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${"fabric_loader_version"()}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${"fabric_api_version"()}")
 
+    testImplementation("net.fabricmc:fabric-loader-junit:${"fabric_loader_version"()}")
+
     modApi(include("com.tterrag.registrate_fabric:Registrate:${"registrate_version"()}")!!)
 
     include(modImplementation("me.lucko:fabric-permissions-api:${"fabric_permissions_api_version"()}") {
@@ -130,10 +133,18 @@ tasks.processResources {
     exclude("**/*.bbmodel", "**/*.lnk", "**/*.xcf", "**/*.md", "**/*.txt", "**/*.blend", "**/*.blend1")
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 sourceSets.main {
     resources { // include generated resources in resources
         srcDir("src/generated/resources")
         exclude(".cache/**")
+    }
+    blossom.javaSources {
+        property("version", "mod_version"())
+        property("gitCommit", gitHash)
     }
 }
 

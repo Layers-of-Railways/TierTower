@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower;
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
+import io.github.slimeistdev.tier_tower.base.data.TierTowerTierGen;
 import io.github.slimeistdev.tier_tower.base.data.lang.LangGen;
 import io.github.slimeistdev.tier_tower.events.CommonEvents;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
@@ -35,20 +36,20 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 
 public class TierTower implements ModInitializer {
 	public static final String MOD_ID = "tier_tower";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final String NAME = "Tier Tower";
+	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
 	private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Tier Tower is loading!");
+		LOGGER.info("{} v{} is initializing! Commit hash: {}", NAME, TierTowerBuildInfo.VERSION, TierTowerBuildInfo.GIT_COMMIT);
 
-		ModSetup.init();
-		CommonEvents.register();
-
-		TierTowerPackets.PACKETS.registerC2SListener();
-
+		ModSetup.register();
 		REGISTRATE.register();
+
+		CommonEvents.register();
+		TierTowerPackets.PACKETS.registerC2SListener();
 
 		if (Utils.isDevEnv() && !Boolean.getBoolean("DATAGEN")) {
 			MixinEnvironment.getCurrentEnvironment().audit();
@@ -57,6 +58,7 @@ public class TierTower implements ModInitializer {
 
 	public static void gatherData(DataGenerator.PackGenerator gen) {
 		REGISTRATE.addDataGenerator(ProviderType.LANG, LangGen::generate);
+		gen.addProvider(TierTowerTierGen::new);
 	}
 
 	public static AbstractRegistrate<? extends AbstractRegistrate<?>> registrate() {

@@ -16,14 +16,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.registry;
+package io.github.slimeistdev.tier_tower.base.math.ast;
 
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.server.packs.PackType;
+import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
+import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
 
-public class ModSetup {
-    public static void register() {
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(TierManager.ReloadListener.INSTANCE);
+public record VariableNode(String name) implements Node {
+    @Override
+    public double evaluate(EvaluationContext context) throws EvaluationException {
+        return context.getVariable(name);
+    }
+
+    @Override
+    public String repr() {
+        return name;
     }
 }

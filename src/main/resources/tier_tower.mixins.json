@@ -3,18 +3,10 @@
   "package": "io.github.slimeistdev.tier_tower.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "common.AccessorNavigation",
-    "common.MixinNavigation",
-    "common.MixinServerPlayer",
-    "common.MixinTrain"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "client.MixinCarriageContraptionEntityRenderer",
-    "client.MixinGlobalRailwayManager",
-    "client.MixinTrackGraphVisualizer",
-    "client.MixinTrain"
   ]
 }

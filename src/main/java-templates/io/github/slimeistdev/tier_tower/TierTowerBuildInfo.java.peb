@@ -1,0 +1,6 @@
+package io.github.slimeistdev.tier_tower;
+
+public class TierTowerBuildInfo {
+    public static final String VERSION = "{{ version }}";
+    public static final String GIT_COMMIT = {{ gitCommit | default("unknown") }};
+}

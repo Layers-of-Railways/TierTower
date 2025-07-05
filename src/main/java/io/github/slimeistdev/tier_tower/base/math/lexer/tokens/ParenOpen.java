@@ -16,14 +16,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.registry;
+package io.github.slimeistdev.tier_tower.base.math.lexer.tokens;
 
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.server.packs.PackType;
+import org.jetbrains.annotations.NotNull;
 
-public class ModSetup {
-    public static void register() {
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(TierManager.ReloadListener.INSTANCE);
+public enum ParenOpen implements Token {
+    INSTANCE;
+
+    @Override
+    public @NotNull String toString() {
+        return "(";
     }
 }

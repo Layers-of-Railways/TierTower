@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower.base.data.lang;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
+import io.github.slimeistdev.tier_tower.base.data.TierTowerTierGen;
 import io.github.slimeistdev.tier_tower.utils.FilesHelper;
 
 import java.util.Map;
@@ -31,6 +32,7 @@ public class LangGen {
         BiConsumer<String, String> langConsumer = provider::add;
 
         provideDefaultLang("interface", langConsumer);
+        TierTowerTierGen.provideLang(langConsumer);
     }
 
     private static void provideDefaultLang(String fileName, BiConsumer<String, String> consumer) {
