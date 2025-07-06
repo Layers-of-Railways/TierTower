@@ -51,7 +51,7 @@ public class TierTower implements ModInitializer {
 		CommonEvents.register();
 		TierTowerPackets.PACKETS.registerC2SListener();
 
-		if (Utils.isDevEnv() && !Boolean.getBoolean("DATAGEN")) {
+		if (Utils.isDevEnv() && !Utils.isEnvVarTrue("DATAGEN")) {
 			MixinEnvironment.getCurrentEnvironment().audit();
 		}
 	}

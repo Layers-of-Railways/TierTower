@@ -46,8 +46,8 @@ public abstract class TierGen implements DataProvider {
     protected final PackOutput.PathProvider sequencePathProvider;
 
     public TierGen(PackOutput output) {
-        this.tierPathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tier_tower_tiers");
-        this.sequencePathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tier_tower_sequences");
+        this.tierPathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tier_tower_tier");
+        this.sequencePathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tier_tower_sequence");
     }
 
     protected abstract void registerTiers(Consumer<GenEntry<TierSavedData>> provider);

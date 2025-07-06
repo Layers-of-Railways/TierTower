@@ -18,10 +18,23 @@
 
 package io.github.slimeistdev.tier_tower.utils;
 
+import io.github.slimeistdev.tier_tower.TierTower;
 import net.fabricmc.loader.api.FabricLoader;
+
+import java.util.Locale;
 
 public class Utils {
     public static boolean isDevEnv() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    public static boolean isEnvVarTrue(String name) {
+        try {
+            String result = System.getenv(name);
+            return result != null && result.toLowerCase(Locale.ROOT).equals("true");
+        } catch (SecurityException e) {
+            TierTower.LOGGER.warn("Caught a security exception while trying to access environment variable `{}`.", name);
+            return false;
+        }
     }
 }

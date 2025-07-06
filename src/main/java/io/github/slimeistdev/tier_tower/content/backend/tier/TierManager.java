@@ -58,8 +58,8 @@ public class TierManager {
             Map<ResourceLocation, TierSavedData> tiers = new HashMap<>();
             Map<ResourceLocation, SequenceSavedData> sequences = new HashMap<>();
 
-            DatapackHelper.scanDirectory(resourceManager, "tier_tower_tiers", GSON, "tier", TierSavedData.CODEC, tiers, LOGGER);
-            DatapackHelper.scanDirectory(resourceManager, "tier_tower_sequences", GSON, "tier sequence", SequenceSavedData.CODEC, sequences, LOGGER);
+            DatapackHelper.scanDirectory(resourceManager, "tier_tower_tier", GSON, "tier", TierSavedData.CODEC, tiers, LOGGER);
+            DatapackHelper.scanDirectory(resourceManager, "tier_tower_sequence", GSON, "tier sequence", SequenceSavedData.CODEC, sequences, LOGGER);
 
             return new PreparedData(tiers, sequences);
         }

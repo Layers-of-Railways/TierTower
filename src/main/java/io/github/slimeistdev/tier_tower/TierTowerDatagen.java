@@ -27,7 +27,7 @@ public class TierTowerDatagen implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
         ExistingFileHelper helper = ExistingFileHelper.withResourcesFromArg();
         FabricDataGenerator.Pack pack = generator.createPack();
-        TierTower.registrate().setupDatagen(pack, helper);
         TierTower.gatherData(pack);
+        TierTower.registrate().setupDatagen(pack, helper);
     }
 }
