@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.content.backend.tier;
+package io.github.slimeistdev.tier_tower.content.backend.tier.pack_data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -25,10 +25,10 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 import java.util.Optional;
 
-public record SequenceSavedData(List<ResourceLocation> tiers, int defaultBaseLevelingCost, Optional<ResourceLocation> nextSequence) {
-    public static final Codec<SequenceSavedData> CODEC = RecordCodecBuilder.create(i -> i.group(
-        ResourceLocation.CODEC.listOf().fieldOf("tiers").forGetter(SequenceSavedData::tiers),
-        Codec.INT.fieldOf("default_base_leveling_cost").forGetter(SequenceSavedData::defaultBaseLevelingCost),
-        ResourceLocation.CODEC.optionalFieldOf("next_sequence").forGetter(SequenceSavedData::nextSequence)
-    ).apply(i, SequenceSavedData::new));
+public record SequencePackData(List<ResourceLocation> tiers, int defaultBaseLevelingCost, Optional<ResourceLocation> nextSequence) {
+    public static final Codec<SequencePackData> CODEC = RecordCodecBuilder.create(i -> i.group(
+        ResourceLocation.CODEC.listOf().fieldOf("tiers").forGetter(SequencePackData::tiers),
+        Codec.INT.fieldOf("default_base_leveling_cost").forGetter(SequencePackData::defaultBaseLevelingCost),
+        ResourceLocation.CODEC.optionalFieldOf("next_sequence").forGetter(SequencePackData::nextSequence)
+    ).apply(i, SequencePackData::new));
 }

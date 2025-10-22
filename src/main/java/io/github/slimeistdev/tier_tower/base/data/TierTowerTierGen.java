@@ -21,8 +21,8 @@ package io.github.slimeistdev.tier_tower.base.data;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.data.api.TierGen;
-import io.github.slimeistdev.tier_tower.content.backend.tier.SequenceSavedData;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierSavedData;
+import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.SequencePackData;
+import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.TierPackData;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -37,14 +37,14 @@ import java.util.function.UnaryOperator;
 @SuppressWarnings({"SameParameterValue", "unused"})
 public class TierTowerTierGen extends TierGen {
     private static final HashMap<String, String> LANG = new HashMap<>();
-    private static final List<GenEntry<TierSavedData>> TIERS = new ArrayList<>();
-    private static final List<GenEntry<SequenceSavedData>> SEQUENCES = new ArrayList<>();
+    private static final List<GenEntry<TierPackData>> TIERS = new ArrayList<>();
+    private static final List<GenEntry<SequencePackData>> SEQUENCES = new ArrayList<>();
 
     public TierTowerTierGen(PackOutput output) {
         super(output);
     }
 
-    static GenEntry<TierSavedData> START = null,
+    static GenEntry<TierPackData> START = null,
 
     QUARTZ = tier("quartz", b -> b
         .additiveLevelingCost(1)),
@@ -59,7 +59,7 @@ public class TierTowerTierGen extends TierGen {
 
     END = null;
 
-    static GenEntry<SequenceSavedData> MAIN_SEQUENCE = sequence("main", b -> b
+    static GenEntry<SequencePackData> MAIN_SEQUENCE = sequence("main", b -> b
         .defaultBaseLevelingCost(1)
         .tier(QUARTZ)
         .tier(IRON)
@@ -69,7 +69,7 @@ public class TierTowerTierGen extends TierGen {
         LANG.forEach(langConsumer);
     }
 
-    private static GenEntry<TierSavedData> tier(ResourceLocation id, String langName, UnaryOperator<TierBuilder> builder) {
+    private static GenEntry<TierPackData> tier(ResourceLocation id, String langName, UnaryOperator<TierBuilder> builder) {
         LANG.put(id.toLanguageKey("tier_tower.tier"), langName);
 
         var entry = new GenEntry<>(
@@ -80,24 +80,24 @@ public class TierTowerTierGen extends TierGen {
         return entry;
     }
 
-    private static GenEntry<TierSavedData> tier(String id, String langName, UnaryOperator<TierBuilder> builder) {
+    private static GenEntry<TierPackData> tier(String id, String langName, UnaryOperator<TierBuilder> builder) {
         return tier(TierTower.asResource(id), langName, builder);
     }
 
-    private static GenEntry<TierSavedData> tier(ResourceLocation id, UnaryOperator<TierBuilder> builder) {
+    private static GenEntry<TierPackData> tier(ResourceLocation id, UnaryOperator<TierBuilder> builder) {
         return tier(id, RegistrateLangProvider.toEnglishName(id.getPath()), builder);
     }
 
-    private static GenEntry<TierSavedData> tier(String id, UnaryOperator<TierBuilder> builder) {
+    private static GenEntry<TierPackData> tier(String id, UnaryOperator<TierBuilder> builder) {
         return tier(id, RegistrateLangProvider.toEnglishName(id), builder);
     }
 
     @Override
-    protected void registerTiers(Consumer<GenEntry<TierSavedData>> provider) {
+    protected void registerTiers(Consumer<GenEntry<TierPackData>> provider) {
         TIERS.forEach(provider);
     }
 
-    private static GenEntry<SequenceSavedData> sequence(ResourceLocation id, UnaryOperator<SequenceBuilder> builder) {
+    private static GenEntry<SequencePackData> sequence(ResourceLocation id, UnaryOperator<SequenceBuilder> builder) {
         var entry = new GenEntry<>(
             id,
             builder.apply(new SequenceBuilder()).build()
@@ -106,12 +106,12 @@ public class TierTowerTierGen extends TierGen {
         return entry;
     }
 
-    private static GenEntry<SequenceSavedData> sequence(String id, UnaryOperator<SequenceBuilder> builder) {
+    private static GenEntry<SequencePackData> sequence(String id, UnaryOperator<SequenceBuilder> builder) {
         return sequence(TierTower.asResource(id), builder);
     }
 
     @Override
-    protected void registerSequences(Consumer<GenEntry<SequenceSavedData>> provider) {
+    protected void registerSequences(Consumer<GenEntry<SequencePackData>> provider) {
         SEQUENCES.forEach(provider);
     }
 

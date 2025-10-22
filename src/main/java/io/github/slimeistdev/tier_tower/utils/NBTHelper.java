@@ -16,13 +16,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.network;
+package io.github.slimeistdev.tier_tower.utils;
 
-import io.github.slimeistdev.tier_tower.base.network.PacketSet;
-import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 
-public class TierTowerPackets {
-    public static final PacketSet PACKETS = PacketSet.builder("tier_tower", 1)
-        .s2c(TowerSummaryPacket.class, TowerSummaryPacket::new)
-        .build();
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+public class NBTHelper {
+    public static <T> ListTag writeCompoundList(Iterable<T> list, BiFunction<T, CompoundTag, CompoundTag> writer) {
+        return writeCompoundList(list, item -> writer.apply(item, new CompoundTag()));
+    }
+
+    public static <T> ListTag writeCompoundList(Iterable<T> list, Function<T, CompoundTag> writer) {
+        ListTag out = new ListTag();
+        for (T item : list) {
+            out.add(writer.apply(item));
+        }
+        return out;
+    }
 }

@@ -18,11 +18,14 @@
 
 package io.github.slimeistdev.tier_tower;
 
+import io.github.slimeistdev.tier_tower.content.backend.ClientTowerManager;
 import io.github.slimeistdev.tier_tower.events.ClientEvents;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import net.fabricmc.api.ClientModInitializer;
 
 public class TierTowerClient implements ClientModInitializer {
+    public static final ClientTowerManager SUBURB = new ClientTowerManager();
+
     @Override
     public void onInitializeClient() {
         TierTower.LOGGER.info("Tier Tower is loading on the client!");

@@ -18,14 +18,18 @@
 
 package io.github.slimeistdev.tier_tower.content.backend.tier;
 
+import io.github.slimeistdev.tier_tower.utils.SearchUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public class Sequence {
     private final ResourceLocation id;
     private final Tier[] tiers;
+    /** How many points are needed to get to level 1 (index 0) of a tier */
+    private final int[] tierBaseCosts;
     private final Object2IntMap<ResourceLocation> idMap;
     private final @Nullable ResourceLocation nextSequence;
 
@@ -43,10 +47,48 @@ public class Sequence {
             }
             idMap.put(tier.getId(), i);
         }
+
+        this.tierBaseCosts = new int[tiers.length];
+        for (int i = 1; i < tiers.length; i++) {
+            int prevCost = tierBaseCosts[i - 1];
+            Tier currentTier = tiers[i];
+
+            tierBaseCosts[i] = prevCost + currentTier.getTotalLevelingCost();
+        }
     }
 
     public ResourceLocation getId() {
         return id;
+    }
+
+    public LevelingState getLevelingState(final int totalPoints) {
+        int tierIdx = SearchUtils.binarySearchLE(tierBaseCosts, totalPoints);
+        assert tierIdx >= 0: "tierBaseCosts[0] should be 0, so a tier should be findable";
+
+        Tier tier = tiers[tierIdx];
+        int pointsWithinTier = totalPoints - tierBaseCosts[tierIdx];
+        int levelIdx = tier.getLevel(pointsWithinTier);
+
+        int levelPoints0 = pointsWithinTier - tier.getCostUpTo(levelIdx);
+
+        int levelPoints = Math.min(tier.getLevelingCost(levelIdx), levelPoints0);
+        int surplusPoints = levelPoints0 - levelPoints;
+
+        return new LevelingState(tierIdx, levelIdx, levelPoints, surplusPoints);
+    }
+
+    public int getCostUpTo(int tierIndex) {
+        if (tierIndex < 0 || tierIndex >= tiers.length) {
+            throw new IndexOutOfBoundsException("Tier index must be between 0 and " + (tiers.length - 1));
+        }
+        return tierBaseCosts[tierIndex];
+    }
+
+    public Tier getTier(int index) {
+        if (index < 0 || index >= tiers.length) {
+            throw new IndexOutOfBoundsException("Index must be between 0 and " + (tiers.length - 1));
+        }
+        return tiers[index];
     }
 
     public @Nullable Tier getTier(ResourceLocation id) {
@@ -62,7 +104,31 @@ public class Sequence {
         return tiers[index + 1];
     }
 
+    public int getTierCount() {
+        return tiers.length;
+    }
+
     public @Nullable ResourceLocation getNextSequence() {
         return nextSequence;
+    }
+
+    public record LevelingState(int tierIndex, int levelIndex, int levelPoints, int surplusPoints) {
+        public static final LevelingState ZERO = new LevelingState(0, 0, 0, 0);
+
+        public static LevelingState read(FriendlyByteBuf buf) {
+            return new LevelingState(
+                buf.readVarInt(),
+                buf.readVarInt(),
+                buf.readVarInt(),
+                buf.readVarInt()
+            );
+        }
+
+        public void write(FriendlyByteBuf buf) {
+            buf.writeVarInt(tierIndex);
+            buf.writeVarInt(levelIndex);
+            buf.writeVarInt(levelPoints);
+            buf.writeVarInt(surplusPoints);
+        }
     }
 }

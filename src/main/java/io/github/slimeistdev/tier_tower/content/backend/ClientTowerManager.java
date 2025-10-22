@@ -16,13 +16,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.network;
+package io.github.slimeistdev.tier_tower.content.backend;
 
-import io.github.slimeistdev.tier_tower.base.network.PacketSet;
-import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
+import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import org.jetbrains.annotations.NotNull;
 
-public class TierTowerPackets {
-    public static final PacketSet PACKETS = PacketSet.builder("tier_tower", 1)
-        .s2c(TowerSummaryPacket.class, TowerSummaryPacket::new)
-        .build();
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class ClientTowerManager {
+    private Map<UUID, TowerSummary> summaries;
+
+    public ClientTowerManager() {
+        cleanUp();
+    }
+
+    public void cleanUp() {
+        this.summaries = new HashMap<>();
+    }
+
+    public @NotNull TowerSummary getSummary(UUID player) {
+        return summaries.getOrDefault(player, TowerSummary.ZERO);
+    }
+
+    public void setSummary(UUID player, TowerSummary summary) {
+        summaries.put(player, summary);
+    }
 }

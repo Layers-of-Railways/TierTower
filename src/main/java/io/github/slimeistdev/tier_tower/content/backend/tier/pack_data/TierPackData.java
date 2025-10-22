@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.content.backend.tier;
+package io.github.slimeistdev.tier_tower.content.backend.tier.pack_data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -24,10 +24,10 @@ import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 
 import java.util.Optional;
 
-public record TierSavedData(int levelCount, Optional<Integer> baseLevelingCost, Node levelingCostFunction) {
-    public static Codec<TierSavedData> CODEC = RecordCodecBuilder.create(i -> i.group(
-        Codec.INT.fieldOf("level_count").forGetter(TierSavedData::levelCount),
-        Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("base_leveling_cost").forGetter(TierSavedData::baseLevelingCost),
-        Node.CODEC.fieldOf("leveling_cost_function").forGetter(TierSavedData::levelingCostFunction)
-    ).apply(i, TierSavedData::new));
+public record TierPackData(int levelCount, Optional<Integer> baseLevelingCost, Node levelingCostFunction) {
+    public static Codec<TierPackData> CODEC = RecordCodecBuilder.create(i -> i.group(
+        Codec.INT.fieldOf("level_count").forGetter(TierPackData::levelCount),
+        Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("base_leveling_cost").forGetter(TierPackData::baseLevelingCost),
+        Node.CODEC.fieldOf("leveling_cost_function").forGetter(TierPackData::levelingCostFunction)
+    ).apply(i, TierPackData::new));
 }

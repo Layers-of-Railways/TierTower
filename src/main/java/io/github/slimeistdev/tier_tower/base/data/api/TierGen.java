@@ -28,8 +28,8 @@ import io.github.slimeistdev.tier_tower.base.math.ParseException;
 import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 import io.github.slimeistdev.tier_tower.base.math.ast.VariableNode;
 import io.github.slimeistdev.tier_tower.base.math.parser.Parser;
-import io.github.slimeistdev.tier_tower.content.backend.tier.SequenceSavedData;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierSavedData;
+import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.SequencePackData;
+import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.TierPackData;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -50,9 +50,9 @@ public abstract class TierGen implements DataProvider {
         this.sequencePathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "tier_tower_sequence");
     }
 
-    protected abstract void registerTiers(Consumer<GenEntry<TierSavedData>> provider);
+    protected abstract void registerTiers(Consumer<GenEntry<TierPackData>> provider);
 
-    protected abstract void registerSequences(Consumer<GenEntry<SequenceSavedData>> provider);
+    protected abstract void registerSequences(Consumer<GenEntry<SequencePackData>> provider);
 
     private static <T> void registerCodec(
         String name,
@@ -82,8 +82,8 @@ public abstract class TierGen implements DataProvider {
     public @NotNull CompletableFuture<?> run(@NotNull CachedOutput output) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
-        registerCodec("tier", this::registerTiers, TierSavedData.CODEC, output, tierPathProvider, futures);
-        registerCodec("sequence", this::registerSequences, SequenceSavedData.CODEC, output, sequencePathProvider, futures);
+        registerCodec("tier", this::registerTiers, TierPackData.CODEC, output, tierPathProvider, futures);
+        registerCodec("sequence", this::registerSequences, SequencePackData.CODEC, output, sequencePathProvider, futures);
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
@@ -158,7 +158,7 @@ public abstract class TierGen implements DataProvider {
             return this;
         }
 
-        public TierSavedData build() {
+        public TierPackData build() {
             if (levelCount <= 0) {
                 throw new IllegalArgumentException("Level count must be greater than 0");
             }
@@ -196,7 +196,7 @@ public abstract class TierGen implements DataProvider {
                 throw new IllegalArgumentException("Failed to evaluate leveling cost function: " + levelingCostFunction, e);
             }
 
-            return new TierSavedData(levelCount, Optional.ofNullable(baseLevelingCost), parsedFunction);
+            return new TierPackData(levelCount, Optional.ofNullable(baseLevelingCost), parsedFunction);
         }
     }
 
@@ -207,7 +207,7 @@ public abstract class TierGen implements DataProvider {
 
         public SequenceBuilder() {}
 
-        public SequenceBuilder tier(@NotNull GenEntry<TierSavedData> tier) {
+        public SequenceBuilder tier(@NotNull GenEntry<TierPackData> tier) {
             return tier(tier.getId());
         }
 
@@ -227,7 +227,7 @@ public abstract class TierGen implements DataProvider {
             return this;
         }
 
-        public SequenceBuilder nextSequence(@NotNull GenEntry<SequenceSavedData> nextSequence) {
+        public SequenceBuilder nextSequence(@NotNull GenEntry<SequencePackData> nextSequence) {
             return nextSequence(nextSequence.getId());
         }
 
@@ -236,7 +236,7 @@ public abstract class TierGen implements DataProvider {
             return this;
         }
 
-        public SequenceSavedData build() {
+        public SequencePackData build() {
             if (tiers.isEmpty()) {
                 throw new IllegalArgumentException("Sequence must contain at least one tier");
             }
@@ -244,7 +244,7 @@ public abstract class TierGen implements DataProvider {
                 throw new IllegalArgumentException("Default base leveling cost must be defined and greater than 0");
             }
 
-            return new SequenceSavedData(
+            return new SequencePackData(
                 List.copyOf(tiers),
                 defaultBaseLevelingCost,
                 Optional.ofNullable(nextSequence)

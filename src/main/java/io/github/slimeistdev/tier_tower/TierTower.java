@@ -23,6 +23,7 @@ import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
 import io.github.slimeistdev.tier_tower.base.data.TierTowerTierGen;
 import io.github.slimeistdev.tier_tower.base.data.lang.LangGen;
+import io.github.slimeistdev.tier_tower.content.backend.GlobalTowerManager;
 import io.github.slimeistdev.tier_tower.events.CommonEvents;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.registry.ModSetup;
@@ -38,6 +39,7 @@ public class TierTower implements ModInitializer {
 	public static final String MOD_ID = "tier_tower";
 	public static final String NAME = "Tier Tower";
 	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
+	public static final GlobalTowerManager CITY = new GlobalTowerManager();
 
 	private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
 

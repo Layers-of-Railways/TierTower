@@ -24,6 +24,8 @@ import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.datapack.DatapackHelper;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
+import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.SequencePackData;
+import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.TierPackData;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -39,6 +41,15 @@ import java.util.Map.Entry;
 public class TierManager {
     public static final ResourceLocation MAIN_SEQUENCE = TierTower.asResource("main");
     private static final Map<ResourceLocation, Sequence> SEQUENCES = new HashMap<>();
+    private static int epoch = 1;
+
+    public static int getEpoch() {
+        return epoch;
+    }
+
+    public static @Nullable Sequence getSequence(ResourceLocation sequenceId) {
+        return SEQUENCES.get(sequenceId);
+    }
 
     public static class ReloadListener extends SimplePreparableReloadListener<ReloadListener.PreparedData> implements IdentifiableResourceReloadListener {
         private static final Gson GSON = new Gson();
@@ -55,11 +66,11 @@ public class TierManager {
 
         @Override
         protected @NotNull PreparedData prepare(@NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
-            Map<ResourceLocation, TierSavedData> tiers = new HashMap<>();
-            Map<ResourceLocation, SequenceSavedData> sequences = new HashMap<>();
+            Map<ResourceLocation, TierPackData> tiers = new HashMap<>();
+            Map<ResourceLocation, SequencePackData> sequences = new HashMap<>();
 
-            DatapackHelper.scanDirectory(resourceManager, "tier_tower_tier", GSON, "tier", TierSavedData.CODEC, tiers, LOGGER);
-            DatapackHelper.scanDirectory(resourceManager, "tier_tower_sequence", GSON, "tier sequence", SequenceSavedData.CODEC, sequences, LOGGER);
+            DatapackHelper.scanDirectory(resourceManager, "tier_tower_tier", GSON, "tier", TierPackData.CODEC, tiers, LOGGER);
+            DatapackHelper.scanDirectory(resourceManager, "tier_tower_sequence", GSON, "tier sequence", SequencePackData.CODEC, sequences, LOGGER);
 
             return new PreparedData(tiers, sequences);
         }
@@ -70,7 +81,7 @@ public class TierManager {
 
             Set<ResourceLocation> usedTiers = new HashSet<>();
 
-            for (Entry<ResourceLocation, SequenceSavedData> entry : prepared.sequences().entrySet()) {
+            for (Entry<ResourceLocation, SequencePackData> entry : prepared.sequences().entrySet()) {
                 Sequence sequence = processSequence(entry.getKey(), entry.getValue(), prepared.tiers(), usedTiers);
                 if (sequence != null) {
                     SEQUENCES.put(entry.getKey(), sequence);
@@ -102,9 +113,11 @@ public class TierManager {
                     )
                 );
             }
+
+            epoch++;
         }
 
-        private static @Nullable Sequence processSequence(ResourceLocation sequenceId, SequenceSavedData sequenceData, Map<ResourceLocation, TierSavedData> tiers, Set<ResourceLocation> usedTiers) {
+        private static @Nullable Sequence processSequence(ResourceLocation sequenceId, SequencePackData sequenceData, Map<ResourceLocation, TierPackData> tiers, Set<ResourceLocation> usedTiers) {
             if (sequenceData.tiers().isEmpty()) {
                 LOGGER.warn("Sequence {} has no tiers defined, skipping sequence.", sequenceId);
                 return null;
@@ -116,7 +129,7 @@ public class TierManager {
 
             for (int i = 0; i < sequenceData.tiers().size(); i++) {
                 ResourceLocation tierId = sequenceData.tiers().get(i);
-                TierSavedData tierData = tiers.get(tierId);
+                TierPackData tierData = tiers.get(tierId);
                 if (tierData == null) {
                     LOGGER.warn("Tier {} in sequence {} not found, skipping tier.", tierId, sequenceId);
                     continue;
@@ -166,6 +179,6 @@ public class TierManager {
             return new Sequence(sequenceId, tierList.toArray(new Tier[0]), sequenceData.nextSequence().orElse(null));
         }
 
-        protected record PreparedData(Map<ResourceLocation, TierSavedData> tiers, Map<ResourceLocation, SequenceSavedData> sequences) {}
+        protected record PreparedData(Map<ResourceLocation, TierPackData> tiers, Map<ResourceLocation, SequencePackData> sequences) {}
     }
 }
