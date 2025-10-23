@@ -8,6 +8,7 @@
     "common.MixinTranslatableContents"
   ],
   "client": [
+    "client.MixinPlayerRenderer",
     "client.MixinPlayerTabOverlay",
     "client.MixinStringRenderOutput"
   ],

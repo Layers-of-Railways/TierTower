@@ -39,7 +39,7 @@ import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 @SuppressWarnings("SameParameterValue")
-public class ChatBadgeClient {
+public class ChatBadgeRenderer {
     private static final Style BADGE_STYLE = Style.EMPTY.withFont(TierTower.BADGE_FONT);
     private static final Map<ResourceLocation, GlyphRenderTypes> RENDER_CACHE = new HashMap<>();
 
@@ -54,7 +54,7 @@ public class ChatBadgeClient {
                                    Font.DisplayMode mode, Sequence sequence, TowerSummary summary, Font font) {
         y -= 1;
         Tier tier = sequence.getTier(summary.levelingState().tierIndex());
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(ChatBadgeClient.getBadgeRenderTypes(tier).select(mode));
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(ChatBadgeRenderer.getBadgeRenderTypes(tier).select(mode));
         quad(
             x, y,
             x + 18f, y + 9f,
@@ -80,12 +80,12 @@ public class ChatBadgeClient {
         font.drawInBatch(levelComponent, x + (18 - width)/2f, y - 1, color, false, pose2, bufferSource, mode, 0, packedLight);
     }
 
-    private static void quad(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1,
+    static void quad(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1,
                              int packedLight, Matrix4f pose, VertexConsumer vertexConsumer) {
         quad(x0, y0, x1, y1, u0, v0, u1, v1, packedLight, pose, vertexConsumer, 0f);
     }
 
-    private static void quad(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1,
+    static void quad(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1,
                              int packedLight, Matrix4f pose, VertexConsumer vertexConsumer, float z) {
         vertexConsumer.vertex(pose, x0, y0, z).color(-1).uv(u0, v0).uv2(packedLight).endVertex();
         vertexConsumer.vertex(pose, x0, y1, z).color(-1).uv(u0, v1).uv2(packedLight).endVertex();

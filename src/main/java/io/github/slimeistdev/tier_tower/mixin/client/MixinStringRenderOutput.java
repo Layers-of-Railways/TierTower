@@ -21,7 +21,7 @@ package io.github.slimeistdev.tier_tower.mixin.client;
 import io.github.slimeistdev.tier_tower.TierTowerClient;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
-import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeClient;
+import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeRenderer;
 import io.github.slimeistdev.tier_tower.mixin_ducks.common.Style_Duck;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -74,7 +74,7 @@ public class MixinStringRenderOutput {
         if (sequence == null) return;
 
         if (!dropShadow) {
-            ChatBadgeClient.renderBadge(x + 1, y, packedLightCoords, pose, bufferSource, mode, sequence, summary, this$0);
+            ChatBadgeRenderer.renderBadge(x + 1, y, packedLightCoords, pose, bufferSource, mode, sequence, summary, this$0);
         }
 
         x += 20;
