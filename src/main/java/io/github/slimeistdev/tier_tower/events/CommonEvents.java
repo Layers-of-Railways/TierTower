@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower.events;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.PlayerTower;
+import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
 import io.github.slimeistdev.tier_tower.registry.TierTowerCommands;
@@ -47,6 +48,8 @@ public class CommonEvents {
 
         MinecraftServer server = player.getServer();
         if (server == null) return;
+
+        TierTowerPackets.PACKETS.sendTo(player, TierManager.makeSyncPacket());
 
         for (ServerPlayer otherPlayer : server.getPlayerList().getPlayers()) {
             PlayerTower tower = TierTower.CITY.getTower(otherPlayer);

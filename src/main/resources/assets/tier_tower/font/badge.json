@@ -1,0 +1,23 @@
+{
+  "providers": [
+    {
+      "type": "space",
+      "advances": {
+        " ": 4,
+        "!": 20
+      }
+    },
+    {
+      "type": "bitmap",
+      "file": "tier_tower:font/badge.png",
+      "ascent": 5,
+      "height": 5,
+      "chars": [
+        "12345",
+        "67890",
+        ",\u0000\u0000\u0000\u0000",
+        "KMGT\u0000"
+      ]
+    }
+  ]
+}

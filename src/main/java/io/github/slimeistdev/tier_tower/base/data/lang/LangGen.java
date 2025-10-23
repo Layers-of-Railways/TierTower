@@ -33,6 +33,7 @@ public class LangGen {
 
         provideDefaultLang("interface", langConsumer);
         TierTowerTierGen.provideLang(langConsumer);
+        provider.add("tier_tower.special.badge", "!"); // just to have a fallback
     }
 
     private static void provideDefaultLang(String fileName, BiConsumer<String, String> consumer) {

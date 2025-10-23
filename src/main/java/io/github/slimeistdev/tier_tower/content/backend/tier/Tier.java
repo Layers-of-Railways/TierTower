@@ -19,6 +19,7 @@
 package io.github.slimeistdev.tier_tower.content.backend.tier;
 
 import io.github.slimeistdev.tier_tower.utils.SearchUtils;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 public final class Tier {
@@ -76,5 +77,23 @@ public final class Tier {
 
     public int getTotalLevelingCost() {
         return totalCost;
+    }
+
+    public void write(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(id);
+        buf.writeVarInt(levelCount);
+        for (int cost : levelingCosts) {
+            buf.writeInt(cost);
+        }
+    }
+
+    public static Tier read(FriendlyByteBuf buf) {
+        ResourceLocation id = buf.readResourceLocation();
+        int levelCount = buf.readVarInt();
+        int[] levelingCosts = new int[levelCount];
+        for (int i = 0; i < levelCount; i++) {
+            levelingCosts[i] = buf.readInt();
+        }
+        return new Tier(id, levelingCosts);
     }
 }

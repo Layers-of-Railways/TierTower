@@ -81,7 +81,7 @@ public class TierTowerTierGen extends TierGen {
     }
 
     private static GenEntry<TierPackData> tier(String id, String langName, UnaryOperator<TierBuilder> builder) {
-        return tier(TierTower.asResource(id), langName, builder);
+        return tier(new ResourceLocation(id), langName, builder);
     }
 
     private static GenEntry<TierPackData> tier(ResourceLocation id, UnaryOperator<TierBuilder> builder) {

@@ -24,8 +24,11 @@ import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.datapack.DatapackHelper;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
+import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.SequencePackData;
 import io.github.slimeistdev.tier_tower.content.backend.tier.pack_data.TierPackData;
+import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
+import io.github.slimeistdev.tier_tower.network.packets.s2c.SequenceSyncPacket;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -51,6 +54,10 @@ public class TierManager {
         return SEQUENCES.get(sequenceId);
     }
 
+    public static SequenceSyncPacket makeSyncPacket() {
+        return new SequenceSyncPacket(List.copyOf(SEQUENCES.values()));
+    }
+
     public static class ReloadListener extends SimplePreparableReloadListener<ReloadListener.PreparedData> implements IdentifiableResourceReloadListener {
         private static final Gson GSON = new Gson();
         public static final ResourceLocation ID = TierTower.asResource("tiers");
@@ -69,8 +76,8 @@ public class TierManager {
             Map<ResourceLocation, TierPackData> tiers = new HashMap<>();
             Map<ResourceLocation, SequencePackData> sequences = new HashMap<>();
 
-            DatapackHelper.scanDirectory(resourceManager, "tier_tower_tier", GSON, "tier", TierPackData.CODEC, tiers, LOGGER);
-            DatapackHelper.scanDirectory(resourceManager, "tier_tower_sequence", GSON, "tier sequence", SequencePackData.CODEC, sequences, LOGGER);
+            DatapackHelper.scanDirectory(resourceManager, "tier_tower/tier", GSON, "tier", TierPackData.CODEC, tiers, LOGGER);
+            DatapackHelper.scanDirectory(resourceManager, "tier_tower/sequence", GSON, "tier sequence", SequencePackData.CODEC, sequences, LOGGER);
 
             return new PreparedData(tiers, sequences);
         }
@@ -115,6 +122,10 @@ public class TierManager {
             }
 
             epoch++;
+
+            if (epoch > 2) {
+                TierTowerPackets.PACKETS.sendTo(PlayerSelection.all(), makeSyncPacket());
+            }
         }
 
         private static @Nullable Sequence processSequence(ResourceLocation sequenceId, SequencePackData sequenceData, Map<ResourceLocation, TierPackData> tiers, Set<ResourceLocation> usedTiers) {

@@ -19,10 +19,12 @@
 package io.github.slimeistdev.tier_tower.network;
 
 import io.github.slimeistdev.tier_tower.base.network.PacketSet;
+import io.github.slimeistdev.tier_tower.network.packets.s2c.SequenceSyncPacket;
 import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
 
 public class TierTowerPackets {
     public static final PacketSet PACKETS = PacketSet.builder("tier_tower", 1)
         .s2c(TowerSummaryPacket.class, TowerSummaryPacket::new)
+        .s2c(SequenceSyncPacket.class, SequenceSyncPacket::new)
         .build();
 }

@@ -112,6 +112,34 @@ public class Sequence {
         return nextSequence;
     }
 
+    public void write(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(id);
+        buf.writeVarInt(tiers.length);
+        for (Tier tier : tiers) {
+            tier.write(buf);
+        }
+        buf.writeBoolean(nextSequence != null);
+        if (nextSequence != null) {
+            buf.writeResourceLocation(nextSequence);
+        }
+    }
+
+    public static Sequence read(FriendlyByteBuf buf) {
+        ResourceLocation id = buf.readResourceLocation();
+        int tierCount = buf.readVarInt();
+        Tier[] tiers = new Tier[tierCount];
+        for (int i = 0; i < tierCount; i++) {
+            tiers[i] = Tier.read(buf);
+        }
+        ResourceLocation nextSequence;
+        if (buf.readBoolean()) {
+            nextSequence = buf.readResourceLocation();
+        } else {
+            nextSequence = null;
+        }
+        return new Sequence(id, tiers, nextSequence);
+    }
+
     public record LevelingState(int tierIndex, int levelIndex, int levelPoints, int surplusPoints) {
         public static final LevelingState ZERO = new LevelingState(0, 0, 0, 0);
 

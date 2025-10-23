@@ -18,22 +18,27 @@
 
 package io.github.slimeistdev.tier_tower.content.backend;
 
+import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class ClientTowerManager {
-    private Map<UUID, TowerSummary> summaries;
+    private final Map<UUID, TowerSummary> summaries = new HashMap<>();
+    private final Map<ResourceLocation, Sequence> sequences = new HashMap<>();
 
     public ClientTowerManager() {
         cleanUp();
     }
 
     public void cleanUp() {
-        this.summaries = new HashMap<>();
+        this.summaries.clear();
+        clearSequences();
     }
 
     public @NotNull TowerSummary getSummary(UUID player) {
@@ -42,5 +47,17 @@ public class ClientTowerManager {
 
     public void setSummary(UUID player, TowerSummary summary) {
         summaries.put(player, summary);
+    }
+
+    public void clearSequences() {
+        sequences.clear();
+    }
+
+    public @Nullable Sequence getSequence(ResourceLocation sequenceId) {
+        return sequences.get(sequenceId);
+    }
+
+    public void setSequence(ResourceLocation sequenceId, @NotNull Sequence sequence) {
+        sequences.put(sequenceId, sequence);
     }
 }

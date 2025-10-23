@@ -1,5 +1,6 @@
 {
-  "tier_tower.tier.tier_tower.copper": "Copper",
-  "tier_tower.tier.tier_tower.iron": "Iron",
-  "tier_tower.tier.tier_tower.quartz": "Quartz"
+  "tier_tower.special.badge": "",
+  "tier_tower.tier.minecraft.copper": "Copper",
+  "tier_tower.tier.minecraft.iron": "Iron",
+  "tier_tower.tier.minecraft.quartz": "Quartz"
 }

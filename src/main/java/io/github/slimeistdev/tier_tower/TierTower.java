@@ -41,6 +41,8 @@ public class TierTower implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 	public static final GlobalTowerManager CITY = new GlobalTowerManager();
 
+	public static final ResourceLocation BADGE_FONT = asResource("badge");
+
 	private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
 
 	@Override

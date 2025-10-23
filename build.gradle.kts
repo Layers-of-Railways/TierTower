@@ -42,10 +42,10 @@ repositories {
     mavenCentral()
     exclusiveMaven("https://maven.parchmentmc.org", "org.parchmentmc.data") // Parchment mappings
     maven("https://maven.terraformersmc.com/releases/") // Mod Menu, EMI
-    maven("https://jitpack.io/") // Mixin Extras, Fabric ASM
     exclusiveMaven("https://api.modrinth.com/maven", "maven.modrinth") // LazyDFU
     maven("https://mvn.devos.one/snapshots/") // Porting Lib, Forge Tags, Milk Lib, Registrate Fabric
     maven("https://mvn.devos.one/releases") // Porting Lib Releases
+    maven("https://jitpack.io/") // Mixin Extras, Fabric ASM
 }
 
 val loom = project.extensions.getByType<LoomGradleExtensionAPI>()

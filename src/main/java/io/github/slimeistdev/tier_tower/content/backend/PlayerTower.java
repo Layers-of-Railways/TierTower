@@ -22,10 +22,13 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
+import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
+import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -125,8 +128,9 @@ public class PlayerTower {
         }
         currentSequence = id;
         sequences.put(currentSequence, state);
-        markDirty();
         $levelingState = null; // reset the cached leveling state
+        markDirty();
+        syncData();
         return Pair.of(state, sequence);
     }
 
@@ -206,10 +210,15 @@ public class PlayerTower {
         );
 
         markDirty();
+        syncData();
     }
 
     public void markDirty() {
         TierTower.CITY.markCityDirty();
+    }
+
+    public void syncData() {
+        TierTowerPackets.PACKETS.sendTo(PlayerSelection.all(), new TowerSummaryPacket(this));
     }
 
     public @NotNull TowerSummary summarize() {

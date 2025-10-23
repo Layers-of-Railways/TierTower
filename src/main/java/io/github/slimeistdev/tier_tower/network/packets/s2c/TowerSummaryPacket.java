@@ -22,6 +22,8 @@ import io.github.slimeistdev.tier_tower.TierTowerClient;
 import io.github.slimeistdev.tier_tower.base.network.S2CPacket;
 import io.github.slimeistdev.tier_tower.content.backend.PlayerTower;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -43,6 +45,7 @@ public record TowerSummaryPacket(UUID player, TowerSummary summary) implements S
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void handle(Minecraft mc) {
         TierTowerClient.SUBURB.setSummary(player, summary);
     }
