@@ -1,0 +1,7 @@
+{
+  "commands.tier_tower.tier.query.tier": "%s's tier is %s.",
+  "commands.tier_tower.tier.query.level": "%s's level is %s.",
+  "commands.tier_tower.tier.query.points": "%s has %s points in the current level.",
+  "commands.tier_tower.tier.query.total_points": "%s has %s total points.",
+  "argument.tier_tower.tier.not_found": "Can't find tier '%s'"
+}

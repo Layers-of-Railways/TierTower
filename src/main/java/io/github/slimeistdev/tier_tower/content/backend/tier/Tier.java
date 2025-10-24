@@ -47,6 +47,10 @@ public final class Tier {
         return id;
     }
 
+    public String getTranslationKey() {
+        return id.toLanguageKey("tier_tower.tier");
+    }
+
     public int getLevelCount() {
         return levelCount;
     }

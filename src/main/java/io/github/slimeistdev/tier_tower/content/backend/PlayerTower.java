@@ -139,7 +139,7 @@ public class PlayerTower {
         return sequences.get(currentSequence);
     }
 
-    protected @NotNull Sequence getSequence() {
+    public @NotNull Sequence getSequence() {
         ensureCurrent();
         // this is safe because ensureCurrent() guarantees that the sequence exists
         return Objects.requireNonNull(sequences.get(currentSequence).getSequence());
@@ -224,6 +224,10 @@ public class PlayerTower {
     public @NotNull TowerSummary summarize() {
         Sequence.LevelingState levelingState = ensureCurrent();
         return new TowerSummary(currentSequence, levelingState);
+    }
+
+    public int totalPoints() {
+        return getSequenceState().totalPoints;
     }
 
     protected static class SequenceState {

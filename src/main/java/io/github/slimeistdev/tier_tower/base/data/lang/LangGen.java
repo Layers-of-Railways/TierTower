@@ -32,6 +32,7 @@ public class LangGen {
         BiConsumer<String, String> langConsumer = provider::add;
 
         provideDefaultLang("interface", langConsumer);
+        provideDefaultLang("commands", langConsumer);
         TierTowerTierGen.provideLang(langConsumer);
         provider.add("tier_tower.special.badge", "!"); // just to have a fallback
     }

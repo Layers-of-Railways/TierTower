@@ -23,6 +23,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.slimeistdev.tier_tower.content.commands.server.ReloadCommandsCommand;
+import io.github.slimeistdev.tier_tower.content.commands.server.TierCommand;
 import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -34,7 +35,8 @@ import static net.minecraft.commands.Commands.literal;
 
 public class TierTowerCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection selection) {
-        var towerCommand = literal("tier_tower");
+        var towerCommand = literal("tier_tower")
+            .then(TierCommand.register());
 
         if (Utils.isDevEnv()) {
             towerCommand = towerCommand
