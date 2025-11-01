@@ -18,20 +18,22 @@
 
 package io.github.slimeistdev.tier_tower.content.backend.tier;
 
+import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence.LevelingState;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 
 // Intended for the client's view of a player's progression
-public record TowerSummary(ResourceLocation sequenceId, LevelingState levelingState) {
-    public static final TowerSummary ZERO = new TowerSummary(TierManager.MAIN_SEQUENCE, LevelingState.ZERO);
+public record TowerSummary(ResourceKey<Sequence> sequenceId, LevelingState levelingState) {
+    public static final TowerSummary ZERO = new TowerSummary(TierTower.MAIN_SEQUENCE, LevelingState.ZERO);
 
     public static TowerSummary read(FriendlyByteBuf buf) {
-        return new TowerSummary(buf.readResourceLocation(), LevelingState.read(buf));
+        return new TowerSummary(buf.readResourceKey(TierTowerRegistries.SEQUENCE), LevelingState.read(buf));
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(sequenceId);
+        buf.writeResourceKey(sequenceId);
         levelingState.write(buf);
     }
 }

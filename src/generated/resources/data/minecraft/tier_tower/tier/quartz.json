@@ -1,4 +1,4 @@
 {
-  "level_count": 100,
+  "level_count": 10,
   "leveling_cost_function": "(prev + 1.0)"
 }

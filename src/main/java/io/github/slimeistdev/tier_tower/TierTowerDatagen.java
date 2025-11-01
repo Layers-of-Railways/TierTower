@@ -19,8 +19,12 @@
 package io.github.slimeistdev.tier_tower;
 
 import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import io.github.slimeistdev.tier_tower.registry.TierTowerSequences;
+import io.github.slimeistdev.tier_tower.registry.TierTowerTiers;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.minecraft.core.RegistrySetBuilder;
 
 public class TierTowerDatagen implements DataGeneratorEntrypoint {
     @Override
@@ -29,5 +33,11 @@ public class TierTowerDatagen implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = generator.createPack();
         TierTower.gatherData(pack);
         TierTower.registrate().setupDatagen(pack, helper);
+    }
+
+    @Override
+    public void buildRegistry(RegistrySetBuilder registryBuilder) {
+        registryBuilder.add(TierTowerRegistries.TIER, TierTowerTiers::bootstrap);
+        registryBuilder.add(TierTowerRegistries.SEQUENCE, TierTowerSequences::bootstrap);
     }
 }

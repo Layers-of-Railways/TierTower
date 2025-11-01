@@ -46,5 +46,5 @@ public interface Node {
             }
         },
         Node::repr
-    );
+    ); // TODO: allow checking for allowed variables
 }

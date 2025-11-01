@@ -20,6 +20,9 @@ package io.github.slimeistdev.tier_tower.utils;
 
 import io.github.slimeistdev.tier_tower.TierTower;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
@@ -36,5 +39,14 @@ public class Utils {
             TierTower.LOGGER.warn("Caught a security exception while trying to access environment variable `{}`.", name);
             return false;
         }
+    }
+
+    public static <T> @Nullable Registry<T> castRegistry(Registry<?> registry, ResourceKey<? extends Registry<T>> key) {
+        if (registry.key().equals(key)) {
+            @SuppressWarnings("unchecked")
+            Registry<T> casted = (Registry<T>) registry;
+            return casted;
+        }
+        return null;
     }
 }

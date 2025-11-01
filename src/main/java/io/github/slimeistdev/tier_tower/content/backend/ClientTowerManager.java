@@ -20,7 +20,10 @@ package io.github.slimeistdev.tier_tower.content.backend;
 
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
-import net.minecraft.resources.ResourceLocation;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +33,7 @@ import java.util.UUID;
 
 public class ClientTowerManager {
     private final Map<UUID, TowerSummary> summaries = new HashMap<>();
-    private final Map<ResourceLocation, Sequence> sequences = new HashMap<>();
+    private final Map<ResourceKey<Sequence>, Sequence> cachedSequences = new HashMap<>();
 
     public ClientTowerManager() {
         cleanUp();
@@ -38,7 +41,7 @@ public class ClientTowerManager {
 
     public void cleanUp() {
         this.summaries.clear();
-        clearSequences();
+        this.cachedSequences.clear();
     }
 
     public @NotNull TowerSummary getSummary(UUID player) {
@@ -49,15 +52,17 @@ public class ClientTowerManager {
         summaries.put(player, summary);
     }
 
-    public void clearSequences() {
-        sequences.clear();
-    }
+    public @Nullable Sequence getSequence(ResourceKey<Sequence> key, RegistryAccess registryAccess) {
+        if (cachedSequences.containsKey(key)) {
+            return cachedSequences.get(key);
+        }
 
-    public @Nullable Sequence getSequence(ResourceLocation sequenceId) {
-        return sequences.get(sequenceId);
-    }
+        Registry<Sequence> registry = registryAccess.registryOrThrow(TierTowerRegistries.SEQUENCE);
+        Sequence sequence = registry.get(key);
+        if (sequence != null) {
+            cachedSequences.put(key, sequence);
+        }
 
-    public void setSequence(ResourceLocation sequenceId, @NotNull Sequence sequence) {
-        sequences.put(sequenceId, sequence);
+        return sequence;
     }
 }

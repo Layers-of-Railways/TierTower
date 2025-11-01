@@ -18,11 +18,17 @@
 
 package io.github.slimeistdev.tier_tower.content.backend.tier;
 
+import com.mojang.datafixers.util.Pair;
+import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
+import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
+import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 import io.github.slimeistdev.tier_tower.utils.SearchUtils;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 
 public final class Tier {
+    private final Holder<TierPackData> definition;
     private final ResourceLocation id;
     private final int levelCount;
     private final int[] levelingCosts;
@@ -30,8 +36,12 @@ public final class Tier {
     private final int[] levelBaseCosts;
     private final int totalCost;
 
-    public Tier(ResourceLocation id, int[] levelingCosts) {
-        this.id = id;
+    public Tier(Holder<TierPackData> definition, int[] levelingCosts) {
+        assert definition.value().levelCount() == levelingCosts.length :
+            "Level count mismatch between definition and provided leveling costs";
+
+        this.definition = definition;
+        this.id = definition.unwrapKey().orElseThrow().location();
         this.levelCount = levelingCosts.length;
         this.levelingCosts = levelingCosts;
 
@@ -41,6 +51,53 @@ public final class Tier {
             levelBaseCosts[i] = levelBaseCosts[i - 1] + levelingCosts[i - 1];
         }
         this.totalCost = levelBaseCosts[levelCount - 1] + levelingCosts[levelCount - 1];
+    }
+
+    /**
+     * Create a Tier from its definition and a base leveling cost.
+     * @param definition the tier's definition
+     * @param baseLevelingCost the previous tier's next leveling cost, or the sequence's base for the first tier
+     * @return (the constructed tier, the base leveling cost for the next tier)
+     */
+    public static Pair<Tier, Integer> constructFrom(final Holder<TierPackData> definition, final int baseLevelingCost) {
+        final TierPackData data = definition.value();
+        final int levelCount = data.levelCount();
+        final Node costFunction = data.levelingCostFunction();
+
+        final int levelingCost = data.baseLevelingCost().orElse(baseLevelingCost);
+        int[] costs = new int[levelCount];
+        costs[0] = levelingCost;
+
+        double cost = levelingCost;
+        EvaluationContext ctx = new EvaluationContext()
+            .setFinal("levels", costs.length)
+            .setFinal("base", levelingCost)
+            .set("prev", cost)
+            .set("level", 0);
+
+        // each iteration computes the cost for the NEXT level
+        for (int level = 0; level < levelCount; level++) {
+            ctx.set("level", level + 1);
+
+            try {
+                cost = costFunction.evaluate(ctx);
+            } catch (EvaluationException e) {
+                TierTower.LOGGER.error("Failed to evaluate leveling cost for level {} of tier {}. It will inherit the cost of level {}", level + 1, definition.unwrapKey().orElseThrow().location(), level, e);
+            }
+            ctx.set("prev", cost);
+
+            // the loop computes one more cost than is needed for this tier, to provide the next tier with a base cost
+            if (level + 1 < costs.length) {
+                costs[level + 1] = (int) Math.max(1, Math.round(cost));
+            }
+        }
+
+        int nextBase = (int) Math.max(1, Math.round(cost));
+        return Pair.of(new Tier(definition, costs), nextBase);
+    }
+
+    public Holder<TierPackData> getDefinition() {
+        return definition;
     }
 
     public ResourceLocation getId() {
@@ -83,7 +140,7 @@ public final class Tier {
         return totalCost;
     }
 
-    public void write(FriendlyByteBuf buf) {
+    /*public void write(FriendlyByteBuf buf) {
         buf.writeResourceLocation(id);
         buf.writeVarInt(levelCount);
         for (int cost : levelingCosts) {
@@ -99,5 +156,5 @@ public final class Tier {
             levelingCosts[i] = buf.readInt();
         }
         return new Tier(id, levelingCosts);
-    }
+    }*/
 }

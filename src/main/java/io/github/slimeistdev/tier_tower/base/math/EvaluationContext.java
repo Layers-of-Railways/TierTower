@@ -22,19 +22,38 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class EvaluationContext {
     private final Object2DoubleMap<String> variables;
+    private final Set<String> finalVariables;
 
     public EvaluationContext() {
         this.variables = new Object2DoubleOpenHashMap<>();
+        this.finalVariables = new HashSet<>();
     }
 
-    public EvaluationContext(Object2DoubleMap<String> variables) {
+    public EvaluationContext(Object2DoubleMap<String> variables, Set<String> finalVariables) {
         this.variables = new Object2DoubleOpenHashMap<>(variables);
+        this.finalVariables = new HashSet<>(finalVariables);
+    }
+
+    public EvaluationContext(EvaluationContext original) {
+        this(original.variables, original.finalVariables);
     }
 
     public EvaluationContext set(@NotNull String name, double value) {
+        if (finalVariables.contains(name)) {
+            throw new IllegalStateException("Variable '" + name + "' is final and cannot be modified.");
+        }
         variables.put(name, value);
+        return this;
+    }
+
+    public EvaluationContext setFinal(@NotNull String name, double value) {
+        set(name, value);
+        finalVariables.add(name);
         return this;
     }
 

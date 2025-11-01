@@ -24,13 +24,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
+import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,25 +44,25 @@ import java.util.UUID;
 public class PlayerTower {
     public static final Codec<PlayerTower> CODEC = RecordCodecBuilder.create(i -> i.group(
         UUIDUtil.CODEC.fieldOf("id").forGetter(p -> p.playerId),
-        Codec.unboundedMap(ResourceLocation.CODEC, SequenceState.CODEC).fieldOf("sequences").forGetter(p -> p.sequences),
-        ResourceLocation.CODEC.fieldOf("current_sequence").forGetter(p -> p.currentSequence)
+        Codec.unboundedMap(TierTowerRegistries.SEQUENCE_CODEC, SequenceState.CODEC).fieldOf("sequences").forGetter(p -> p.sequences),
+        TierTowerRegistries.SEQUENCE_CODEC.fieldOf("current_sequence").forGetter(p -> p.currentSequence)
     ).apply(i, PlayerTower::new));
 
-    private int epoch;
-
     private final UUID playerId;
-    private final Map<ResourceLocation, SequenceState> sequences = new HashMap<>();
-    private @NotNull ResourceLocation currentSequence = TierManager.MAIN_SEQUENCE;
+    private final Map<ResourceKey<Sequence>, SequenceState> sequences = new HashMap<>();
+    private @NotNull ResourceKey<Sequence> currentSequence = TierTower.MAIN_SEQUENCE;
 
     // cache variables
     private @Nullable Sequence.LevelingState $levelingState = null;
+
+    @Nullable RegistryAccess registryAccess;
 
     public PlayerTower(UUID playerId) {
         this.playerId = playerId;
     }
 
     // codec constructor
-    private PlayerTower(UUID playerId, Map<ResourceLocation, SequenceState> sequences, @NotNull ResourceLocation currentSequence) {
+    private PlayerTower(UUID playerId, Map<ResourceKey<Sequence>, SequenceState> sequences, @NotNull ResourceKey<Sequence> currentSequence) {
         this(playerId);
         this.sequences.putAll(sequences);
         this.currentSequence = currentSequence;
@@ -74,9 +75,10 @@ public class PlayerTower {
     private @NotNull Sequence.LevelingState ensureCurrent() {
         SequenceState state = sequences.get(currentSequence);
 
-        if (state != null && state.getSequence() != null && epoch == TierManager.getEpoch()) {
+        Sequence sequence;
+        if (state != null && (sequence = state.getSequence(registryAccess)) != null) {
             if ($levelingState == null)
-                $levelingState = state.getSequence().getLevelingState(state.totalPoints);
+                $levelingState = sequence.getLevelingState(state.totalPoints);
             return $levelingState;
         }
 
@@ -87,14 +89,14 @@ public class PlayerTower {
             needsAdd = true;
         }
 
-        while (state.getSequence() == null) {
-            if (currentSequence.equals(TierManager.MAIN_SEQUENCE)) {
+        while ((sequence = state.getSequence(registryAccess)) == null) {
+            if (currentSequence.equals(TierTower.MAIN_SEQUENCE)) {
                 throw new IllegalStateException("The main sequence does not exist. This is a critical error");
             }
 
             sequences.remove(currentSequence);
 
-            currentSequence = TierManager.MAIN_SEQUENCE;
+            currentSequence = TierTower.MAIN_SEQUENCE;
             state = sequences.computeIfAbsent(currentSequence, k -> new SequenceState(k, 0));
             needsAdd = true;
         }
@@ -104,21 +106,20 @@ public class PlayerTower {
             markDirty();
         }
 
-        $levelingState = state.getSequence().getLevelingState(state.totalPoints);
-        epoch = TierManager.getEpoch();
+        $levelingState = sequence.getLevelingState(state.totalPoints);
 
         return $levelingState;
     }
 
     @SuppressWarnings("SameParameterValue")
-    private @Nullable Pair<@NotNull SequenceState, @NotNull Sequence> trySwitchToSequence(@NotNull ResourceLocation id, boolean discardCurrent) {
+    private @Nullable Pair<@NotNull SequenceState, @NotNull Sequence> trySwitchToSequence(@NotNull ResourceKey<Sequence> id, boolean discardCurrent) {
         SequenceState state = sequences.get(id);
 
         if (state == null) {
             state = new SequenceState(id, 0);
         }
 
-        Sequence sequence = state.getSequence();
+        Sequence sequence = state.getSequence(registryAccess);
         if (sequence == null) {
             return null;
         }
@@ -142,7 +143,7 @@ public class PlayerTower {
     public @NotNull Sequence getSequence() {
         ensureCurrent();
         // this is safe because ensureCurrent() guarantees that the sequence exists
-        return Objects.requireNonNull(sequences.get(currentSequence).getSequence());
+        return Objects.requireNonNull(sequences.get(currentSequence).getSequence(registryAccess));
     }
 
     public void addPoints(int points) {
@@ -173,7 +174,7 @@ public class PlayerTower {
                     tierIndex++;
 
                     if (tierIndex >= sequence.getTierCount()) { // move up to the next sequence
-                        ResourceLocation nextSequence = sequence.getNextSequence();
+                        ResourceKey<Sequence> nextSequence = sequence.getNextSequenceKey();
                         Pair<SequenceState, Sequence> newSeq;
                         if (nextSequence == null || (newSeq = trySwitchToSequence(nextSequence, true)) == null) {
                             // restore maxed-out state
@@ -232,18 +233,16 @@ public class PlayerTower {
 
     protected static class SequenceState {
         public static final Codec<SequenceState> CODEC = RecordCodecBuilder.create(i -> i.group(
-            ResourceLocation.CODEC.fieldOf("sequence_id").forGetter(s -> s.sequenceId),
+            TierTowerRegistries.SEQUENCE_CODEC.fieldOf("sequence_id").forGetter(s -> s.sequenceId),
             Codec.INT.fieldOf("total_points").forGetter(s -> s.totalPoints)
         ).apply(i, SequenceState::new));
 
-        private final ResourceLocation sequenceId;
+        private final ResourceKey<Sequence> sequenceId;
         private @Nullable Sequence cachedSequence;
-
-        private int epoch;
 
         private int totalPoints;
 
-        private SequenceState(ResourceLocation sequenceId, int totalPoints) {
+        private SequenceState(ResourceKey<Sequence> sequenceId, int totalPoints) {
             this.sequenceId = sequenceId;
             this.totalPoints = totalPoints;
         }
@@ -252,10 +251,9 @@ public class PlayerTower {
          * @return the sequence associated with this state, or null if it does not exist. If the sequence does not exist,
          * this SequenceState must be discarded.
          */
-        public @Nullable Sequence getSequence() {
-            if (cachedSequence == null || epoch != TierManager.getEpoch()) {
-                cachedSequence = TierManager.getSequence(sequenceId);
-                epoch = TierManager.getEpoch();
+        public @Nullable Sequence getSequence(@Nullable RegistryAccess registryAccess) {
+            if (cachedSequence == null && registryAccess != null) {
+                cachedSequence = registryAccess.registryOrThrow(TierTowerRegistries.SEQUENCE).get(sequenceId);
             }
 
             return cachedSequence;

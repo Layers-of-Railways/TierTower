@@ -1,8 +1,10 @@
 {
+  "argument.tier_tower.tier.not_found": ",%s, ɹǝıʇ puıɟ ʇ,uɐƆ",
   "commands.tier_tower.tier.query.level": "˙%s sı ןǝʌǝן s,%s",
   "commands.tier_tower.tier.query.points": "˙ןǝʌǝן ʇuǝɹɹnɔ ǝɥʇ uı sʇuıod %s sɐɥ %s",
   "commands.tier_tower.tier.query.tier": "˙%s sı ɹǝıʇ s,%s",
   "commands.tier_tower.tier.query.total_points": "˙sʇuıod ןɐʇoʇ %s sɐɥ %s",
+  "tier_tower.sequence.tier_tower.main": "uıɐW",
   "tier_tower.special.badge": "¡",
   "tier_tower.tier.minecraft.copper": "ɹǝddoƆ",
   "tier_tower.tier.minecraft.iron": "uoɹI",

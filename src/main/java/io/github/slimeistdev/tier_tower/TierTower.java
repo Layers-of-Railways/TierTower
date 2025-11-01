@@ -21,15 +21,18 @@ package io.github.slimeistdev.tier_tower;
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
-import io.github.slimeistdev.tier_tower.base.data.TierTowerTierGen;
+import io.github.slimeistdev.tier_tower.base.data.TierTowerGeneratedEntriesProvider;
 import io.github.slimeistdev.tier_tower.base.data.lang.LangGen;
 import io.github.slimeistdev.tier_tower.content.backend.GlobalTowerManager;
+import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.events.CommonEvents;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
-import io.github.slimeistdev.tier_tower.registry.ModSetup;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.data.DataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,7 @@ public class TierTower implements ModInitializer {
 	public static final GlobalTowerManager CITY = new GlobalTowerManager();
 
 	public static final ResourceLocation BADGE_FONT = asResource("badge");
+	public static final ResourceKey<Sequence> MAIN_SEQUENCE = asKey(TierTowerRegistries.SEQUENCE, "main");
 
 	private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
 
@@ -49,7 +53,7 @@ public class TierTower implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.info("{} v{} is initializing! Commit hash: {}", NAME, TierTowerBuildInfo.VERSION, TierTowerBuildInfo.GIT_COMMIT);
 
-		ModSetup.register();
+		ModSetup.init();
 		REGISTRATE.register();
 
 		CommonEvents.register();
@@ -60,9 +64,9 @@ public class TierTower implements ModInitializer {
 		}
 	}
 
-	public static void gatherData(DataGenerator.PackGenerator gen) {
+	public static void gatherData(FabricDataGenerator.Pack gen) {
 		REGISTRATE.addDataGenerator(ProviderType.LANG, LangGen::generate);
-		gen.addProvider(TierTowerTierGen::new);
+		gen.addProvider(TierTowerGeneratedEntriesProvider::new);
 	}
 
 	public static AbstractRegistrate<? extends AbstractRegistrate<?>> registrate() {
@@ -71,5 +75,9 @@ public class TierTower implements ModInitializer {
 
 	public static ResourceLocation asResource(String id) {
 		return new ResourceLocation(MOD_ID, id);
+	}
+
+	public static <T> ResourceKey<T> asKey(ResourceKey<? extends Registry<T>> registryKey, String id) {
+		return ResourceKey.create(registryKey, asResource(id));
 	}
 }

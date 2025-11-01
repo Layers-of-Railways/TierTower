@@ -23,8 +23,10 @@ import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeRenderer;
 import io.github.slimeistdev.tier_tower.mixin_ducks.common.Style_Duck;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Style;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -66,11 +68,15 @@ public class MixinStringRenderOutput {
         UUID playerId = ((Style_Duck) style).tt$getBadgePlayer();
         if (playerId == null) return;
 
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        RegistryAccess registryAccess = mc.level.registryAccess();
+
         // no default rendering
         cir.setReturnValue(true);
 
         TowerSummary summary = TierTowerClient.SUBURB.getSummary(playerId);
-        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId());
+        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId(), registryAccess);
         if (sequence == null) return;
 
         if (!dropShadow) {

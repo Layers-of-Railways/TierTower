@@ -19,24 +19,26 @@
 package io.github.slimeistdev.tier_tower.events;
 
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.base.events.DynamicRegistryFreezeCallback;
 import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.PlayerTower;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
+import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
-import io.github.slimeistdev.tier_tower.registry.TierTowerCommands;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.core.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
 
 public class CommonEvents {
     public static void register() {
-        CommandRegistrationCallback.EVENT.register(TierTowerCommands::register);
         ServerWorldEvents.LOAD.register((server, level) -> onLoadLevel(level));
         ServerPlayConnectionEvents.JOIN.register((connection, packetSender, server) -> onPlayerJoin(connection.player));
+        DynamicRegistryFreezeCallback.POST.register(CommonEvents::onDynamicRegistryFreeze);
     }
 
     private static void onLoadLevel(LevelAccessor level) {
@@ -49,8 +51,6 @@ public class CommonEvents {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        TierTowerPackets.PACKETS.sendTo(player, TierManager.makeSyncPacket());
-
         for (ServerPlayer otherPlayer : server.getPlayerList().getPlayers()) {
             PlayerTower tower = TierTower.CITY.getTower(otherPlayer);
             if (tower == null) continue;
@@ -59,6 +59,15 @@ public class CommonEvents {
                 TierTowerPackets.PACKETS.sendTo(PlayerSelection.all(), new TowerSummaryPacket(tower));
             } else {
                 TierTowerPackets.PACKETS.sendTo(PlayerSelection.of(player), new TowerSummaryPacket(tower));
+            }
+        }
+    }
+
+    private static void onDynamicRegistryFreeze(Registry<?> registry) {
+        Registry<Sequence> sequences = Utils.castRegistry(registry, TierTowerRegistries.SEQUENCE);
+        if (sequences != null) {
+            for (Sequence sequence : sequences) {
+                sequence.freeze();
             }
         }
     }

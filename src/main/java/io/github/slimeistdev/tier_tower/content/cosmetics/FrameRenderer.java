@@ -61,7 +61,7 @@ public class FrameRenderer {
         Font font
     ) {
         TowerSummary summary = TierTowerClient.SUBURB.getSummary(player.getUUID());
-        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId());
+        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId(), player.level().registryAccess());
         if (sequence == null) return;
 
         Tier tier = sequence.getTier(summary.levelingState().tierIndex());

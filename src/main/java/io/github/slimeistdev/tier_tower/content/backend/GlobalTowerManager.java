@@ -20,6 +20,7 @@ package io.github.slimeistdev.tier_tower.content.backend;
 
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.utils.Utils;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
@@ -33,6 +34,7 @@ import java.util.UUID;
 public class GlobalTowerManager {
     private TowerSavedData savedData;
     public Map<UUID, PlayerTower> towers;
+    private RegistryAccess registryAccess;
 
     public GlobalTowerManager() {
         cleanUp();
@@ -59,6 +61,7 @@ public class GlobalTowerManager {
             return;
         cleanUp();
         savedData = null;
+        registryAccess = level.registryAccess();
         loadCityData(server);
     }
 
@@ -67,12 +70,14 @@ public class GlobalTowerManager {
             return;
         savedData = TowerSavedData.load(server);
         for (PlayerTower tower : savedData.getTowers()) {
+            tower.registryAccess = registryAccess;
             towers.put(tower.getPlayerId(), tower);
         }
     }
 
     private void cleanUp() {
         towers = new HashMap<>();
+        registryAccess = null;
     }
 
     public void markCityDirty() {
@@ -91,6 +96,7 @@ public class GlobalTowerManager {
             return towers.get(uuid);
         } else {
             PlayerTower tower = new PlayerTower(uuid);
+            tower.registryAccess = registryAccess;
             towers.put(uuid, tower);
             markCityDirty();
             return tower;

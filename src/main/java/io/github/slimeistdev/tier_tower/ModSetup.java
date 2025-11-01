@@ -16,14 +16,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.registry;
+package io.github.slimeistdev.tier_tower;
 
-import io.github.slimeistdev.tier_tower.content.backend.tier.TierManager;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.server.packs.PackType;
+import io.github.slimeistdev.tier_tower.registry.TierTowerCommands;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import io.github.slimeistdev.tier_tower.registry.TierTowerSequences;
+import io.github.slimeistdev.tier_tower.registry.TierTowerTiers;
 
 public class ModSetup {
-    public static void register() {
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(TierManager.ReloadListener.INSTANCE);
+    public static void init() {
+        TierTowerRegistries.init();
+        TierTowerCommands.init();
+        TierTowerTiers.init();
+        TierTowerSequences.init();
     }
 }

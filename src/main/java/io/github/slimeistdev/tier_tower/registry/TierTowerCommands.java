@@ -25,6 +25,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.slimeistdev.tier_tower.content.commands.server.ReloadCommandsCommand;
 import io.github.slimeistdev.tier_tower.content.commands.server.TierCommand;
 import io.github.slimeistdev.tier_tower.utils.Utils;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -34,6 +35,10 @@ import java.util.Collections;
 import static net.minecraft.commands.Commands.literal;
 
 public class TierTowerCommands {
+    public static void init() {
+        CommandRegistrationCallback.EVENT.register(TierTowerCommands::register);
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection selection) {
         var towerCommand = literal("tier_tower")
             .then(TierCommand.register());

@@ -16,13 +16,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.network;
+package io.github.slimeistdev.tier_tower.base.events;
 
-import io.github.slimeistdev.tier_tower.base.network.PacketSet;
-import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.core.Registry;
 
-public class TierTowerPackets {
-    public static final PacketSet PACKETS = PacketSet.builder("tier_tower", 1)
-        .s2c(TowerSummaryPacket.class, TowerSummaryPacket::new)
-        .build();
+public interface DynamicRegistryFreezeCallback {
+    Event<DynamicRegistryFreezeCallback> POST = EventFactory.createArrayBacked(
+        DynamicRegistryFreezeCallback.class,
+        listeners -> registry -> {
+            for (DynamicRegistryFreezeCallback listener : listeners) {
+                listener.onFreeze(registry);
+            }
+        });
+
+    void onFreeze(Registry<?> registry);
 }

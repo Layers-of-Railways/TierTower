@@ -18,50 +18,115 @@
 
 package io.github.slimeistdev.tier_tower.content.backend.tier;
 
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import io.github.slimeistdev.tier_tower.utils.SearchUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.RegistryFixedCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Sequence {
-    private final ResourceLocation id;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+public final class Sequence {
+    public static final Codec<Sequence> CODEC = RecordCodecBuilder.create(i -> i.group(
+        Codec.list(RegistryFixedCodec.create(TierTowerRegistries.TIER)).fieldOf("tiers")
+            .forGetter(Sequence::getDefinitions),
+        Codec.INT.fieldOf("default_base_leveling_cost")
+            .forGetter(s -> s.defaultBaseLevelingCost),
+        RegistryFixedCodec.create(TierTowerRegistries.SEQUENCE).optionalFieldOf("next_sequence")
+            .forGetter(s -> Optional.ofNullable(s.getNextSequence()))
+    ).apply(i, (t, c, s) -> new Sequence(t, c, s.orElse(null))));
+
+    private @Nullable List<Holder<TierPackData>> unfrozenTiers;
+
     private final Tier[] tiers;
+    private final int defaultBaseLevelingCost;
+    private final @Nullable Holder<Sequence> nextSequence;
+    // derived values
     /** How many points are needed to get to level 1 (index 0) of a tier */
     private final int[] tierBaseCosts;
     private final Object2IntMap<ResourceLocation> idMap;
-    private final @Nullable ResourceLocation nextSequence;
 
-    public Sequence(ResourceLocation id, Tier[] tiers, @Nullable ResourceLocation nextSequence) {
-        this.id = id;
-        this.tiers = tiers;
-        this.idMap = new Object2IntOpenHashMap<>();
+    public Sequence(@NotNull List<Holder<TierPackData>> tiers, int defaultBaseLevelingCost, @Nullable Holder<Sequence> nextSequence) {
+        this.defaultBaseLevelingCost = defaultBaseLevelingCost;
         this.nextSequence = nextSequence;
 
-        for (int i = 0; i < this.tiers.length; i++) {
-            Tier tier = this.tiers[i];
+        this.unfrozenTiers = List.copyOf(tiers);
+        this.tiers = new Tier[tiers.size()];
+        this.idMap = new Object2IntOpenHashMap<>();
+        this.tierBaseCosts = new int[tiers.size()];
+    }
 
-            if (idMap.containsKey(tier.getId())) {
-                throw new IllegalArgumentException("Duplicate tier ID: " + tier.getId());
+    private static void checkForDuplicates(List<Holder<TierPackData>> tiers) {
+        if (tiers.isEmpty()) {
+            throw new IllegalArgumentException("A sequence must contain at least one tier");
+        }
+
+        Set<ResourceKey<TierPackData>> seen = new HashSet<>();
+        for (Holder<TierPackData> tier : tiers) {
+            Optional<ResourceKey<TierPackData>> keyOpt = tier.unwrapKey();
+            if (keyOpt.isEmpty()) {
+                throw new IllegalArgumentException("Direct TierPackData holders are not allowed in a Sequence");
             }
+            ResourceKey<TierPackData> key = keyOpt.get();
+            if (!seen.add(key)) {
+                throw new IllegalArgumentException("Duplicate tier pack data ID: " + key);
+            }
+        }
+    }
+
+    @ApiStatus.Internal
+    public void freeze() {
+        if (unfrozenTiers == null) return;
+        checkForDuplicates(unfrozenTiers);
+
+        // construct tiers
+        int nextBaseCost = defaultBaseLevelingCost;
+        for (int i = 0; i < tiers.length; i++) {
+            Pair<Tier, Integer> constructed = Tier.constructFrom(unfrozenTiers.get(i), nextBaseCost);
+            Tier tier = constructed.getFirst();
+            nextBaseCost = constructed.getSecond();
+
+            tiers[i] = tier;
             idMap.put(tier.getId(), i);
         }
 
-        this.tierBaseCosts = new int[tiers.length];
+        // compute base costs
         for (int i = 1; i < tiers.length; i++) {
             int prevCost = tierBaseCosts[i - 1];
             Tier currentTier = tiers[i];
 
             tierBaseCosts[i] = prevCost + currentTier.getTotalLevelingCost();
         }
+
+        unfrozenTiers = null;
     }
 
-    public ResourceLocation getId() {
-        return id;
+    private void ensureFrozen() {
+        if (unfrozenTiers != null) {
+            throw new IllegalStateException("Sequence must be frozen before use");
+        }
+    }
+
+    private List<Holder<TierPackData>> getDefinitions() {
+        return unfrozenTiers != null ? unfrozenTiers : Arrays.stream(tiers).map(Tier::getDefinition).toList();
     }
 
     public LevelingState getLevelingState(final int totalPoints) {
+        ensureFrozen();
         int tierIdx = SearchUtils.binarySearchLE(tierBaseCosts, totalPoints);
         assert tierIdx >= 0: "tierBaseCosts[0] should be 0, so a tier should be findable";
 
@@ -78,6 +143,7 @@ public class Sequence {
     }
 
     public int getCostUpTo(int tierIndex) {
+        ensureFrozen();
         if (tierIndex < 0 || tierIndex >= tiers.length) {
             throw new IndexOutOfBoundsException("Tier index must be between 0 and " + (tiers.length - 1));
         }
@@ -85,6 +151,7 @@ public class Sequence {
     }
 
     public Tier getTier(int index) {
+        ensureFrozen();
         if (index < 0 || index >= tiers.length) {
             throw new IndexOutOfBoundsException("Index must be between 0 and " + (tiers.length - 1));
         }
@@ -92,11 +159,13 @@ public class Sequence {
     }
 
     public @Nullable Tier getTier(ResourceLocation id) {
+        ensureFrozen();
         int index = idMap.getOrDefault(id, -1);
         return index >= 0 ? tiers[index] : null;
     }
 
     public @Nullable Tier getNextTier(Tier currentTier) {
+        ensureFrozen();
         int index = idMap.getOrDefault(currentTier.getId(), -1);
         if (index < 0 || index + 1 >= tiers.length) {
             return null; // No next tier available
@@ -108,36 +177,12 @@ public class Sequence {
         return tiers.length;
     }
 
-    public @Nullable ResourceLocation getNextSequence() {
+    public @Nullable Holder<Sequence> getNextSequence() {
         return nextSequence;
     }
 
-    public void write(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(id);
-        buf.writeVarInt(tiers.length);
-        for (Tier tier : tiers) {
-            tier.write(buf);
-        }
-        buf.writeBoolean(nextSequence != null);
-        if (nextSequence != null) {
-            buf.writeResourceLocation(nextSequence);
-        }
-    }
-
-    public static Sequence read(FriendlyByteBuf buf) {
-        ResourceLocation id = buf.readResourceLocation();
-        int tierCount = buf.readVarInt();
-        Tier[] tiers = new Tier[tierCount];
-        for (int i = 0; i < tierCount; i++) {
-            tiers[i] = Tier.read(buf);
-        }
-        ResourceLocation nextSequence;
-        if (buf.readBoolean()) {
-            nextSequence = buf.readResourceLocation();
-        } else {
-            nextSequence = null;
-        }
-        return new Sequence(id, tiers, nextSequence);
+    public @Nullable ResourceKey<Sequence> getNextSequenceKey() {
+        return nextSequence != null ? nextSequence.unwrapKey().orElse(null) : null;
     }
 
     public record LevelingState(int tierIndex, int levelIndex, int levelPoints, int surplusPoints) {

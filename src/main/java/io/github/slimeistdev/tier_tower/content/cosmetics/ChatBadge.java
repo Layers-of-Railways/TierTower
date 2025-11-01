@@ -24,7 +24,7 @@ import net.minecraft.network.chat.MutableComponent;
 
 import java.util.UUID;
 
-public class ChatBadge {
+public class ChatBadge { // FIXME: add hover text to badges
     public static MutableComponent decorate(Component component) {
         if (component instanceof MutableComponent mutable) {
             return decorate(mutable);
