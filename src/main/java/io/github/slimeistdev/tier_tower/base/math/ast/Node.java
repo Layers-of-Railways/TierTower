@@ -25,7 +25,10 @@ import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
 import io.github.slimeistdev.tier_tower.base.math.ParseException;
 import io.github.slimeistdev.tier_tower.base.math.parser.Parser;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public interface Node {
     double evaluate(EvaluationContext context) throws EvaluationException;
@@ -46,5 +49,25 @@ public interface Node {
             }
         },
         Node::repr
-    ); // TODO: allow checking for allowed variables
+    );
+
+    static Codec<Node> limitedCodec(String... allowedVariables) {
+        Set<String> allowedSet = Set.of(allowedVariables);
+
+        Function<Node, DataResult<Node>> validator = n -> {
+            Set<String> foundVariables = new HashSet<>();
+            n.visitSelfAndChildren(node -> {
+                if (node instanceof VariableNode varNode) {
+                    foundVariables.add(varNode.name());
+                }
+            });
+            foundVariables.removeAll(allowedSet);
+            if (!foundVariables.isEmpty()) {
+                return DataResult.error(() -> "Expression contains disallowed variables: " + String.join(", ", foundVariables));
+            }
+            return DataResult.success(n);
+        };
+
+        return CODEC.flatXmap(validator, validator);
+    }
 }

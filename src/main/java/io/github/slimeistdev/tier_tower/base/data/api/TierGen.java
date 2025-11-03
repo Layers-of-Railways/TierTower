@@ -18,6 +18,7 @@
 
 package io.github.slimeistdev.tier_tower.base.data.api;
 
+import com.mojang.datafixers.util.Either;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
@@ -105,12 +106,15 @@ public final class TierGen {
 
     public static class TierBuilder {
         private int levelCount = 10;
-        private @Nullable Integer baseLevelingCost = null;
+        private @Nullable Either<Integer, String> baseLevelingCost = null;
         private @Nullable String levelingCostFunction;
 
         public TierBuilder() {}
 
         public TierBuilder levelCount(int levelCount) {
+            if (levelCount <= 0) {
+                throw new IllegalArgumentException("Level count must be greater than 0");
+            }
             this.levelCount = levelCount;
             return this;
         }
@@ -121,7 +125,19 @@ public final class TierGen {
         }
 
         public TierBuilder baseLevelingCost(int baseLevelingCost) {
-            this.baseLevelingCost = baseLevelingCost;
+            if (baseLevelingCost <= 0) {
+                throw new IllegalArgumentException("Base leveling cost must be greater than 0");
+            }
+            this.baseLevelingCost = Either.left(baseLevelingCost);
+            return this;
+        }
+
+        public TierBuilder factoredBaseLevelingCost(double factor) {
+            return customBaseLevelingCost("prev * " + factor);
+        }
+
+        public TierBuilder customBaseLevelingCost(@NotNull String baseLevelingCostFunction) {
+            this.baseLevelingCost = Either.right(baseLevelingCostFunction);
             return this;
         }
 
@@ -147,15 +163,50 @@ public final class TierGen {
         }
 
         public TierPackData build() {
-            if (levelCount <= 0) {
-                throw new IllegalArgumentException("Level count must be greater than 0");
-            }
-            if (baseLevelingCost != null && baseLevelingCost <= 0) {
-                throw new IllegalArgumentException("Base leveling cost must be greater than 0");
-            }
             if (levelingCostFunction == null) {
                 throw new IllegalArgumentException("Leveling cost function must be set");
             }
+
+            Either<Integer, Node> baseLevelingCost = this.baseLevelingCost == null ? null : this.baseLevelingCost.mapRight(fn -> {
+                Node parsed;
+                try {
+                    parsed = Parser.parse(fn);
+                } catch (ParseException e) {
+                    throw new IllegalArgumentException("Failed to parse base leveling cost function: " + fn, e);
+                }
+
+                // Check
+                Set<String> variables = new HashSet<>();
+                parsed.visitSelfAndChildren(node -> {
+                    if (node instanceof VariableNode variableNode) {
+                        variables.add(variableNode.name());
+                    }
+                });
+                variables.remove("prev");
+                if (!variables.isEmpty()) {
+                    throw new IllegalArgumentException("Base leveling cost function contains unsupported variables: " + variables);
+                }
+
+                try {
+                    parsed.evaluate(new EvaluationContext()
+                        .setFinal("prev", 1)
+                    );
+                } catch (EvaluationException e) {
+                    throw new IllegalArgumentException("Failed to evaluate base leveling cost function: " + fn, e);
+                }
+
+                return parsed;
+            });
+
+            int testBaseLevelingCost = baseLevelingCost == null ? 1 : baseLevelingCost.map(i -> i, n -> {
+                EvaluationContext ctx = new EvaluationContext()
+                    .setFinal("prev", 1);
+                try {
+                    return (int) Math.max(1, Math.round(n.evaluate(ctx)));
+                } catch (EvaluationException e) {
+                    throw new IllegalArgumentException("Failed to evaluate base leveling cost function: " + n.repr(), e);
+                }
+            });
 
             Node parsedFunction;
             try {
@@ -179,8 +230,8 @@ public final class TierGen {
             try {
                 parsedFunction.evaluate(new EvaluationContext()
                     .setFinal("levels", levelCount)
-                    .setFinal("base", baseLevelingCost == null ? 1 : baseLevelingCost)
-                    .set("prev", baseLevelingCost == null ? 1 : baseLevelingCost)
+                    .setFinal("base", testBaseLevelingCost)
+                    .set("prev", testBaseLevelingCost)
                     .set("level", 1)
                 );
             } catch (EvaluationException e) {

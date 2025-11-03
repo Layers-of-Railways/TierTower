@@ -25,6 +25,7 @@ import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
 import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 import io.github.slimeistdev.tier_tower.utils.SearchUtils;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 public final class Tier {
@@ -64,7 +65,21 @@ public final class Tier {
         final int levelCount = data.levelCount();
         final Node costFunction = data.levelingCostFunction();
 
-        final int levelingCost = data.baseLevelingCost().orElse(baseLevelingCost);
+        final int levelingCost = data.baseLevelingCost().map(cost -> cost.map(i -> i, n -> {
+            EvaluationContext ctx = new EvaluationContext()
+                .setFinal("prev", baseLevelingCost);
+            try {
+                return (int) Math.max(1, Math.round(n.evaluate(ctx)));
+            } catch (EvaluationException e) {
+                TierTower.LOGGER.error(
+                    "Failed to evaluate base leveling cost for tier {}. It will use the provided base leveling cost of {}",
+                    definition.unwrapKey().map(ResourceKey::toString).orElse("???"),
+                    baseLevelingCost,
+                    e
+                );
+                return baseLevelingCost;
+            }
+        })).orElse(baseLevelingCost);
         int[] costs = new int[levelCount];
         costs[0] = levelingCost;
 
