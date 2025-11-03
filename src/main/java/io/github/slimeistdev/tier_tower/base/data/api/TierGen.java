@@ -261,6 +261,22 @@ public final class TierGen {
             return this;
         }
 
+        @SafeVarargs
+        public final SequenceBuilder tiers(@NotNull GenEntry<TierPackData>... tiers) {
+            for (var tier : tiers) {
+                tier(tier);
+            }
+            return this;
+        }
+
+        @SafeVarargs
+        public final SequenceBuilder tiers(@NotNull ResourceKey<TierPackData>... tiers) {
+            for (var tier : tiers) {
+                tier(tier);
+            }
+            return this;
+        }
+
         public SequenceBuilder defaultBaseLevelingCost(int baseLevelingCost) {
             if (baseLevelingCost <= 0) {
                 throw new IllegalArgumentException("Base leveling cost must be greater than 0");

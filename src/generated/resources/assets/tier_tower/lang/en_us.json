@@ -6,7 +6,19 @@
   "commands.tier_tower.tier.query.total_points": "%s has %s total points.",
   "tier_tower.sequence.tier_tower.main": "Main",
   "tier_tower.special.badge": "!",
+  "tier_tower.tier.ae2.fluix": "Fluix",
+  "tier_tower.tier.create.brass": "Brass",
+  "tier_tower.tier.create.rose_quartz": "Rose Quartz",
+  "tier_tower.tier.create.zinc": "Zinc",
+  "tier_tower.tier.minecraft.amethyst": "Amethyst",
   "tier_tower.tier.minecraft.copper": "Copper",
+  "tier_tower.tier.minecraft.diamond": "Diamond",
+  "tier_tower.tier.minecraft.echo": "Echo",
+  "tier_tower.tier.minecraft.emerald": "Emerald",
+  "tier_tower.tier.minecraft.gold": "Gold",
   "tier_tower.tier.minecraft.iron": "Iron",
-  "tier_tower.tier.minecraft.quartz": "Quartz"
+  "tier_tower.tier.minecraft.netherite": "Netherite",
+  "tier_tower.tier.minecraft.prismarine": "Prismarine",
+  "tier_tower.tier.minecraft.quartz": "Quartz",
+  "tier_tower.tier.minecraft.redstone": "Redstone"
 }

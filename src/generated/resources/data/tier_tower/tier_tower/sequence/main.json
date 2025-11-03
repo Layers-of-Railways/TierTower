@@ -1,8 +1,20 @@
 {
   "default_base_leveling_cost": 1,
   "tiers": [
-    "minecraft:quartz",
+    "minecraft:copper",
+    "create:zinc",
     "minecraft:iron",
-    "minecraft:copper"
+    "minecraft:gold",
+    "minecraft:quartz",
+    "minecraft:amethyst",
+    "minecraft:redstone",
+    "create:brass",
+    "create:rose_quartz",
+    "minecraft:prismarine",
+    "minecraft:diamond",
+    "minecraft:emerald",
+    "minecraft:echo",
+    "ae2:fluix",
+    "minecraft:netherite"
   ]
 }

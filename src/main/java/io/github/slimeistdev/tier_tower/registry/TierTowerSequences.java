@@ -46,9 +46,23 @@ public class TierTowerSequences {
 
     static GenEntry<Sequence> MAIN_SEQUENCE = sequence(TierTower.MAIN_SEQUENCE.location(), b -> b
         .defaultBaseLevelingCost(1)
-        .tier(QUARTZ)
-        .tier(IRON)
-        .tier(COPPER));
+        .tiers(
+            COPPER,
+            ZINC,
+            IRON,
+            GOLD,
+            QUARTZ,
+            AMETHYST,
+            REDSTONE,
+            BRASS,
+            ROSE_QUARTZ,
+            PRISMARINE,
+            DIAMOND,
+            EMERALD,
+            ECHO,
+            FLUIX,
+            NETHERITE
+        ));
 
     public static void provideLang(BiConsumer<String, String> langConsumer) {
         LANG.forEach(langConsumer);

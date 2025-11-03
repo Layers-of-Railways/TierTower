@@ -1,0 +1,5 @@
+{
+  "base_leveling_cost": "(prev * 0.75)",
+  "level_count": 10,
+  "leveling_cost_function": "((((5.0 * level) + 233.0) * 27.0) + base)"
+}

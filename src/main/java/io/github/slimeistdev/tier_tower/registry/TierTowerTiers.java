@@ -43,16 +43,65 @@ public class TierTowerTiers {
 
     static TierGen.GenEntry<TierPackData> START = null,
 
-    QUARTZ = tier("quartz", b -> b
-        .additiveLevelingCost(1)),
+    COPPER = tier("copper", b -> b
+        .baseLevelingCost(16)
+        .multOffsetBoostCost(1, 1, 2)),
+
+    ZINC = tier(new ResourceLocation("create", "zinc"), b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(2, 1, 5)),
 
     IRON = tier("iron", b -> b
-        .additiveLevelingCost(2)),
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(2, 2, 6)),
 
-    COPPER = tier("copper", b -> b
-        .levelInterpolatedMultiplicativeCost(2)
-        .baseLevelingCost(1000)
-        .levelCount(20)),
+    GOLD = tier("gold", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(3, 3, 7)),
+
+    QUARTZ = tier("quartz", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(3, 5, 9)),
+
+    AMETHYST = tier("amethyst", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(3, 8, 10)),
+
+    REDSTONE = tier("redstone", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(4, 13, 12)),
+
+    BRASS = tier(new ResourceLocation("create", "brass"), b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(4, 21, 16)),
+
+    ROSE_QUARTZ = tier(new ResourceLocation("create", "rose_quartz"), b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(4, 34, 18)),
+
+    PRISMARINE = tier("prismarine", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(4, 55, 21)),
+
+    DIAMOND = tier("diamond", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(5, 89, 24)),
+
+    EMERALD = tier("emerald", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(5, 144, 25)),
+
+    ECHO = tier("echo", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(5, 233, 27)),
+
+    FLUIX = tier(new ResourceLocation("ae2", "fluix"), b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(5, 377, 29)),
+
+    NETHERITE = tier("netherite", b -> b
+        .factoredBaseLevelingCost(0.75)
+        .multOffsetBoostCost(5, 610, 32)),
 
     END = null;
 

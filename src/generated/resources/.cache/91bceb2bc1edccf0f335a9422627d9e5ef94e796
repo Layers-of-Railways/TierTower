@@ -1,5 +1,17 @@
-// 1.20.1	2025-11-01T03:09:35.598179774	Tier Tower/Tier Tower's Generated Registry Entries
-003b5a55e069025f45a5ce1f47df8d475ccab722 data/tier_tower/tier_tower/sequence/main.json
-62a7248fa689a820ef6bf28f8f672140abba04de data/minecraft/tier_tower/tier/iron.json
-0cfc47e731b85b84e5fe324c8611ac38be3a649f data/minecraft/tier_tower/tier/quartz.json
-e88c6565146d78d43a7fa8654fb3c4854eae0b6e data/minecraft/tier_tower/tier/copper.json
+// 1.20.1	2025-11-03T06:55:11.911308748	Tier Tower/Tier Tower's Generated Registry Entries
+781149872d264f51385a8bc38fb276d9b199c40e data/minecraft/tier_tower/tier/netherite.json
+a5af0a872528e42b6cd24c2a84a77bfbe64cb5b3 data/minecraft/tier_tower/tier/emerald.json
+a72c3bd4a775479bbf047e9353fd5ca5295dd3ba data/minecraft/tier_tower/tier/prismarine.json
+6726538333af12e5bf5c9bc12ada3a1e46fa4630 data/minecraft/tier_tower/tier/quartz.json
+00c4c66a4f7b70b07e9ccbfcfd39f2b7e3510ab1 data/minecraft/tier_tower/tier/copper.json
+7f67976e857f244e05a285854f3a2f7f586a8147 data/minecraft/tier_tower/tier/echo.json
+9b2a63328eb973570f13c1e217530868d511ab41 data/minecraft/tier_tower/tier/redstone.json
+1b41715715d99274867d0a22eea26cd37eeeced2 data/minecraft/tier_tower/tier/amethyst.json
+c235350bf5966184b862b89a3a4cf651f21dbd1c data/tier_tower/tier_tower/sequence/main.json
+28ce7cb2dde0329f51ee4ae6e03c7a07f8dfec5b data/create/tier_tower/tier/brass.json
+6d58d1a8792e80149ec6a5db5b14b66e5bdbc0f0 data/minecraft/tier_tower/tier/iron.json
+e572993154181f9e73c4bd27614889a40fd35972 data/ae2/tier_tower/tier/fluix.json
+c22d41b7a3e03099c1d33f6c6e257fdd8b884214 data/create/tier_tower/tier/rose_quartz.json
+b5f5b1e3b7452fecfd43ce7c04bbb278e928eae5 data/create/tier_tower/tier/zinc.json
+68ad974cd64502b6699deea572c965783b6987b2 data/minecraft/tier_tower/tier/gold.json
+41b254c5e19a60c026483889c0e847b2b697a1df data/minecraft/tier_tower/tier/diamond.json
