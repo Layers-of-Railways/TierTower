@@ -19,6 +19,7 @@
 package io.github.slimeistdev.tier_tower.mixin.common;
 
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeContents;
+import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeHoverContents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -44,11 +45,18 @@ public class MixinTranslatableContents {
         cancellable = true
     )
     private <T> void visitBadge(FormattedText.StyledContentConsumer<T> styledContentConsumer, Style style, CallbackInfoReturnable<Optional<T>> cir) {
-        if ("tier_tower.special.badge".equals(key) && args.length == 1 && args[0] instanceof String uuid$) {
-            try {
-                ChatBadgeContents badgeContents = new ChatBadgeContents(UUID.fromString(uuid$));
-                cir.setReturnValue(badgeContents.visit(styledContentConsumer, style));
-            } catch (IllegalArgumentException ignored) {}
+        if (args.length == 1 && args[0] instanceof String uuid$) {
+            if ("tier_tower.special.badge".equals(key)) {
+                try {
+                    ChatBadgeContents badgeContents = new ChatBadgeContents(UUID.fromString(uuid$));
+                    cir.setReturnValue(badgeContents.visit(styledContentConsumer, style));
+                } catch (IllegalArgumentException ignored) {}
+            } else if ("tier_tower.special.badge.hover".equals(key)) {
+                try {
+                    ChatBadgeHoverContents hoverContents = new ChatBadgeHoverContents(UUID.fromString(uuid$));
+                    cir.setReturnValue(hoverContents.visit(styledContentConsumer, style));
+                } catch (IllegalArgumentException ignored) {}
+            }
         }
     }
 }

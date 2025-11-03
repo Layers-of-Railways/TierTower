@@ -21,10 +21,11 @@ package io.github.slimeistdev.tier_tower.content.cosmetics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 
 import java.util.UUID;
 
-public class ChatBadge { // FIXME: add hover text to badges
+public class ChatBadge {
     public static MutableComponent decorate(Component component) {
         if (component instanceof MutableComponent mutable) {
             return decorate(mutable);
@@ -40,7 +41,12 @@ public class ChatBadge { // FIXME: add hover text to badges
         if (hover != null) {
             HoverEvent.EntityTooltipInfo info = hover.getValue(HoverEvent.Action.SHOW_ENTITY);
             if (info != null) {
-                component.append(Component.translatable("tier_tower.special.badge", info.id.toString()));
+                var style = Style.EMPTY.withHoverEvent(new HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    Component.translatable("tier_tower.special.badge.hover", info.id.toString())
+                ));
+                component.append(Component.translatable("tier_tower.special.badge", info.id.toString())
+                    .withStyle(style));
             }
         }
 
