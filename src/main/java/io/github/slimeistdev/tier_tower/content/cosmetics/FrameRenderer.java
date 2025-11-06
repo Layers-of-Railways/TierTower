@@ -21,9 +21,7 @@ package io.github.slimeistdev.tier_tower.content.cosmetics;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.slimeistdev.tier_tower.TierTowerClient;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
@@ -44,11 +42,15 @@ import static io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeRender
 public class FrameRenderer {
     private static final Map<ResourceLocation, GlyphRenderTypes> RENDER_CACHE = new HashMap<>();
 
-    private static GlyphRenderTypes getFrameRenderTypes(Tier tier) {
-        return RENDER_CACHE.computeIfAbsent(tier.getId(), id -> GlyphRenderTypes.createForColorTexture(new ResourceLocation(
+    private static GlyphRenderTypes getFrameRenderTypes(BadgeState badge) {
+        return RENDER_CACHE.computeIfAbsent(badge.tierId(), id -> GlyphRenderTypes.createForColorTexture(new ResourceLocation(
             id.getNamespace(),
             "textures/tier_tower/frame/" + id.getPath() + ".png"
         )));
+    }
+
+    static {
+        CacheInvalidationReloadListener.CLIENT_RESOURCES.registerCallback(RENDER_CACHE::clear);
     }
 
     public static void renderFrame(
@@ -60,11 +62,7 @@ public class FrameRenderer {
         EntityRenderDispatcher entityRenderDispatcher,
         Font font
     ) {
-        TowerSummary summary = TierTowerClient.SUBURB.getSummary(player.getUUID());
-        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId(), player.level().registryAccess());
-        if (sequence == null) return;
-
-        Tier tier = sequence.getTier(summary.levelingState().tierIndex());
+        BadgeState badge = TierTowerClient.SUBURB.getBadgeState(player.getUUID());
 
         double d = entityRenderDispatcher.distanceToSqr(player);
         if (!(d > 4096.0)) {
@@ -81,7 +79,7 @@ public class FrameRenderer {
             float halfWidth = (float)(font.width(displayName) / 2);
 
             Font.DisplayMode mode = Font.DisplayMode.NORMAL;
-            VertexConsumer vc = buffer.getBuffer(getFrameRenderTypes(tier).select(mode));
+            VertexConsumer vc = buffer.getBuffer(getFrameRenderTypes(badge).select(mode));
 
             int padding = 5;
 

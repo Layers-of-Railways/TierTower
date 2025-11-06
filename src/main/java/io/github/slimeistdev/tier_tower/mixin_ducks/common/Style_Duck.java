@@ -18,6 +18,8 @@
 
 package io.github.slimeistdev.tier_tower.mixin_ducks.common;
 
+import com.mojang.datafixers.util.Either;
+import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +27,7 @@ import java.util.UUID;
 
 public interface Style_Duck {
     /* WARN: the badge style is very ephemeral, and should only be set immediately prior to rendering. */
-    Style tt$withBadge(UUID player);
+    Style tt$withBadge(Either<UUID, BadgeState> playerOrBadge);
 
-    @Nullable UUID tt$getBadgePlayer();
+    @Nullable Either<UUID, BadgeState> tt$getBadge();
 }

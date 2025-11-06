@@ -25,17 +25,9 @@ import net.minecraft.network.chat.Style;
 
 import java.util.UUID;
 
-public class ChatBadge {
-    public static MutableComponent decorate(Component component) {
-        if (component instanceof MutableComponent mutable) {
-            return decorate(mutable);
-        } else {
-            return decorate(component.copy());
-        }
-    }
-
-    public static MutableComponent decorate(MutableComponent component) {
-        component.getSiblings().replaceAll(c -> decorate(c.copy()));
+public class ChatBadgeUtil {
+    public static MutableComponent decorateAutomatically(MutableComponent component) {
+        component.getSiblings().replaceAll(c -> decorateAutomatically(c.copy()));
 
         HoverEvent hover = component.getStyle().getHoverEvent();
         if (hover != null) {
@@ -53,9 +45,18 @@ public class ChatBadge {
         return component;
     }
 
-    public static Component decorate(Component original, UUID id) {
+    public static Component decorateAppend(Component original, UUID id) {
         MutableComponent out = original instanceof MutableComponent mutable ? mutable : original.copy();
         out.append(Component.translatable("tier_tower.special.badge", id.toString()));
         return out;
+    }
+
+    public static MutableComponent staticBadge(BadgeState badge) {
+        Style style = Style.EMPTY.withHoverEvent(new HoverEvent(
+            HoverEvent.Action.SHOW_TEXT,
+            Component.translatable("tier_tower.special.badge.hover.static", badge.tierId().toString(), "" + badge.levelIndex())
+        ));
+        return Component.translatable("tier_tower.special.badge.static", badge.tierId().toString(), "" + badge.levelIndex())
+            .withStyle(style);
     }
 }

@@ -18,11 +18,14 @@
 
 package io.github.slimeistdev.tier_tower.mixin.common;
 
+import com.mojang.datafixers.util.Either;
+import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeContents;
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeHoverContents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -48,14 +51,32 @@ public class MixinTranslatableContents {
         if (args.length == 1 && args[0] instanceof String uuid$) {
             if ("tier_tower.special.badge".equals(key)) {
                 try {
-                    ChatBadgeContents badgeContents = new ChatBadgeContents(UUID.fromString(uuid$));
+                    ChatBadgeContents badgeContents = new ChatBadgeContents(Either.left(UUID.fromString(uuid$)));
                     cir.setReturnValue(badgeContents.visit(styledContentConsumer, style));
                 } catch (IllegalArgumentException ignored) {}
             } else if ("tier_tower.special.badge.hover".equals(key)) {
                 try {
-                    ChatBadgeHoverContents hoverContents = new ChatBadgeHoverContents(UUID.fromString(uuid$));
+                    ChatBadgeHoverContents hoverContents = new ChatBadgeHoverContents(Either.left(UUID.fromString(uuid$)));
                     cir.setReturnValue(hoverContents.visit(styledContentConsumer, style));
                 } catch (IllegalArgumentException ignored) {}
+            }
+        } else if (args.length == 2 && args[0] instanceof String tierId$ && args[1] instanceof String levelIndex$) {
+            ResourceLocation tierId = ResourceLocation.tryParse(tierId$);
+            if (tierId == null) return;
+
+            int levelIndex;
+            try {
+                levelIndex = Integer.parseInt(levelIndex$);
+            } catch (NumberFormatException e) {
+                return;
+            }
+
+            if ("tier_tower.special.badge.static".equals(key)) {
+                ChatBadgeContents badgeContents = new ChatBadgeContents(Either.right(new BadgeState(tierId, levelIndex)));
+                cir.setReturnValue(badgeContents.visit(styledContentConsumer, style));
+            } else if ("tier_tower.special.badge.hover.static".equals(key)) {
+                ChatBadgeHoverContents hoverContents = new ChatBadgeHoverContents(Either.right(new BadgeState(tierId, levelIndex)));
+                cir.setReturnValue(hoverContents.visit(styledContentConsumer, style));
             }
         }
     }

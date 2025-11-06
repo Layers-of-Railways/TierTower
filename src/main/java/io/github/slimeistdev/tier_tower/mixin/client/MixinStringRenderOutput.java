@@ -18,16 +18,15 @@
 
 package io.github.slimeistdev.tier_tower.mixin.client;
 
+import com.mojang.datafixers.util.Either;
 import io.github.slimeistdev.tier_tower.TierTowerClient;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeRenderer;
 import io.github.slimeistdev.tier_tower.mixin_ducks.common.Style_Duck;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Style;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -65,22 +64,16 @@ public class MixinStringRenderOutput {
 
     @Inject(method = "accept", at = @At("HEAD"), cancellable = true)
     private void renderBadge(int i, Style style, int j, CallbackInfoReturnable<Boolean> cir) {
-        UUID playerId = ((Style_Duck) style).tt$getBadgePlayer();
-        if (playerId == null) return;
+        @Nullable Either<UUID, BadgeState> playerOrBadge = ((Style_Duck) style).tt$getBadge();
+        if (playerOrBadge == null) return;
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
-        RegistryAccess registryAccess = mc.level.registryAccess();
+        BadgeState badge = playerOrBadge.map(TierTowerClient.SUBURB::getBadgeState, b -> b);
 
         // no default rendering
         cir.setReturnValue(true);
 
-        TowerSummary summary = TierTowerClient.SUBURB.getSummary(playerId);
-        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId(), registryAccess);
-        if (sequence == null) return;
-
         if (!dropShadow) {
-            ChatBadgeRenderer.renderBadge(x + 1, y, packedLightCoords, pose, bufferSource, mode, sequence, summary, this$0);
+            ChatBadgeRenderer.renderBadge(x + 1, y, packedLightCoords, pose, bufferSource, mode, badge, this$0);
         }
 
         x += 20;

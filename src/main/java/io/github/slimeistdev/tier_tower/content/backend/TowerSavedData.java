@@ -20,6 +20,7 @@ package io.github.slimeistdev.tier_tower.content.backend;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import io.github.slimeistdev.tier_tower.TierTower;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
@@ -41,7 +42,7 @@ public class TowerSavedData extends SavedData {
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag nbt) {
-        Codec.list(PlayerTower.CODEC).encodeStart(NbtOps.INSTANCE, this.towers)
+        Codec.list(PlayerTower.CODEC).encodeStart(NbtOps.INSTANCE, TierTower.CITY.towers.values().stream().toList())
             .resultOrPartial(LOGGER::error)
             .ifPresent(tag -> nbt.put("towers", tag));
         return nbt;

@@ -20,9 +20,7 @@ package io.github.slimeistdev.tier_tower.content.cosmetics;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.slimeistdev.tier_tower.TierTower;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -49,8 +47,12 @@ public class ChatBadgeRenderer {
     private static final Style BADGE_STYLE = Style.EMPTY.withFont(TierTower.BADGE_FONT);
     private static final Map<ResourceLocation, BadgeRenderData> RENDER_CACHE = new HashMap<>();
 
-    private static BadgeRenderData getBadgeRenderData(Tier tier) {
-        return RENDER_CACHE.computeIfAbsent(tier.getId(), id -> {
+    static {
+        CacheInvalidationReloadListener.CLIENT_RESOURCES.registerCallback(RENDER_CACHE::clear);
+    }
+
+    private static BadgeRenderData getBadgeRenderData(BadgeState badge) {
+        return RENDER_CACHE.computeIfAbsent(badge.tierId(), id -> {
             ResourceLocation texture = new ResourceLocation(
                 id.getNamespace(),
                 "textures/tier_tower/badge/" + id.getPath() + ".png"
@@ -85,9 +87,8 @@ public class ChatBadgeRenderer {
     }
 
     public static void renderBadge(float x, float y, int packedLight, Matrix4f pose, MultiBufferSource bufferSource,
-                                   Font.DisplayMode mode, Sequence sequence, TowerSummary summary, Font font) {
-        Tier tier = sequence.getTier(summary.levelingState().tierIndex());
-        BadgeRenderData badgeRenderData = ChatBadgeRenderer.getBadgeRenderData(tier);
+                                   Font.DisplayMode mode, BadgeState badge, Font font) {
+        BadgeRenderData badgeRenderData = ChatBadgeRenderer.getBadgeRenderData(badge);
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(badgeRenderData.renderTypes().select(mode));
         quad(
@@ -100,7 +101,7 @@ public class ChatBadgeRenderer {
             vertexConsumer
         );
 
-        MutableComponent levelComponent = Component.literal(String.valueOf(123/*summary.levelingState().levelIndex() + 1*/))
+        MutableComponent levelComponent = Component.literal(String.valueOf(badge.levelIndex() + 1))
             .withStyle(BADGE_STYLE);
 
         int width = font.width(levelComponent);

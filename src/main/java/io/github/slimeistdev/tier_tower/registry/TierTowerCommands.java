@@ -22,7 +22,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.slimeistdev.tier_tower.content.commands.server.LockCommand;
 import io.github.slimeistdev.tier_tower.content.commands.server.ReloadCommandsCommand;
+import io.github.slimeistdev.tier_tower.content.commands.server.SequenceCommand;
 import io.github.slimeistdev.tier_tower.content.commands.server.TierCommand;
 import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -41,7 +43,10 @@ public class TierTowerCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection selection) {
         var towerCommand = literal("tier_tower")
-            .then(TierCommand.register());
+            .then(TierCommand.register(context))
+            .then(SequenceCommand.register(context))
+            .then(LockCommand.register(false))
+            .then(LockCommand.register(true));
 
         if (Utils.isDevEnv()) {
             towerCommand = towerCommand

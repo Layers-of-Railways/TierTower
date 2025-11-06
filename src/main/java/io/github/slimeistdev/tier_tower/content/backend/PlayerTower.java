@@ -45,12 +45,14 @@ public class PlayerTower {
     public static final Codec<PlayerTower> CODEC = RecordCodecBuilder.create(i -> i.group(
         UUIDUtil.CODEC.fieldOf("id").forGetter(p -> p.playerId),
         Codec.unboundedMap(TierTowerRegistries.SEQUENCE_CODEC, SequenceState.CODEC).fieldOf("sequences").forGetter(p -> p.sequences),
-        TierTowerRegistries.SEQUENCE_CODEC.fieldOf("current_sequence").forGetter(p -> p.currentSequence)
+        TierTowerRegistries.SEQUENCE_CODEC.fieldOf("current_sequence").forGetter(p -> p.currentSequence),
+        Codec.BOOL.fieldOf("locked").forGetter(PlayerTower::isLocked)
     ).apply(i, PlayerTower::new));
 
     private final UUID playerId;
     private final Map<ResourceKey<Sequence>, SequenceState> sequences = new HashMap<>();
     private @NotNull ResourceKey<Sequence> currentSequence = TierTower.MAIN_SEQUENCE;
+    private boolean locked = false;
 
     // cache variables
     private @Nullable Sequence.LevelingState $levelingState = null;
@@ -62,10 +64,12 @@ public class PlayerTower {
     }
 
     // codec constructor
-    private PlayerTower(UUID playerId, Map<ResourceKey<Sequence>, SequenceState> sequences, @NotNull ResourceKey<Sequence> currentSequence) {
+    private PlayerTower(UUID playerId, Map<ResourceKey<Sequence>, SequenceState> sequences,
+                        @NotNull ResourceKey<Sequence> currentSequence, boolean locked) {
         this(playerId);
         this.sequences.putAll(sequences);
         this.currentSequence = currentSequence;
+        this.locked = locked;
     }
 
     public UUID getPlayerId() {
@@ -111,6 +115,10 @@ public class PlayerTower {
         return $levelingState;
     }
 
+    public boolean trySwitchToSequence(@NotNull ResourceKey<Sequence> id) {
+        return trySwitchToSequence(id, false) != null;
+    }
+
     @SuppressWarnings("SameParameterValue")
     private @Nullable Pair<@NotNull SequenceState, @NotNull Sequence> trySwitchToSequence(@NotNull ResourceKey<Sequence> id, boolean discardCurrent) {
         SequenceState state = sequences.get(id);
@@ -124,7 +132,7 @@ public class PlayerTower {
             return null;
         }
 
-        if (discardCurrent) {
+        if (discardCurrent && !id.equals(currentSequence)) {
             sequences.remove(currentSequence);
         }
         currentSequence = id;
@@ -147,6 +155,8 @@ public class PlayerTower {
     }
 
     public void addPoints(int points) {
+        if (points <= 0) return;
+
         final var levelState = ensureCurrent();
 
         SequenceState sequenceState = getSequenceState();
@@ -176,7 +186,7 @@ public class PlayerTower {
                     if (tierIndex >= sequence.getTierCount()) { // move up to the next sequence
                         ResourceKey<Sequence> nextSequence = sequence.getNextSequenceKey();
                         Pair<SequenceState, Sequence> newSeq;
-                        if (nextSequence == null || (newSeq = trySwitchToSequence(nextSequence, true)) == null) {
+                        if (nextSequence == null || (newSeq = trySwitchToSequence(nextSequence, false)) == null) {
                             // restore maxed-out state
                             tierIndex--;
                             levelIndex = tier.getLevelCount() - 1;
@@ -212,6 +222,76 @@ public class PlayerTower {
 
         markDirty();
         syncData();
+    }
+
+    public boolean removePoints(int points) {
+        if (points <= 0) return false;
+
+        SequenceState sequenceState = getSequenceState();
+        Sequence sequence = getSequence();
+
+        int totalPoints = sequenceState.totalPoints - points;
+        if (totalPoints < 0) return false;
+
+        sequenceState.totalPoints = totalPoints;
+        $levelingState = sequence.getLevelingState(totalPoints);
+
+        markDirty();
+        syncData();
+
+        return true;
+    }
+
+    /**
+     * Sets state of current sequence
+     *
+     * @param tierIndex index of tier
+     * @param level     level within tier
+     * @param points    points within level
+     * @return the new summary after setting the state, or null if any parameters exceed the maxima
+     */
+    public @Nullable TowerSummary setTierLevelAndPoints(int tierIndex, int level, int points) {
+        if (tierIndex < 0 || level < 0 || points < 0) {
+            return null;
+        }
+
+        SequenceState sequenceState = getSequenceState();
+        Sequence sequence = getSequence();
+
+        if (tierIndex >= sequence.getTierCount()) {
+            return null;
+        }
+        Tier tier = sequence.getTier(tierIndex);
+
+        if (level >= tier.getLevelCount()) {
+            return null;
+        }
+        if (points >= tier.getLevelingCost(level)) {
+            return null;
+        }
+
+        sequenceState.totalPoints = sequence.getCostUpTo(tierIndex) + tier.getCostUpTo(level) + points;
+
+        $levelingState = new Sequence.LevelingState(
+            tierIndex,
+            level,
+            points,
+            0
+        );
+
+        markDirty();
+        syncData();
+
+        return new TowerSummary(currentSequence, $levelingState);
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+        markDirty(); // no syncData because clients aren't informed of lock state
     }
 
     public void markDirty() {

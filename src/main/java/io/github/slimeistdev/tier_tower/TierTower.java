@@ -28,12 +28,15 @@ import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.events.CommonEvents;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
 import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.MixinEnvironment;
@@ -58,6 +61,9 @@ public class TierTower implements ModInitializer {
 
 		CommonEvents.register();
 		TierTowerPackets.PACKETS.registerC2SListener();
+
+		ResourceManagerHelper.get(PackType.SERVER_DATA)
+			.registerReloadListener(CacheInvalidationReloadListener.SERVER_DATA);
 
 		if (Utils.isDevEnv() && !Utils.isEnvVarTrue("DATAGEN")) {
 			MixinEnvironment.getCurrentEnvironment().audit();

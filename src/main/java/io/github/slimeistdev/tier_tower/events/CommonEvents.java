@@ -51,15 +51,14 @@ public class CommonEvents {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        for (ServerPlayer otherPlayer : server.getPlayerList().getPlayers()) {
-            PlayerTower tower = TierTower.CITY.getTower(otherPlayer);
-            if (tower == null) continue;
+        PlayerTower tower = TierTower.CITY.getTower(player);
+        if (tower != null) {
+            TierTowerPackets.PACKETS.sendTo(PlayerSelection.all(), new TowerSummaryPacket(tower));
+        }
 
-            if (otherPlayer == player) {
-                TierTowerPackets.PACKETS.sendTo(PlayerSelection.all(), new TowerSummaryPacket(tower));
-            } else {
-                TierTowerPackets.PACKETS.sendTo(PlayerSelection.of(player), new TowerSummaryPacket(tower));
-            }
+        for (PlayerTower otherTower : TierTower.CITY.towers.values()) {
+            if (otherTower.getPlayerId().equals(player.getUUID())) continue;
+            TierTowerPackets.PACKETS.sendTo(PlayerSelection.of(player), new TowerSummaryPacket(otherTower));
         }
     }
 

@@ -18,20 +18,9 @@
 
 package io.github.slimeistdev.tier_tower.content.cosmetics;
 
-import com.mojang.datafixers.util.Either;
-import io.github.slimeistdev.tier_tower.TierTower;
-import io.github.slimeistdev.tier_tower.mixin_ducks.common.Style_Duck;
-import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-import java.util.UUID;
-
-public record ChatBadgeContents(Either<UUID, BadgeState> playerOrBadge) implements ComponentContents {
-    @Override
-    public <T> @NotNull Optional<T> visit(FormattedText.StyledContentConsumer<T> styledContentConsumer, @NotNull Style style) {
-        return styledContentConsumer.accept(((Style_Duck) style.withFont(TierTower.BADGE_FONT)).tt$withBadge(playerOrBadge), "!");
-    }
+public record BadgeState(@NotNull ResourceLocation tierId, int levelIndex) {
+    public static final BadgeState ZERO = new BadgeState(new ResourceLocation("minecraft", "copper"), 0);
 }

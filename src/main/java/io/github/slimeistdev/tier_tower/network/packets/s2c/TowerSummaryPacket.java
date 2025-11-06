@@ -47,6 +47,6 @@ public record TowerSummaryPacket(UUID player, TowerSummary summary) implements S
     @Override
     @Environment(EnvType.CLIENT)
     public void handle(Minecraft mc) {
-        TierTowerClient.SUBURB.setSummary(player, summary);
+        TierTowerClient.SUBURB.setSummary(player, summary, mc);
     }
 }

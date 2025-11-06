@@ -36,8 +36,12 @@ public class LangGen {
         provideDefaultLang("commands", langConsumer);
         TierTowerTiers.provideLang(langConsumer);
         TierTowerSequences.provideLang(langConsumer);
-        provider.add("tier_tower.special.badge", "!"); // just to have a fallback
-        provider.add("tier_tower.special.badge.hover", ""); // ditto
+
+        // just to have fallbacks
+        provider.add("tier_tower.special.badge", "!");
+        provider.add("tier_tower.special.badge.static", "!");
+        provider.add("tier_tower.special.badge.hover", "");
+        provider.add("tier_tower.special.badge.hover.static", "");
     }
 
     private static void provideDefaultLang(String fileName, BiConsumer<String, String> consumer) {

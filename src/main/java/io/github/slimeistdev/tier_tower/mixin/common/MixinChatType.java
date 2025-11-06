@@ -20,7 +20,7 @@ package io.github.slimeistdev.tier_tower.mixin.common;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadge;
+import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeUtil;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,6 +36,6 @@ public class MixinChatType {
         )
     )
     private ChatType.Bound addBadge(ChatType chatType, Component name, Operation<ChatType.Bound> original) {
-        return original.call(chatType, ChatBadge.decorate(name.copy()));
+        return original.call(chatType, ChatBadgeUtil.decorateAutomatically(name.copy()));
     }
 }

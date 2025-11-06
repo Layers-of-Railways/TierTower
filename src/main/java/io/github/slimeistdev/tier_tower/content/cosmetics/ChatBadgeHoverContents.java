@@ -18,18 +18,13 @@
 
 package io.github.slimeistdev.tier_tower.content.cosmetics;
 
+import com.mojang.datafixers.util.Either;
 import io.github.slimeistdev.tier_tower.TierTowerClient;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,34 +32,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class ChatBadgeHoverContents implements ComponentContents {
-    private record Key(ResourceLocation tier, int level) {}
+    private final Either<UUID, BadgeState> playerOrBadge;
 
-    private final UUID player;
-
-    private @Nullable Key cacheKey;
+    private @Nullable BadgeState cachedBadge;
     private @Nullable TranslatableContents delegate;
 
-    public ChatBadgeHoverContents(UUID player) {
-        this.player = player;
+    public ChatBadgeHoverContents(Either<UUID, BadgeState> playerOrBadge) {
+        this.playerOrBadge = playerOrBadge;
     }
 
     private void refreshDelegate() {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
-        RegistryAccess registryAccess = mc.level.registryAccess();
-
-        TowerSummary summary = TierTowerClient.SUBURB.getSummary(player);
-        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId(), registryAccess);
-        if (sequence == null) return;
-
-        Tier tier = sequence.getTier(summary.levelingState().tierIndex());
-        int level = summary.levelingState().levelIndex();
-        Key newKey = new Key(tier.getId(), level);
-        if (delegate == null || !newKey.equals(cacheKey)) {
-            cacheKey = newKey;
+        BadgeState badge = playerOrBadge.map(TierTowerClient.SUBURB::getBadgeState, b -> b);
+        if (delegate == null || !badge.equals(cachedBadge)) {
+            cachedBadge = badge;
             delegate = new TranslatableContents("tier_tower.badge.hover", null, new Object[]{
-                Component.translatable(tier.getTranslationKey()),
-                level + 1
+                Component.translatable(badge.tierId().toLanguageKey("tier_tower.tier")),
+                badge.levelIndex() + 1
             });
         }
     }

@@ -20,7 +20,9 @@ package io.github.slimeistdev.tier_tower.content.backend;
 
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
+import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -33,6 +35,7 @@ import java.util.UUID;
 
 public class ClientTowerManager {
     private final Map<UUID, TowerSummary> summaries = new HashMap<>();
+    private final Map<UUID, BadgeState> badgeStates = new HashMap<>();
     private final Map<ResourceKey<Sequence>, Sequence> cachedSequences = new HashMap<>();
 
     public ClientTowerManager() {
@@ -41,6 +44,7 @@ public class ClientTowerManager {
 
     public void cleanUp() {
         this.summaries.clear();
+        this.badgeStates.clear();
         this.cachedSequences.clear();
     }
 
@@ -48,8 +52,21 @@ public class ClientTowerManager {
         return summaries.getOrDefault(player, TowerSummary.ZERO);
     }
 
-    public void setSummary(UUID player, TowerSummary summary) {
+    public @NotNull BadgeState getBadgeState(UUID player) {
+        return badgeStates.getOrDefault(player, BadgeState.ZERO);
+    }
+
+    public void setSummary(UUID player, TowerSummary summary, Minecraft mc) {
         summaries.put(player, summary);
+
+        if (mc.level != null) {
+            var registryAccess = mc.level.registryAccess();
+            var sequence = getSequence(summary.sequenceId(), registryAccess);
+            if (sequence != null) {
+                var tier = sequence.getTier(summary.levelingState().tierIndex());
+                badgeStates.put(player, new BadgeState(tier.getId(), summary.levelingState().levelIndex()));
+            }
+        }
     }
 
     public @Nullable Sequence getSequence(ResourceKey<Sequence> key, RegistryAccess registryAccess) {

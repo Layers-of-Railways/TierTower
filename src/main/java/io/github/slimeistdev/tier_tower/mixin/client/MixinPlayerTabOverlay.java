@@ -19,7 +19,7 @@
 package io.github.slimeistdev.tier_tower.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadge;
+import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeUtil;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
@@ -30,6 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class MixinPlayerTabOverlay {
     @ModifyReturnValue(method = "decorateName", at = @At("RETURN"))
     private Component addBadge(Component original, PlayerInfo playerInfo) {
-        return ChatBadge.decorate(original, playerInfo.getProfile().getId());
+        return ChatBadgeUtil.decorateAppend(original, playerInfo.getProfile().getId());
     }
 }

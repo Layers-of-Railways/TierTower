@@ -107,9 +107,9 @@ public final class Sequence {
         // compute base costs
         for (int i = 1; i < tiers.length; i++) {
             int prevCost = tierBaseCosts[i - 1];
-            Tier currentTier = tiers[i];
+            Tier prevTier = tiers[i - 1];
 
-            tierBaseCosts[i] = prevCost + currentTier.getTotalLevelingCost();
+            tierBaseCosts[i] = prevCost + prevTier.getTotalLevelingCost();
         }
 
         unfrozenTiers = null;
@@ -162,6 +162,11 @@ public final class Sequence {
         ensureFrozen();
         int index = idMap.getOrDefault(id, -1);
         return index >= 0 ? tiers[index] : null;
+    }
+
+    public int indexOf(ResourceLocation tierId) {
+        ensureFrozen();
+        return idMap.getOrDefault(tierId, -1);
     }
 
     public @Nullable Tier getNextTier(Tier currentTier) {

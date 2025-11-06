@@ -20,6 +20,8 @@ package io.github.slimeistdev.tier_tower.mixin.common;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.datafixers.util.Either;
+import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
 import io.github.slimeistdev.tier_tower.mixin_ducks.common.Style_Duck;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
@@ -45,28 +47,28 @@ public abstract class MixinStyle implements Style_Duck {
     @Nullable Boolean bold;
 
     @Unique
-    private @Nullable UUID tt$badgePlayer = null;
+    private @Nullable Either<UUID, BadgeState> tt$playerOrBadge = null;
 
     @Override
-    public Style tt$withBadge(UUID player) {
-        return ((MixinStyle) (Object) withBold(bold)).tt$setBadge(player);
+    public Style tt$withBadge(Either<UUID, BadgeState> playerOrBadge) {
+        return ((MixinStyle) (Object) withBold(bold)).tt$setBadge(playerOrBadge);
     }
 
     @Unique
-    private Style tt$setBadge(UUID player) {
-        tt$badgePlayer = player;
+    private Style tt$setBadge(Either<UUID, BadgeState> playerOrBadge) {
+        tt$playerOrBadge = playerOrBadge;
         return (Style)(Object)this;
     }
 
     @Override
-    public @Nullable UUID tt$getBadgePlayer() {
-        return tt$badgePlayer;
+    public @Nullable Either<UUID, BadgeState> tt$getBadge() {
+        return tt$playerOrBadge;
     }
 
     @WrapOperation(method = "applyTo", at = @At(value = "NEW", target = "(Lnet/minecraft/network/chat/TextColor;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lnet/minecraft/network/chat/ClickEvent;Lnet/minecraft/network/chat/HoverEvent;Ljava/lang/String;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/network/chat/Style;"))
     private Style preserveBadgePlayer(TextColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ClickEvent clickEvent, HoverEvent hoverEvent, String insertion, ResourceLocation font, Operation<Style> original) {
         Style out = original.call(color, bold, italic, underlined, strikethrough, obfuscated, clickEvent, hoverEvent, insertion, font);
-        ((MixinStyle) (Object) out).tt$setBadge(tt$badgePlayer);
+        ((MixinStyle) (Object) out).tt$setBadge(tt$playerOrBadge);
         return out;
     }
 
@@ -74,12 +76,12 @@ public abstract class MixinStyle implements Style_Duck {
     @WrapOperation(method = "toString", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style$1Collector;addValueString(Ljava/lang/String;Ljava/lang/Object;)V", ordinal = 4))
     private void appendBadgePlayer(@Coerce Object instance, String s, Object o, Operation<Void> original) {
         original.call(instance, s, o);
-        original.call(instance, "tt$badgePlayer", tt$badgePlayer);
+        original.call(instance, "tt$playerOrBadge", tt$playerOrBadge);
     }
 
     @WrapOperation(method = "equals", at = @At(value = "INVOKE", target = "Ljava/util/Objects;equals(Ljava/lang/Object;Ljava/lang/Object;)Z", ordinal = 0))
     private boolean compareBadgePlayer(Object a, Object b, Operation<Boolean> original, Object other) {
-        if (!Objects.equals(tt$badgePlayer, ((MixinStyle) other).tt$badgePlayer)) {
+        if (!Objects.equals(tt$playerOrBadge, ((MixinStyle) other).tt$playerOrBadge)) {
             return false;
         }
         return original.call(a, b);
@@ -89,7 +91,7 @@ public abstract class MixinStyle implements Style_Duck {
     private int hashBadgePlayer(Object[] values, Operation<Integer> original) {
         Object[] extended = new Object[values.length + 1];
         System.arraycopy(values, 0, extended, 0, values.length);
-        extended[values.length] = tt$badgePlayer;
+        extended[values.length] = tt$playerOrBadge;
         return original.call(new Object[]{extended}); // yay java varargs
     }
 }
