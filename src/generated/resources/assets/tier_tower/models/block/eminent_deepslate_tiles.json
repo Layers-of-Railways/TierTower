@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "tier_tower:block/eminent_deepslate_tiles"
+  }
+}

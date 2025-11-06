@@ -1,4 +1,9 @@
 {
+  "block.tier_tower.deepslate_pillar": "Deepslate Pillar",
+  "block.tier_tower.eminent_deepslate_bricks": "Eminent Deepslate Bricks",
+  "block.tier_tower.eminent_deepslate_pillar": "Eminent Deepslate Pillar",
+  "block.tier_tower.eminent_deepslate_tiles": "Eminent Deepslate Tiles",
+  "block.tier_tower.eminent_glass": "Eminent Glass",
   "commands.tier_tower.lock.no_change.multiple": "All selected players' towers are already locked",
   "commands.tier_tower.lock.no_change.single": "%s's tower is already locked",
   "commands.tier_tower.lock.success.multiple": "Locked %s players' towers",

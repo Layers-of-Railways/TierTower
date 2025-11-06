@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "tier_tower:block/eminent_deepslate_pillar_top",
+    "side": "tier_tower:block/eminent_deepslate_pillar_side"
+  }
+}

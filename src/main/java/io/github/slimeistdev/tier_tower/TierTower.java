@@ -18,7 +18,6 @@
 
 package io.github.slimeistdev.tier_tower;
 
-import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
 import io.github.slimeistdev.tier_tower.base.data.TierTowerGeneratedEntriesProvider;
@@ -42,48 +41,48 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 public class TierTower implements ModInitializer {
-	public static final String MOD_ID = "tier_tower";
-	public static final String NAME = "Tier Tower";
-	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
-	public static final GlobalTowerManager CITY = new GlobalTowerManager();
+    public static final String MOD_ID = "tier_tower";
+    public static final String NAME = "Tier Tower";
+    public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
+    public static final GlobalTowerManager CITY = new GlobalTowerManager();
 
-	public static final ResourceLocation BADGE_FONT = asResource("badge");
-	public static final ResourceKey<Sequence> MAIN_SEQUENCE = asKey(TierTowerRegistries.SEQUENCE, "main");
+    public static final ResourceLocation BADGE_FONT = asResource("badge");
+    public static final ResourceKey<Sequence> MAIN_SEQUENCE = asKey(TierTowerRegistries.SEQUENCE, "main");
 
-	private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
+    private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
 
-	@Override
-	public void onInitialize() {
-		LOGGER.info("{} v{} is initializing! Commit hash: {}", NAME, TierTowerBuildInfo.VERSION, TierTowerBuildInfo.GIT_COMMIT);
+    @Override
+    public void onInitialize() {
+        LOGGER.info("{} v{} is initializing! Commit hash: {}", NAME, TierTowerBuildInfo.VERSION, TierTowerBuildInfo.GIT_COMMIT);
 
-		ModSetup.init();
-		REGISTRATE.register();
+        ModSetup.init();
+        REGISTRATE.register();
 
-		CommonEvents.register();
-		TierTowerPackets.PACKETS.registerC2SListener();
+        CommonEvents.register();
+        TierTowerPackets.PACKETS.registerC2SListener();
 
-		ResourceManagerHelper.get(PackType.SERVER_DATA)
-			.registerReloadListener(CacheInvalidationReloadListener.SERVER_DATA);
+        ResourceManagerHelper.get(PackType.SERVER_DATA)
+            .registerReloadListener(CacheInvalidationReloadListener.SERVER_DATA);
 
-		if (Utils.isDevEnv() && !Utils.isEnvVarTrue("DATAGEN")) {
-			MixinEnvironment.getCurrentEnvironment().audit();
-		}
-	}
+        if (Utils.isDevEnv() && !Utils.isEnvVarTrue("DATAGEN")) {
+            MixinEnvironment.getCurrentEnvironment().audit();
+        }
+    }
 
-	public static void gatherData(FabricDataGenerator.Pack gen) {
-		REGISTRATE.addDataGenerator(ProviderType.LANG, LangGen::generate);
-		gen.addProvider(TierTowerGeneratedEntriesProvider::new);
-	}
+    public static void gatherData(FabricDataGenerator.Pack gen) {
+        REGISTRATE.addDataGenerator(ProviderType.LANG, LangGen::generate);
+        gen.addProvider(TierTowerGeneratedEntriesProvider::new);
+    }
 
-	public static AbstractRegistrate<? extends AbstractRegistrate<?>> registrate() {
-		return REGISTRATE;
-	}
+    public static Registrate registrate() {
+        return REGISTRATE;
+    }
 
-	public static ResourceLocation asResource(String id) {
-		return new ResourceLocation(MOD_ID, id);
-	}
+    public static ResourceLocation asResource(String id) {
+        return new ResourceLocation(MOD_ID, id);
+    }
 
-	public static <T> ResourceKey<T> asKey(ResourceKey<? extends Registry<T>> registryKey, String id) {
-		return ResourceKey.create(registryKey, asResource(id));
-	}
+    public static <T> ResourceKey<T> asKey(ResourceKey<? extends Registry<T>> registryKey, String id) {
+        return ResourceKey.create(registryKey, asResource(id));
+    }
 }

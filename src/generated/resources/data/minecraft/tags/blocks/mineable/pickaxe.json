@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "tier_tower:deepslate_pillar",
+    "tier_tower:eminent_deepslate_pillar",
+    "tier_tower:eminent_deepslate_bricks",
+    "tier_tower:eminent_deepslate_tiles"
+  ]
+}
