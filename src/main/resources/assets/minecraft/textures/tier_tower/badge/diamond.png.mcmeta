@@ -1,9 +1,9 @@
 {
   "tier_tower:chat_badge": {
     "text_color": {
-      "r": 0,
-      "g": 59,
-      "b": 58
+      "r": 158,
+      "g": 255,
+      "b": 234
     }
   }
 }
