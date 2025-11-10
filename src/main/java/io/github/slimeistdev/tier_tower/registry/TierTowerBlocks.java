@@ -66,6 +66,12 @@ public class TierTowerBlocks {
         .simpleItem()
         .register();
 
+    public static final BlockEntry<Block> EMINENT_GLASS_BRICKS = REGISTRATE.block("eminent_glass_bricks", Block::new)
+        .initialProperties(() -> Blocks.SEA_LANTERN)
+        .transform(lightLevel(10))
+        .simpleItem()
+        .register();
+
     public static void register() {
         TierTower.LOGGER.info("Registering blocks for " + TierTower.NAME);
     }
