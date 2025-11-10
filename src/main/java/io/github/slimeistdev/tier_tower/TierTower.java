@@ -22,6 +22,7 @@ import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
 import io.github.slimeistdev.tier_tower.base.data.TierTowerGeneratedEntriesProvider;
 import io.github.slimeistdev.tier_tower.base.data.lang.LangGen;
+import io.github.slimeistdev.tier_tower.base.data.recipe.TierTowerItemSinkRecipeGen;
 import io.github.slimeistdev.tier_tower.content.backend.GlobalTowerManager;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.events.CommonEvents;
@@ -33,6 +34,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.Registry;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -72,6 +74,7 @@ public class TierTower implements ModInitializer {
     public static void gatherData(FabricDataGenerator.Pack gen) {
         REGISTRATE.addDataGenerator(ProviderType.LANG, LangGen::generate);
         gen.addProvider(TierTowerGeneratedEntriesProvider::new);
+        ((DataGenerator.PackGenerator) gen).addProvider(TierTowerItemSinkRecipeGen::new);
     }
 
     public static Registrate registrate() {

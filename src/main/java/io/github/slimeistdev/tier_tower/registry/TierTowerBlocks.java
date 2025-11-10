@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower.registry;
 import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.content.item_sink.ItemSinkBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -69,6 +70,22 @@ public class TierTowerBlocks {
     public static final BlockEntry<Block> EMINENT_GLASS_BRICKS = REGISTRATE.block("eminent_glass_bricks", Block::new)
         .initialProperties(() -> Blocks.SEA_LANTERN)
         .transform(lightLevel(10))
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<ItemSinkBlock> ITEM_SINK = REGISTRATE.block("item_sink", ItemSinkBlock::new)
+        .initialProperties(() -> Blocks.DEEPSLATE_BRICKS)
+        .transform(pickaxeOnly())
+        .transform(lightLevel(15))
+        .blockstate((c, p) -> p.simpleBlock(
+            c.get(),
+            p.models().cubeBottomTop(
+                c.getName(),
+                p.modLoc("block/item_sink_side"),
+                p.mcLoc("block/deepslate_bricks"),
+                p.modLoc("block/item_sink_top")
+            )
+        ))
         .simpleItem()
         .register();
 

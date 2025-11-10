@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "tier_tower:block/item_sink"
+    }
+  }
+}
