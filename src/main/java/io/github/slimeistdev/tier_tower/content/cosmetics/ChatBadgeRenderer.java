@@ -93,7 +93,7 @@ public class ChatBadgeRenderer {
         VertexConsumer vertexConsumer = bufferSource.getBuffer(badgeRenderData.renderTypes().select(mode));
         quad(
             x, y - 1,
-            x + 18f, y + 9f,
+            x + 18f, y + 9f - 1,
             0f, 0f,
             18 / 32f, 9 / 16f,
             packedLight,
