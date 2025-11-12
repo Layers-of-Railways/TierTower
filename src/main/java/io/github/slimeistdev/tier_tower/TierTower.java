@@ -20,7 +20,9 @@ package io.github.slimeistdev.tier_tower;
 
 import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import io.github.slimeistdev.tier_tower.base.data.TierTowerGeneratedEntriesProvider;
+import io.github.slimeistdev.tier_tower.base.data.TierTowerSoundDefinitionsProvider;
 import io.github.slimeistdev.tier_tower.base.data.lang.LangGen;
 import io.github.slimeistdev.tier_tower.base.data.recipe.TierTowerItemSinkRecipeGen;
 import io.github.slimeistdev.tier_tower.content.backend.GlobalTowerManager;
@@ -71,10 +73,14 @@ public class TierTower implements ModInitializer {
         }
     }
 
-    public static void gatherData(FabricDataGenerator.Pack gen) {
+    public static void gatherData(FabricDataGenerator.Pack gen, ExistingFileHelper helper) {
         REGISTRATE.addDataGenerator(ProviderType.LANG, LangGen::generate);
         gen.addProvider(TierTowerGeneratedEntriesProvider::new);
-        ((DataGenerator.PackGenerator) gen).addProvider(TierTowerItemSinkRecipeGen::new);
+
+        //noinspection UnnecessaryLocalVariable
+        DataGenerator.PackGenerator baseGen = gen;
+        baseGen.addProvider(TierTowerItemSinkRecipeGen::new);
+        baseGen.addProvider(output -> new TierTowerSoundDefinitionsProvider(output, helper));
     }
 
     public static Registrate registrate() {

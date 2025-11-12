@@ -1,0 +1,38 @@
+{
+  "eminence.pickup": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.experience_orb.pickup"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.eminence.pickup"
+  },
+  "eminent_snake.ambient": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.phantom.ambient"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.eminent_snake.ambient"
+  },
+  "eminent_snake.strike": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.phantom.bite"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.eminent_snake.strike"
+  },
+  "eminent_snake.swoop": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.phantom.swoop"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.eminent_snake.swoop"
+  }
+}

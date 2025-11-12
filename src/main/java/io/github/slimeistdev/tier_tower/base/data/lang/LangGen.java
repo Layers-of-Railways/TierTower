@@ -34,6 +34,7 @@ public class LangGen {
 
         provideDefaultLang("interface", langConsumer);
         provideDefaultLang("commands", langConsumer);
+        provideDefaultLang("sounds", langConsumer);
         TierTowerTiers.provideLang(langConsumer);
         TierTowerSequences.provideLang(langConsumer);
 

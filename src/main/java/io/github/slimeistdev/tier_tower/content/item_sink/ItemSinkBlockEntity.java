@@ -18,11 +18,13 @@
 
 package io.github.slimeistdev.tier_tower.content.item_sink;
 
-import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.recipe.ItemSinkRecipe;
 import io.github.slimeistdev.tier_tower.foundation.block_entity.TickingBlockEntity;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -36,6 +38,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEntity {
     private final CraftingContainer recipeContainer = new TransientCraftingContainer(new AbstractContainerMenu(null, -1) {
@@ -51,6 +59,9 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
     }, 1, 1);
     private final RecipeManager.CachedCheck<Container, ? extends ItemSinkRecipe> quickCheck;
 
+    private final List<EminentSnake> snakes = new ArrayList<>();
+    private final Map<UUID, EminentSnake> recentSnakes = new HashMap<>();
+
     public ItemSinkBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
         quickCheck = RecipeManager.createCheck(TierTowerRecipeTypes.ITEM_SINK);
@@ -58,7 +69,28 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
 
     @Override
     public void tick() {
+        if (level instanceof ServerLevel serverLevel) {
+            if (!snakes.isEmpty()) setChanged();
+            snakes.removeIf(snake -> !snake.tick(serverLevel, worldPosition));
+        }
+    }
 
+    private void addSnake(int points, @NotNull ServerPlayer beneficiary) {
+        UUID uuid = beneficiary.getUUID();
+
+        var recent = recentSnakes.get(uuid);
+        if (recent != null && recent.age >= 0 && recent.age <= EminentSnake.DEBOUNCE) {
+            recent.points += points;
+            recent.age /= 2;
+            setChanged();
+            return;
+        }
+
+        EminentSnake snake = new EminentSnake(uuid, points);
+        snake.owner = beneficiary;
+        snakes.add(snake);
+        recentSnakes.put(uuid, snake);
+        setChanged();
     }
 
     public void tryAbsorbItem(@NotNull ItemEntity item, @NotNull ServerPlayer beneficiary) {
@@ -73,6 +105,33 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
         int points = recipe.points() * item.getItem().getCount();
         item.discard();
 
-        TierTower.CITY.getOrCreateTower(beneficiary).addPoints(points);
+        addSnake(points, beneficiary);
+    }
+
+    @Override
+    public void load(@NotNull CompoundTag tag) {
+        super.load(tag);
+
+        if (tag.contains("Snakes", CompoundTag.TAG_LIST)) {
+            ListTag snakes = tag.getList("Snakes", CompoundTag.TAG_COMPOUND);
+            for (int i = 0; i < snakes.size(); i++) {
+                this.snakes.add(EminentSnake.load(snakes.getCompound(i), worldPosition));
+            }
+        }
+    }
+
+    @Override
+    protected void saveAdditional(@NotNull CompoundTag tag) {
+        super.saveAdditional(tag);
+
+        if (!snakes.isEmpty()) {
+            ListTag snakes = new ListTag();
+            for (EminentSnake snake : this.snakes) {
+                CompoundTag snakeTag = new CompoundTag();
+                snake.save(snakeTag);
+                snakes.add(snakeTag);
+            }
+            tag.put("Snakes", snakes);
+        }
     }
 }
