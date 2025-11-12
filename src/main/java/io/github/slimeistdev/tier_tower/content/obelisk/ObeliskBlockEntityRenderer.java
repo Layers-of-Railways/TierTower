@@ -18,6 +18,7 @@
 
 package io.github.slimeistdev.tier_tower.content.obelisk;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -50,7 +51,12 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.level.LightLayer;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBlockEntity> {
+    private static final ResourceLocation BACKGROUND = TierTower.asResource("textures/gui/obelisk_background.png");
+
     private static final ResourceLocation TOWER_TOP = TierTower.asResource("textures/gui/tower/tower_top.png");
     private static final ResourceLocation TOWER_EMPTY = TierTower.asResource("textures/gui/tower/tower_empty.png");
     private static final ResourceLocation TOWER_BOTTOM = TierTower.asResource("textures/gui/tower/tower_bottom.png");
@@ -111,13 +117,13 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             FormattedCharSequence name = player.getDisplayName().getVisualOrderText();
             int nameWidth = font.width(name);
             ms.translate(width * 8f, height * 16f - 2f, 0.125f);
-            ms.scale(1/2f, -1/2f, -1/2f);
+            ms.scale(1/2f, -1/2f, 1/2f);
 
             //noinspection IntegerDivisionInFloatingPointContext
             font.drawInBatch(
                 name,
                 -nameWidth / 2, 0f,
-                textColor, false,
+                0xFFFFFF, true,
                 ms.last().pose(),
                 buffer,
                 Font.DisplayMode.NORMAL,
@@ -130,6 +136,7 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             boolean drawHat = player.isModelPartShown(PlayerModelPart.HAT);
             boolean upsideDown = LivingEntityRenderer.isEntityUpsideDown(player);
             for (int sign = -1; sign <= 1; sign += 2) {
+                RenderSystem.enableDepthTest();
                 PlayerFaceRenderer.draw(
                     guiGraphics,
                     player.getSkinTextureLocation(),
@@ -138,6 +145,7 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
                     drawHat,
                     upsideDown
                 );
+                RenderSystem.disableDepthTest();
             }
 
             ms.popPose();
@@ -151,38 +159,91 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
 
             int offsetSteps = renderTower(ms, buffer, frontPackedLight, sequence, currentTier, 9, 0.5f);
 
-            //ms.translate(0, -TOWER_SECTION_HEIGHT * offsetSteps, 0.75f);
-            ms.translate(0, TOWER_SECTION_HEIGHT, 0.75f);
-            ms.scale(1, -1, -1);
+            // render progress bars
+            int progressHeight = 9;
+
+            int maxLevel = tier.getLevelCount() - 1;
+            int nextTierTotalPoints = tier.getCostUpTo(maxLevel) + tier.getLevelingCost(maxLevel);
+            int nextTierProgressPoints = tier.getCostUpTo(currentLevel) + summary.levelingState().levelPoints();
+            int nextLevelTotalPoints = tier.getLevelingCost(currentLevel);
+            int nextLevelProgressPoints = summary.levelingState().levelPoints();
+
+            BadgeState current = new BadgeState(tier.getId(), currentLevel);
+            BadgeState nextTier;
+            BadgeState nextLevel;
 
             if (currentTier + 1 < sequence.getTierCount()) {
-                BadgeState current = new BadgeState(tier.getId(), currentLevel);
-                BadgeState next;
-                if (current.levelIndex() + 1 < tier.getLevelCount()) {
-                    next = new BadgeState(current.tierId(), current.levelIndex() + 1);
-                } else {
-                    next = new BadgeState(sequence.getTier(currentTier + 1).getId(), 0);
-                }
-                int pointsToNext = tier.getLevelingCost(currentLevel) - summary.levelingState().levelPoints();
-
-                Component progressComponent = Component.empty()
-                    .append(ChatBadgeUtil.staticBadge(current))
-                    .append("→ " + pointsToNext + " points →")
-                    .append(ChatBadgeUtil.staticBadge(next));
-                FormattedCharSequence progressText = progressComponent.getVisualOrderText();
-                int textWidth = font.width(progressText);
-                //noinspection IntegerDivisionInFloatingPointContext
-                font.drawInBatch(
-                    progressText,
-                    (TOWER_SECTION_WIDTH - textWidth) / 2, 8,
-                    textColor, false,
-                    ms.last().pose(),
-                    buffer,
-                    Font.DisplayMode.NORMAL,
-                    0,
-                    frontPackedLight
-                );
+                nextTier = new BadgeState(sequence.getTier(currentTier + 1).getId(), 0);
+            } else {
+                nextTier = null;
             }
+
+            if (current.levelIndex() + 1 < tier.getLevelCount()) {
+                nextLevel = new BadgeState(current.tierId(), current.levelIndex() + 1);
+            } else if (currentTier + 1 < sequence.getTierCount()) {
+                nextLevel = new BadgeState(sequence.getTier(currentTier + 1).getId(), 0);
+            } else {
+                nextLevel = null;
+            }
+
+            renderProgressBg(ms, buffer, frontPackedLight, progressHeight, -16, 0, 0.5f);
+            renderProgressFg(ms, buffer, frontPackedLight, progressHeight, -16, 0, 0.625f,
+                (float) nextTierProgressPoints /  nextTierTotalPoints);
+            renderProgressBg(ms, buffer, frontPackedLight, progressHeight, TOWER_SECTION_WIDTH, 0, 0.5f);
+            renderProgressFg(ms, buffer, frontPackedLight, progressHeight, TOWER_SECTION_WIDTH, 0, 0.625f,
+                (float) nextLevelProgressPoints /  nextLevelTotalPoints);
+
+            // render badges
+            ms.translate(0, 0, 0.75f);
+            ms.scale(1, -1, 1);
+
+            int[] x$ = new int[] { -16, TOWER_SECTION_WIDTH };
+            int[] y$ = new int[] { (progressHeight * 16) - 4, -3 };
+            BadgeState[] badge$ = new BadgeState[] { nextTier, nextLevel };
+
+            for (int i = 0; i < 2; i++) {
+                BadgeState[] badge$$ = new BadgeState[] { current, badge$[i] };
+                for (int j = 0; j < 2; j++) {
+                    int x = x$[i];
+                    int y = y$[j];
+                    BadgeState badge = badge$$[j];
+                    if (badge == null) continue;
+
+                    font.drawInBatch(
+                        ChatBadgeUtil.staticBadge(badge),
+                        x - 2, y,
+                        -1, false,
+                        ms.last().pose(),
+                        buffer,
+                        Font.DisplayMode.NORMAL,
+                        0,
+                        frontPackedLight
+                    );
+                }
+            }
+
+            // render total points
+            ms.translate(0, TOWER_SECTION_HEIGHT * offsetSteps, 0);
+
+            Locale locale = Locale.forLanguageTag(mc.getLanguageManager().getSelected());
+            NumberFormat numberFormat = NumberFormat.getInstance(locale);
+            int totalPoints = sequence.getCostUpTo(currentTier) + tier.getCostUpTo(currentLevel)
+                + summary.levelingState().levelPoints() + summary.levelingState().surplusPoints();
+
+            Component progressComponent = Component.literal(numberFormat.format(totalPoints));
+            FormattedCharSequence progressText = progressComponent.getVisualOrderText();
+            int textWidth = font.width(progressText);
+            //noinspection IntegerDivisionInFloatingPointContext
+            font.drawInBatch(
+                progressText,
+                (TOWER_SECTION_WIDTH - textWidth) / 2, 3,
+                textColor, false,
+                ms.last().pose(),
+                buffer,
+                Font.DisplayMode.NORMAL,
+                0,
+                frontPackedLight
+            );
 
             ms.popPose();
         }
@@ -191,16 +252,106 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
     }
 
     @SuppressWarnings("SameParameterValue")
+    private void renderProgressFg(PoseStack ms, MultiBufferSource buffer, int packedLight, int height, float x, float y, float z, float progress) {
+        assert height >= 2;
+        VertexConsumer vc = buffer.getBuffer(RenderType.text(PROGRESS_FG));
+
+        int padding = 6;
+        int endcapHeight = 16 - padding;
+
+        int barHeight = height * 16 - (padding * 2);
+        int filledHeight = Math.round(barHeight * progress);
+
+        int topAmount;
+        int middleAmount;
+        int bottomAmount;
+
+        if (filledHeight <= endcapHeight * 2) {
+            middleAmount = 0;
+            bottomAmount = filledHeight / 2;
+            topAmount = filledHeight - bottomAmount;
+        } else {
+            topAmount = endcapHeight;
+            bottomAmount = endcapHeight;
+            middleAmount = filledHeight - (endcapHeight * 2);
+        }
+
+        // bottom endcap
+        float y1 = y - height * 16;
+        quad(ms, vc,
+            x + 0, y1,
+            x + 16, y1 + bottomAmount + padding,
+            z,
+            0, 3 / 3f,
+            1, (3 - ((bottomAmount + padding) / 16f)) / 3f,
+            packedLight,
+            -1
+        );
+        y1 += bottomAmount + padding;
+
+        // middle
+        for (int i = 0; i < middleAmount / 16; i++) {
+            quad(ms, vc,
+                x + 0, y1,
+                x + 16, y1 + 16,
+                z,
+                0, 2 / 3f,
+                1, 1 / 3f,
+                packedLight,
+                -1
+            );
+            y1 += 16;
+        }
+        int remainingMiddle = middleAmount % 16;
+        if (remainingMiddle > 0) {
+            quad(ms, vc,
+                x + 0, y1,
+                x + 16, y1 + remainingMiddle,
+                z,
+                0, 2 / 3f,
+                1, (2 - (remainingMiddle / 16f)) / 3f,
+                packedLight,
+                -1
+            );
+            y1 += remainingMiddle;
+        }
+
+        // top endcap
+        quad(ms, vc,
+            x + 0, y1,
+            x + 16, y1 + topAmount + padding,
+            z,
+            0, ((topAmount + padding) / 16f) / 3f,
+            1, 0 / 3f,
+            packedLight,
+            -1
+        );
+    }
+
+    private void renderProgressBg(PoseStack ms, MultiBufferSource buffer, int packedLight, int height, float x, float y, float z) {
+        assert height >= 2;
+        VertexConsumer vc = buffer.getBuffer(RenderType.text(PROGRESS_BG));
+
+        for (int y1 = 0; y1 < height; y1++) {
+            int tile = (y1 == 0) ? 0 : (y1 == height - 1) ? 2 : 1;
+            quad(ms, vc,
+                x + 0, y + -y1 * 16 - 16,
+                x + 16, y + -y1 * 16,
+                z,
+                0, (tile + 1) / 3f,
+                1, tile / 3f,
+                packedLight,
+                -1
+            );
+        }
+    }
+
+    @SuppressWarnings("SameParameterValue")
     private void renderBackground(PoseStack ms, MultiBufferSource buffer, int packedLight, ResourceLocation texture, int width, int height, float z) {
         VertexConsumer vc = buffer.getBuffer(RenderType.text(texture));
 
+        // top and bottom edges
         for (int x = 0; x < width; x++) {
-            // inner tiles
-            for (int y = 0; y < height; y++) {
-                bgTile(ms, vc, x, y, z, 1, 1, packedLight);
-            }
-
-            // top and bottom edges
             bgTile(ms, vc, x, -1, z, 1, 2, packedLight);
             bgTile(ms, vc, x, height, z, 1, 0, packedLight);
         }
@@ -216,6 +367,22 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
         bgTile(ms, vc, width, -1, z, 2, 2, packedLight);
         bgTile(ms, vc, -1, height, z, 0, 0, packedLight);
         bgTile(ms, vc, width, height, z, 2, 0, packedLight);
+
+        // inner tiles
+        vc = buffer.getBuffer(RenderType.text(BACKGROUND));
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                quad(ms, vc,
+                    x * 16, y * 16,
+                    x * 16 + 16, y * 16 + 16,
+                    z,
+                    0, 1,
+                    1, 0,
+                    packedLight,
+                    -1
+                );
+            }
+        }
     }
 
     @SuppressWarnings("SameParameterValue")

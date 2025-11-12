@@ -159,22 +159,22 @@ public class EminentSnake {
                     intermediateTarget = null;
                     if (level.random.nextInt(3) == 0)
                         pathfindingState = PathfindingState.SEEK_CLOSE;
-                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_AMBIENT, SoundSource.BLOCKS, 0.5f, 1.0f, level.random.nextLong());
+                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_AMBIENT, SoundSource.BLOCKS, 0.3f, 1.0f, level.random.nextLong());
                     yield true;
                 }
                 case SEEK_CLOSE -> {
                     intermediateTarget = null;
                     if (level.random.nextInt(3) != 0)
                         pathfindingState = PathfindingState.SEEK_TERMINAL;
-                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_SWOOP, SoundSource.BLOCKS, 0.5f, 1.0f, level.random.nextLong());
+                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_SWOOP, SoundSource.BLOCKS, 0.3f, 1.0f, level.random.nextLong());
                     yield true;
                 }
                 case SEEK_TERMINAL -> {
                     TierTower.CITY.getOrCreateTower(ownerId).addPoints(points);
                     intermediateTarget = null;
                     age = -1;
-                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_STRIKE, SoundSource.BLOCKS, 0.5f, 1.0f, level.random.nextLong());
-                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENCE_PICKUP, SoundSource.BLOCKS, 0.5f, 1.0f, level.random.nextLong());
+                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_STRIKE, SoundSource.BLOCKS, 0.3f, 1.0f, level.random.nextLong());
+                    level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENCE_PICKUP, SoundSource.BLOCKS, 0.3f, 1.0f, level.random.nextLong());
                     yield false;
                 }
             };
