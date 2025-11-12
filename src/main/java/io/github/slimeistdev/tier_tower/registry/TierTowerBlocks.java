@@ -22,6 +22,7 @@ import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.ItemSinkBlock;
+import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -44,6 +45,19 @@ public class TierTowerBlocks {
         .transform(pickaxeOnly())
         .transform(eminentBlock())
         .transform(pillarState())
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<ObeliskBlock> OBELISK = REGISTRATE.block("obelisk", ObeliskBlock::new)
+        .initialProperties(() -> Blocks.POLISHED_DEEPSLATE)
+        .transform(pickaxeOnly())
+        .transform(eminentBlock())
+        .blockstate((c, p) -> p.horizontalBlock(
+            c.get(),
+            p.modLoc("block/eminent_deepslate_pillar_side"),
+            p.modLoc("block/obelisk_front"),
+            p.modLoc("block/eminent_deepslate_pillar_top")
+        ))
         .simpleItem()
         .register();
 

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "tier_tower:block/obelisk_front",
+    "side": "tier_tower:block/eminent_deepslate_pillar_side",
+    "top": "tier_tower:block/eminent_deepslate_pillar_top"
+  }
+}

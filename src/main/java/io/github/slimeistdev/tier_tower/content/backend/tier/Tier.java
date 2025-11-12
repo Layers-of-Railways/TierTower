@@ -119,6 +119,13 @@ public final class Tier {
         return id;
     }
 
+    public ResourceLocation getTexture(String type) {
+        return new ResourceLocation(
+            id.getNamespace(),
+            "textures/tier_tower/" + type + "/" + id.getPath() + ".png"
+        );
+    }
+
     public String getTranslationKey() {
         return id.toLanguageKey("tier_tower.tier");
     }

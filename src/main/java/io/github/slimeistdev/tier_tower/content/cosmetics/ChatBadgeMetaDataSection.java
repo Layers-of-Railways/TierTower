@@ -21,10 +21,39 @@ package io.github.slimeistdev.tier_tower.content.cosmetics;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
+import net.minecraft.server.packs.resources.ResourceManager;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public record ChatBadgeMetaDataSection(int textColor, boolean shadow) {
     public static final ChatBadgeMetaDataSection DEFAULT = new ChatBadgeMetaDataSection(0xFFFFFF, false);
+
+    private static final Map<ResourceLocation, ChatBadgeMetaDataSection> CACHE = new HashMap<>();
+    static {
+        CacheInvalidationReloadListener.CLIENT_RESOURCES.registerCallback(CACHE::clear);
+    }
+
+    public static ChatBadgeMetaDataSection get(ResourceLocation texture) {
+        return CACHE.computeIfAbsent(texture, key -> {
+            ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+            return resourceManager.getResource(key)
+                .flatMap(r -> {
+                    try {
+                        return r.metadata().getSection(ChatBadgeMetaDataSection.TYPE);
+                    } catch (IOException e) {
+                        return Optional.empty();
+                    }
+                })
+                .orElse(ChatBadgeMetaDataSection.DEFAULT);
+        });
+    }
 
     public ChatBadgeMetaDataSection(int textColor, boolean shadow) {
         this.textColor = textColor & 0xFFFFFF;

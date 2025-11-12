@@ -29,10 +29,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 public class ClientEvents {
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register(TierTowerCommandsClient::register);
-        ClientPlayConnectionEvents.INIT.register((handler, client) -> onBeginPlay());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> onEndPlay());
     }
 
-    private static void onBeginPlay() {
+    private static void onEndPlay() {
         TierTowerClient.SUBURB.cleanUp();
     }
 }

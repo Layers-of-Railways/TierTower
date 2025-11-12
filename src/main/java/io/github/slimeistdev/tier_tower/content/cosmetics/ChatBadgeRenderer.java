@@ -23,7 +23,6 @@ import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.GlyphRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -31,13 +30,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.joml.Matrix4f;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 @SuppressWarnings("SameParameterValue")
@@ -57,20 +53,10 @@ public class ChatBadgeRenderer {
                 id.getNamespace(),
                 "textures/tier_tower/badge/" + id.getPath() + ".png"
             );
-            GlyphRenderTypes renderTypes = GlyphRenderTypes.createForColorTexture(texture);
-
-            ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-            ChatBadgeMetaDataSection meta = resourceManager.getResource(texture)
-                .flatMap(r -> {
-                    try {
-                        return r.metadata().getSection(ChatBadgeMetaDataSection.TYPE);
-                    } catch (IOException e) {
-                        return Optional.empty();
-                    }
-                })
-                .orElse(ChatBadgeMetaDataSection.DEFAULT);
-
-            return new BadgeRenderData(renderTypes, meta);
+            return new BadgeRenderData(
+                GlyphRenderTypes.createForColorTexture(texture),
+                ChatBadgeMetaDataSection.get(texture)
+            );
         });
     }
 

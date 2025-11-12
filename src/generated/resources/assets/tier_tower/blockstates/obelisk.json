@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "tier_tower:block/obelisk",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "tier_tower:block/obelisk"
+    },
+    "facing=south": {
+      "model": "tier_tower:block/obelisk",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "tier_tower:block/obelisk",
+      "y": 270
+    }
+  }
+}

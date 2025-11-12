@@ -57,7 +57,8 @@ public class CommonEvents {
         }
 
         for (PlayerTower otherTower : TierTower.CITY.towers.values()) {
-            if (otherTower.getPlayerId().equals(player.getUUID())) continue;
+            // it appears like we would send the joining player's tower twice, but this fires before the player has
+            // been added to the player list, so PlayerSelection.all() misses them
             TierTowerPackets.PACKETS.sendTo(PlayerSelection.of(player), new TowerSummaryPacket(otherTower));
         }
     }
