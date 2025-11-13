@@ -33,6 +33,7 @@ public class TierTowerClient implements ClientModInitializer {
     public void onInitializeClient() {
         TierTower.LOGGER.info("Tier Tower is loading on the client!");
 
+        ModSetupClient.init();
         ClientEvents.register();
         TierTowerPackets.PACKETS.registerS2CListener();
 

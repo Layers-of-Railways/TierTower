@@ -88,6 +88,7 @@ public class TierTowerBlocks {
         .register();
 
     public static final BlockEntry<ItemSinkBlock> ITEM_SINK = REGISTRATE.block("item_sink", ItemSinkBlock::new)
+        .lang("Vortex")
         .initialProperties(() -> Blocks.DEEPSLATE_BRICKS)
         .transform(pickaxeOnly())
         .transform(lightLevel(15))

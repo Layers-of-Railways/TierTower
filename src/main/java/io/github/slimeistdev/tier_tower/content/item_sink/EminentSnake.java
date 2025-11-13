@@ -137,7 +137,7 @@ public class EminentSnake {
         };
 
         if (DEBUG_PATHFINDING) {
-            level.sendParticles(new DustParticleOptions(new Vector3f(0, 1, 0), 1), target.x, target.y, target.z, 1, 0, 0, 0, 0);
+            level.sendParticles(new EminentSnakeParticleOptions(new Vector3f(0, 1, 0), 1), target.x, target.y, target.z, 1, 0, 0, 0, 0);
         }
 
         Vec3 toTarget = target.subtract(pos);
@@ -149,7 +149,8 @@ public class EminentSnake {
         pos = pos.add(vel);
 
         if (distanceToTarget > 0.125 || pathfindingState != PathfindingState.RETURN_TO_SINK || age <= DEBOUNCE) {
-            level.sendParticles(new DustParticleOptions(getColor(), 2), pos.x, pos.y, pos.z, 2, 0.125, 0.125, 0.125, 0);
+            level.sendParticles(new EminentSnakeParticleOptions(getColor(), 2), pos.x, pos.y, pos.z, 2, 0.125, 0.125, 0.125, 0);
+            level.sendParticles(new DustParticleOptions(getColor(), 1.5f), pos.x, pos.y, pos.z, 1, 0.125, 0.125, 0.125, 0);
         }
 
         if (distanceToTarget < 0.5) {

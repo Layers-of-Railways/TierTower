@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower;
 import io.github.slimeistdev.tier_tower.registry.TierTowerBlockEntities;
 import io.github.slimeistdev.tier_tower.registry.TierTowerBlocks;
 import io.github.slimeistdev.tier_tower.registry.TierTowerCommands;
+import io.github.slimeistdev.tier_tower.registry.TierTowerParticleTypes;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeSerializers;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeTypes;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
@@ -38,6 +39,7 @@ public class ModSetup {
         TierTowerBlocks.register();
         TierTowerBlockEntities.register();
         TierTowerSoundEvents.register();
+        TierTowerParticleTypes.register();
 
         TierTowerRecipeTypes.register();
         TierTowerRecipeSerializers.register();

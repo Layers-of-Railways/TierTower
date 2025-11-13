@@ -5,7 +5,7 @@
   "block.tier_tower.eminent_deepslate_tiles": "Eminent Deepslate Tiles",
   "block.tier_tower.eminent_glass": "Eminent Glass",
   "block.tier_tower.eminent_glass_bricks": "Eminent Glass Bricks",
-  "block.tier_tower.item_sink": "Item Sink",
+  "block.tier_tower.item_sink": "Vortex",
   "block.tier_tower.obelisk": "Obelisk",
   "commands.tier_tower.lock.no_change.multiple": "All selected players' towers are already locked",
   "commands.tier_tower.lock.no_change.single": "%s's tower is already locked",
