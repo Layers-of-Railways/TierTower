@@ -29,6 +29,7 @@ import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -63,11 +64,11 @@ public class CommonEvents {
         }
     }
 
-    private static void onDynamicRegistryFreeze(Registry<?> registry) {
+    private static void onDynamicRegistryFreeze(Registry<?> registry, HolderLookup.Provider lookupProvider) {
         Registry<Sequence> sequences = Utils.castRegistry(registry, TierTowerRegistries.SEQUENCE);
         if (sequences != null) {
             for (Sequence sequence : sequences) {
-                sequence.freeze();
+                sequence.freeze(lookupProvider);
             }
         }
     }

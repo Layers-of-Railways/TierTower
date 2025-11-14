@@ -34,8 +34,8 @@ public class TierTowerGeneratedEntriesProvider extends FabricDynamicRegistryProv
 
     @Override
     protected void configure(HolderLookup.Provider registries, Entries entries) {
-        TierTowerTiers.bootstrap(entries, registries);
-        TierTowerSequences.bootstrap(entries, registries);
+        TierTowerTiers.bootstrap(entries);
+        TierTowerSequences.bootstrap(entries);
     }
 
     @Override

@@ -29,8 +29,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 public final class Tier {
-    private final Holder<TierPackData> definition;
-    private final ResourceLocation id;
+    private final ResourceKey<TierPackData> key;
     private final int levelCount;
     private final int[] levelingCosts;
     /** How many points, within this tier, are needed to get to a level */
@@ -41,8 +40,7 @@ public final class Tier {
         assert definition.value().levelCount() == levelingCosts.length :
             "Level count mismatch between definition and provided leveling costs";
 
-        this.definition = definition;
-        this.id = definition.unwrapKey().orElseThrow().location();
+        this.key = definition.unwrapKey().orElseThrow();
         this.levelCount = levelingCosts.length;
         this.levelingCosts = levelingCosts;
 
@@ -111,23 +109,23 @@ public final class Tier {
         return Pair.of(new Tier(definition, costs), nextBase);
     }
 
-    public Holder<TierPackData> getDefinition() {
-        return definition;
+    public ResourceKey<TierPackData> getKey() {
+        return key;
     }
 
     public ResourceLocation getId() {
-        return id;
+        return key.location();
     }
 
     public ResourceLocation getTexture(String type) {
         return new ResourceLocation(
-            id.getNamespace(),
-            "textures/tier_tower/" + type + "/" + id.getPath() + ".png"
+            key.location().getNamespace(),
+            "textures/tier_tower/" + type + "/" + key.location().getPath() + ".png"
         );
     }
 
     public String getTranslationKey() {
-        return id.toLanguageKey("tier_tower.tier");
+        return key.location().toLanguageKey("tier_tower.tier");
     }
 
     public int getLevelCount() {

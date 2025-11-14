@@ -77,6 +77,7 @@ public class ClientTowerManager {
         Registry<Sequence> registry = registryAccess.registryOrThrow(TierTowerRegistries.SEQUENCE);
         Sequence sequence = registry.get(key);
         if (sequence != null) {
+            sequence.freeze(registryAccess);
             cachedSequences.put(key, sequence);
         }
 

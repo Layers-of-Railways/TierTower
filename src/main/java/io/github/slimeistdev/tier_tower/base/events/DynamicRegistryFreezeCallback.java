@@ -20,16 +20,17 @@ package io.github.slimeistdev.tier_tower.base.events;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 
 public interface DynamicRegistryFreezeCallback {
     Event<DynamicRegistryFreezeCallback> POST = EventFactory.createArrayBacked(
         DynamicRegistryFreezeCallback.class,
-        listeners -> registry -> {
+        listeners -> (registry, lookupProvider) -> {
             for (DynamicRegistryFreezeCallback listener : listeners) {
-                listener.onFreeze(registry);
+                listener.onFreeze(registry, lookupProvider);
             }
         });
 
-    void onFreeze(Registry<?> registry);
+    void onFreeze(Registry<?> registry, HolderLookup.Provider lookupProvider);
 }

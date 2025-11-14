@@ -19,7 +19,6 @@
 package io.github.slimeistdev.tier_tower.base.data.api;
 
 import com.mojang.datafixers.util.Either;
-import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
@@ -29,10 +28,6 @@ import io.github.slimeistdev.tier_tower.base.math.ast.VariableNode;
 import io.github.slimeistdev.tier_tower.base.math.parser.Parser;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierPackData;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
-import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,39 +41,14 @@ import java.util.Set;
 public final class TierGen {
     private TierGen() {}
 
-    @FunctionalInterface
-    public interface DynamicHolderProvider {
-        @NotNull <T> Holder<T> get(ResourceKey<T> key);
-    }
-
-    public record BootstapLookup<T>(BootstapContext<T> context) implements DynamicHolderProvider {
-        @Override
-        public @NotNull <R> Holder<R> get(ResourceKey<R> key) {
-            ResourceKey<Registry<R>> registryKey = ResourceKey.createRegistryKey(key.registry());
-            return context.lookup(registryKey).getOrThrow(key);
-        }
-    }
-
-    public record HolderLookupWrapper(HolderLookup.Provider provider) implements DynamicHolderProvider {
-        @Override
-        public @NotNull <T> Holder<T> get(ResourceKey<T> key) {
-            ResourceKey<Registry<T>> registryKey = ResourceKey.createRegistryKey(key.registry());
-            return provider.lookupOrThrow(registryKey).getOrThrow(key);
-        }
-    }
-
-    public static class GenEntry<T> implements NonNullFunction<DynamicHolderProvider, T> {
+    public static class GenEntry<T> implements NonNullSupplier<T> {
         private final ResourceKey<T> key;
-        private NonNullFunction<DynamicHolderProvider, T> factory;
+        private NonNullSupplier<T> supplier;
         private T value;
 
-        public GenEntry(ResourceKey<T> key, NonNullFunction<DynamicHolderProvider, T> factory) {
-            this.key = key;
-            this.factory = factory;
-        }
-
         public GenEntry(ResourceKey<T> key, NonNullSupplier<T> supplier) {
-            this(key, $ -> supplier.get());
+            this.key = key;
+            this.supplier = supplier;
         }
 
         public GenEntry(ResourceKey<T> key, T value) {
@@ -91,15 +61,11 @@ public final class TierGen {
         }
 
         @Override
-        public @NotNull T apply(DynamicHolderProvider provider) {
-            if (factory != null) {
-                value = factory.apply(provider);
-                factory = null;
+        public @NotNull T get() {
+            if (supplier != null) {
+                value = supplier.get();
+                supplier = null;
             }
-            return value;
-        }
-
-        public @Nullable T get() {
             return value;
         }
     }
@@ -294,7 +260,7 @@ public final class TierGen {
             return this;
         }
 
-        public Sequence build(DynamicHolderProvider lookup) {
+        public Sequence build() {
             if (tiers.isEmpty()) {
                 throw new IllegalArgumentException("Sequence must contain at least one tier");
             }
@@ -303,9 +269,9 @@ public final class TierGen {
             }
 
             return new Sequence(
-                tiers.stream().map(lookup::get).toList(),
+                tiers,
                 defaultBaseLevelingCost,
-                nextSequence == null ? null : lookup.get(nextSequence)
+                nextSequence
             );
         }
     }

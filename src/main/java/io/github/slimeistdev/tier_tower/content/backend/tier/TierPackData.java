@@ -22,6 +22,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.slimeistdev.tier_tower.base.math.ast.Node;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -37,4 +38,12 @@ public record TierPackData(int levelCount, Optional<Either<Integer, Node>> baseL
         BASE_COST_CODEC.optionalFieldOf("base_leveling_cost").forGetter(TierPackData::baseLevelingCost),
         COST_FUNCTION_CODEC.fieldOf("leveling_cost_function").forGetter(TierPackData::levelingCostFunction)
     ).apply(i, TierPackData::new));
+
+    @Override
+    public @NotNull String toString() {
+        return "TierPackData[" +
+            "levelCount=" + levelCount + ", " +
+            "baseLevelingCost=" + baseLevelingCost.map(e -> e.mapRight(Node::repr)) + ", " +
+            "levelingCostFunction=" + levelingCostFunction.repr() + ']';
+    }
 }

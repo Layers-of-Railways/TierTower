@@ -20,12 +20,9 @@ package io.github.slimeistdev.tier_tower.registry;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import io.github.slimeistdev.tier_tower.base.data.api.TierGen;
-import io.github.slimeistdev.tier_tower.base.data.api.TierGen.BootstapLookup;
-import io.github.slimeistdev.tier_tower.base.data.api.TierGen.HolderLookupWrapper;
 import io.github.slimeistdev.tier_tower.base.data.api.TierGen.TierBuilder;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierPackData;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -136,18 +133,14 @@ public class TierTowerTiers {
     public static void init() {}
 
     public static void bootstrap(BootstapContext<TierPackData> bootstapContext) {
-        var lookup = new BootstapLookup<>(bootstapContext);
-
         for (var entry : TIERS) {
-            bootstapContext.register(entry.getKey(), entry.apply(lookup));
+            bootstapContext.register(entry.getKey(), entry.get());
         }
     }
 
-    public static void bootstrap(FabricDynamicRegistryProvider.Entries entries, HolderLookup.Provider registries) {
-        var lookup = new HolderLookupWrapper(registries);
-
+    public static void bootstrap(FabricDynamicRegistryProvider.Entries entries) {
         for (var entry : TIERS) {
-            entries.add(entry.getKey(), entry.apply(lookup));
+            entries.add(entry.getKey(), entry.get());
         }
     }
 }

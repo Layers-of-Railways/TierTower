@@ -26,8 +26,9 @@ import io.github.slimeistdev.tier_tower.utils.SearchUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderLookup.RegistryLookup;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
@@ -42,61 +43,64 @@ import java.util.Set;
 
 public final class Sequence {
     public static final Codec<Sequence> CODEC = RecordCodecBuilder.create(i -> i.group(
-        Codec.list(RegistryFixedCodec.create(TierTowerRegistries.TIER)).fieldOf("tiers")
-            .forGetter(Sequence::getDefinitions),
+        Codec.list(TierTowerRegistries.TIER_CODEC).fieldOf("tiers")
+            .forGetter(Sequence::getTierKeys),
         Codec.INT.fieldOf("default_base_leveling_cost")
             .forGetter(s -> s.defaultBaseLevelingCost),
-        RegistryFixedCodec.create(TierTowerRegistries.SEQUENCE).optionalFieldOf("next_sequence")
-            .forGetter(s -> Optional.ofNullable(s.getNextSequence()))
+        TierTowerRegistries.SEQUENCE_CODEC.optionalFieldOf("next_sequence")
+            .forGetter(s -> Optional.ofNullable(s.getNextSequenceKey()))
     ).apply(i, (t, c, s) -> new Sequence(t, c, s.orElse(null))));
 
-    private @Nullable List<Holder<TierPackData>> unfrozenTiers;
+    private @Nullable List<ResourceKey<TierPackData>> unfrozenTiers;
+    private @Nullable ResourceKey<Sequence> unfrozenNextSequence;
 
     private final Tier[] tiers;
     private final int defaultBaseLevelingCost;
-    private final @Nullable Holder<Sequence> nextSequence;
+    private @Nullable Holder<Sequence> nextSequence;
     // derived values
     /** How many points are needed to get to level 1 (index 0) of a tier */
     private final int[] tierBaseCosts;
     private final Object2IntMap<ResourceLocation> idMap;
 
-    public Sequence(@NotNull List<Holder<TierPackData>> tiers, int defaultBaseLevelingCost, @Nullable Holder<Sequence> nextSequence) {
-        this.defaultBaseLevelingCost = defaultBaseLevelingCost;
-        this.nextSequence = nextSequence;
-
+    public Sequence(@NotNull List<ResourceKey<TierPackData>> tiers, int defaultBaseLevelingCost, @Nullable ResourceKey<Sequence> nextSequence) {
         this.unfrozenTiers = List.copyOf(tiers);
+        this.unfrozenNextSequence = nextSequence;
+
+        this.defaultBaseLevelingCost = defaultBaseLevelingCost;
+
         this.tiers = new Tier[tiers.size()];
         this.idMap = new Object2IntOpenHashMap<>();
         this.tierBaseCosts = new int[tiers.size()];
     }
 
-    private static void checkForDuplicates(List<Holder<TierPackData>> tiers) {
+    private static void checkForDuplicates(List<ResourceKey<TierPackData>> tiers) {
         if (tiers.isEmpty()) {
             throw new IllegalArgumentException("A sequence must contain at least one tier");
         }
 
         Set<ResourceKey<TierPackData>> seen = new HashSet<>();
-        for (Holder<TierPackData> tier : tiers) {
-            Optional<ResourceKey<TierPackData>> keyOpt = tier.unwrapKey();
-            if (keyOpt.isEmpty()) {
-                throw new IllegalArgumentException("Direct TierPackData holders are not allowed in a Sequence");
-            }
-            ResourceKey<TierPackData> key = keyOpt.get();
-            if (!seen.add(key)) {
-                throw new IllegalArgumentException("Duplicate tier pack data ID: " + key);
+        for (ResourceKey<TierPackData> tier : tiers) {
+            if (!seen.add(tier)) {
+                throw new IllegalArgumentException("Duplicate tier pack data ID: " + tier);
             }
         }
     }
 
     @ApiStatus.Internal
-    public void freeze() {
+    public void freeze(HolderLookup.Provider lookupProvider) {
         if (unfrozenTiers == null) return;
         checkForDuplicates(unfrozenTiers);
+
+        RegistryLookup<Sequence> sequenceLookup = lookupProvider.lookupOrThrow(TierTowerRegistries.SEQUENCE);
+        RegistryLookup<TierPackData> tierLookup = lookupProvider.lookupOrThrow(TierTowerRegistries.TIER);
+
+        nextSequence = unfrozenNextSequence == null ? null : sequenceLookup.getOrThrow(unfrozenNextSequence);
 
         // construct tiers
         int nextBaseCost = defaultBaseLevelingCost;
         for (int i = 0; i < tiers.length; i++) {
-            Pair<Tier, Integer> constructed = Tier.constructFrom(unfrozenTiers.get(i), nextBaseCost);
+            Holder<TierPackData> holder = tierLookup.getOrThrow(unfrozenTiers.get(i));
+            Pair<Tier, Integer> constructed = Tier.constructFrom(holder, nextBaseCost);
             Tier tier = constructed.getFirst();
             nextBaseCost = constructed.getSecond();
 
@@ -112,6 +116,7 @@ public final class Sequence {
             tierBaseCosts[i] = prevCost + prevTier.getTotalLevelingCost();
         }
 
+        unfrozenNextSequence = null;
         unfrozenTiers = null;
     }
 
@@ -121,8 +126,8 @@ public final class Sequence {
         }
     }
 
-    private List<Holder<TierPackData>> getDefinitions() {
-        return unfrozenTiers != null ? unfrozenTiers : Arrays.stream(tiers).map(Tier::getDefinition).toList();
+    private List<ResourceKey<TierPackData>> getTierKeys() {
+        return unfrozenTiers != null ? unfrozenTiers : Arrays.stream(tiers).map(Tier::getKey).toList();
     }
 
     public LevelingState getLevelingState(final int totalPoints) {
@@ -183,10 +188,12 @@ public final class Sequence {
     }
 
     public @Nullable Holder<Sequence> getNextSequence() {
+        ensureFrozen();
         return nextSequence;
     }
 
     public @Nullable ResourceKey<Sequence> getNextSequenceKey() {
+        ensureFrozen();
         return nextSequence != null ? nextSequence.unwrapKey().orElse(null) : null;
     }
 
