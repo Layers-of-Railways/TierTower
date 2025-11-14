@@ -1,17 +1,77 @@
 {
   "variants": {
-    "facing=east": {
+    "display_face=down,facing=east": {
       "model": "tier_tower:block/obelisk",
       "y": 90
     },
-    "facing=north": {
+    "display_face=down,facing=north": {
       "model": "tier_tower:block/obelisk"
     },
-    "facing=south": {
+    "display_face=down,facing=south": {
       "model": "tier_tower:block/obelisk",
       "y": 180
     },
-    "facing=west": {
+    "display_face=down,facing=west": {
+      "model": "tier_tower:block/obelisk",
+      "y": 270
+    },
+    "display_face=left,facing=east": {
+      "model": "tier_tower:block/obelisk",
+      "y": 90
+    },
+    "display_face=left,facing=north": {
+      "model": "tier_tower:block/obelisk"
+    },
+    "display_face=left,facing=south": {
+      "model": "tier_tower:block/obelisk",
+      "y": 180
+    },
+    "display_face=left,facing=west": {
+      "model": "tier_tower:block/obelisk",
+      "y": 270
+    },
+    "display_face=none,facing=east": {
+      "model": "tier_tower:block/obelisk",
+      "y": 90
+    },
+    "display_face=none,facing=north": {
+      "model": "tier_tower:block/obelisk"
+    },
+    "display_face=none,facing=south": {
+      "model": "tier_tower:block/obelisk",
+      "y": 180
+    },
+    "display_face=none,facing=west": {
+      "model": "tier_tower:block/obelisk",
+      "y": 270
+    },
+    "display_face=right,facing=east": {
+      "model": "tier_tower:block/obelisk",
+      "y": 90
+    },
+    "display_face=right,facing=north": {
+      "model": "tier_tower:block/obelisk"
+    },
+    "display_face=right,facing=south": {
+      "model": "tier_tower:block/obelisk",
+      "y": 180
+    },
+    "display_face=right,facing=west": {
+      "model": "tier_tower:block/obelisk",
+      "y": 270
+    },
+    "display_face=up,facing=east": {
+      "model": "tier_tower:block/obelisk",
+      "y": 90
+    },
+    "display_face=up,facing=north": {
+      "model": "tier_tower:block/obelisk"
+    },
+    "display_face=up,facing=south": {
+      "model": "tier_tower:block/obelisk",
+      "y": 180
+    },
+    "display_face=up,facing=west": {
       "model": "tier_tower:block/obelisk",
       "y": 270
     }

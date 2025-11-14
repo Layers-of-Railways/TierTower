@@ -16,28 +16,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.slimeistdev.tier_tower.content.obelisk;
+package io.github.slimeistdev.tier_tower.foundation.block_entity;
 
-import io.github.slimeistdev.tier_tower.foundation.block_entity.ClientTickingBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.ApiStatus;
 
-public class ObeliskBlockEntity extends BlockEntity implements ClientTickingBlockEntity {
-    @Environment(EnvType.CLIENT)
-    ObeliskRenderState renderState;
-
-    public ObeliskBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
-        super(type, pos, blockState);
-    }
-
+public interface ClientTickingBlockEntity extends TickingBlockEntity {
+    @ApiStatus.NonExtendable
     @Override
-    @Environment(EnvType.CLIENT)
-    public void tickClient() {
-        if (renderState == null) renderState = new ObeliskRenderState();
-        renderState.update(worldPosition);
+    default void tick() {
+        tickClient();
     }
+
+    @ApiStatus.OverrideOnly
+    @Environment(EnvType.CLIENT)
+    void tickClient();
 }

@@ -60,8 +60,12 @@ public interface IBE<T extends BlockEntity> extends EntityBlock {
     @Override
     default <S extends BlockEntity> BlockEntityTicker<S> getTicker(@NotNull Level level, @NotNull BlockState state,
                                                                    @NotNull BlockEntityType<S> type) {
+        if (!level.isClientSide && ClientTickingBlockEntity.class.isAssignableFrom(getBlockEntityClass()))
+            return null;
+
         if (TickingBlockEntity.class.isAssignableFrom(getBlockEntityClass()))
             return new TickingBlockEntityTicker<>();
+
         return null;
     }
 

@@ -23,18 +23,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.slimeistdev.tier_tower.TierTower;
-import io.github.slimeistdev.tier_tower.TierTowerClient;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
-import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
-import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeMetaDataSection;
 import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeUtil;
+import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlock.DisplayFace;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -43,19 +42,18 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
+@Environment(EnvType.CLIENT)
 public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBlockEntity> {
     private static final ResourceLocation BACKGROUND = TierTower.asResource("textures/gui/obelisk_background.png");
+    private static final ResourceLocation EMPTY_FRAME = TierTower.asResource("textures/gui/obelisk_frame_empty.png");
 
     private static final ResourceLocation TOWER_TOP = TierTower.asResource("textures/gui/tower/tower_top.png");
     private static final ResourceLocation TOWER_EMPTY = TierTower.asResource("textures/gui/tower/tower_empty.png");
@@ -75,24 +73,19 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
     @Override
     public void render(@NotNull ObeliskBlockEntity be, float partialTick, @NotNull PoseStack ms, @NotNull MultiBufferSource buffer, int packedLight, int packedOverlay) {
         Minecraft mc = Minecraft.getInstance();
-        LocalPlayer player = mc.player;
-        if (player == null || mc.level == null) return;
+        BlockState state = be.getBlockState();
+        Direction facing = state.getValue(ObeliskBlock.FACING);
+        DisplayFace displayFace = state.getValue(ObeliskBlock.DISPLAY_FACE);
+        ObeliskRenderState ors = be.renderState;
 
-        TowerSummary summary = TierTowerClient.SUBURB.getSummary(player.getUUID());
-        Sequence sequence = TierTowerClient.SUBURB.getSequence(summary.sequenceId(), mc.level.registryAccess());
-        if (sequence == null) return;
-
-        int currentTier = summary.levelingState().tierIndex();
-        int currentLevel = summary.levelingState().levelIndex();
-        Tier tier = sequence.getTier(currentTier);
-        ResourceLocation background = tier.getTexture("obelisk");
-        int textColor = ChatBadgeMetaDataSection.get(tier.getTexture("badge")).textColor();
+        if (displayFace == DisplayFace.NONE || mc.level == null) {
+            return;
+        }
 
         ms.pushPose();
 
         int width = 3;
         int height = 4;
-        Direction facing = be.getBlockState().getValue(ObeliskBlock.FACING);
         float rot = facing.toYRot();
 
         // setup basic transforms
@@ -100,7 +93,21 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
         ms.mulPose(Axis.YP.rotationDegrees(-rot));
         ms.translate(-0.5f, -0.5f, -0.5f);
         ms.scale(1/16f, 1/16f, 1/16f);
-        ms.translate(8 - (width * 8f), 16f, 17f);
+
+        // setup per-DisplayFace transforms
+        float xOffset = switch (displayFace) {
+            case UP, DOWN -> 8 - (width * 8f);
+            case LEFT -> -width * 16f;
+            case RIGHT -> 16f;
+            case NONE -> throw new IllegalStateException();
+        };
+        float yOffset = switch (displayFace) {
+            case LEFT, RIGHT -> -24f;
+            case UP -> 16f;
+            case DOWN -> -height * 16f;
+            case NONE -> throw new IllegalStateException();
+        };
+        ms.translate(xOffset, yOffset, 16.25f);
 
         BlockPos frontPos = be.getBlockPos().offset(facing.getNormal());
         int frontPackedLight = LightTexture.pack(
@@ -108,13 +115,20 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             mc.level.getBrightness(LightLayer.SKY, frontPos)
         );
 
+        ResourceLocation background = ors.valid ? ors.tier.getTexture("obelisk") : EMPTY_FRAME;
         renderBackground(ms, buffer, frontPackedLight, background, width, height, 0f);
+        if (!ors.valid) {
+            ms.popPose();
+            return;
+        }
+
+        int textColor = ChatBadgeMetaDataSection.get(ors.tier.getTexture("badge")).textColor();
 
         // render player faces and name
         {
             ms.pushPose();
 
-            FormattedCharSequence name = player.getDisplayName().getVisualOrderText();
+            FormattedCharSequence name = ors.player.getDisplayName().getVisualOrderText();
             int nameWidth = font.width(name);
             ms.translate(width * 8f, height * 16f - 2f, 0.125f);
             ms.scale(1/2f, -1/2f, 1/2f);
@@ -133,13 +147,13 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             GuiGraphics guiGraphics = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
             guiGraphics.pose().last().pose().set(ms.last().pose());
             guiGraphics.pose().last().normal().set(ms.last().normal());
-            boolean drawHat = player.isModelPartShown(PlayerModelPart.HAT);
-            boolean upsideDown = LivingEntityRenderer.isEntityUpsideDown(player);
+            boolean drawHat = ors.player.isModelPartShown(PlayerModelPart.HAT);
+            boolean upsideDown = LivingEntityRenderer.isEntityUpsideDown(ors.player);
             for (int sign = -1; sign <= 1; sign += 2) {
                 RenderSystem.enableDepthTest();
                 PlayerFaceRenderer.draw(
                     guiGraphics,
-                    player.getSkinTextureLocation(),
+                    ors.player.getSkinTextureLocation(),
                     sign * (width * 16 - 4 - (sign == 1 ? 8 : 0)), 0,
                     8,
                     drawHat,
@@ -157,41 +171,17 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             ms.translate((width - 1) * 8 - 8, height * 16 - 10, 0);
             ms.scale(32f / TOWER_SECTION_WIDTH, 32f / TOWER_SECTION_WIDTH, 32f / TOWER_SECTION_WIDTH);
 
-            int offsetSteps = renderTower(ms, buffer, frontPackedLight, sequence, currentTier, 9, 0.5f);
+            int offsetSteps = renderTower(ms, buffer, frontPackedLight, ors.sequence, ors.summary.levelingState().tierIndex(), 9, 0.5f);
 
             // render progress bars
             int progressHeight = 9;
 
-            int maxLevel = tier.getLevelCount() - 1;
-            int nextTierTotalPoints = tier.getCostUpTo(maxLevel) + tier.getLevelingCost(maxLevel);
-            int nextTierProgressPoints = tier.getCostUpTo(currentLevel) + summary.levelingState().levelPoints();
-            int nextLevelTotalPoints = tier.getLevelingCost(currentLevel);
-            int nextLevelProgressPoints = summary.levelingState().levelPoints();
-
-            BadgeState current = new BadgeState(tier.getId(), currentLevel);
-            BadgeState nextTier;
-            BadgeState nextLevel;
-
-            if (currentTier + 1 < sequence.getTierCount()) {
-                nextTier = new BadgeState(sequence.getTier(currentTier + 1).getId(), 0);
-            } else {
-                nextTier = null;
-            }
-
-            if (current.levelIndex() + 1 < tier.getLevelCount()) {
-                nextLevel = new BadgeState(current.tierId(), current.levelIndex() + 1);
-            } else if (currentTier + 1 < sequence.getTierCount()) {
-                nextLevel = new BadgeState(sequence.getTier(currentTier + 1).getId(), 0);
-            } else {
-                nextLevel = null;
-            }
-
             renderProgressBg(ms, buffer, frontPackedLight, progressHeight, -16, 0, 0.5f);
             renderProgressFg(ms, buffer, frontPackedLight, progressHeight, -16, 0, 0.625f,
-                (float) nextTierProgressPoints /  nextTierTotalPoints);
+                ors.nextTierProgress);
             renderProgressBg(ms, buffer, frontPackedLight, progressHeight, TOWER_SECTION_WIDTH, 0, 0.5f);
             renderProgressFg(ms, buffer, frontPackedLight, progressHeight, TOWER_SECTION_WIDTH, 0, 0.625f,
-                (float) nextLevelProgressPoints /  nextLevelTotalPoints);
+                ors.nextLevelProgress);
 
             // render badges
             ms.translate(0, 0, 0.75f);
@@ -199,10 +189,10 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
 
             int[] x$ = new int[] { -16, TOWER_SECTION_WIDTH };
             int[] y$ = new int[] { (progressHeight * 16) - 4, -3 };
-            BadgeState[] badge$ = new BadgeState[] { nextTier, nextLevel };
+            BadgeState[] badge$ = new BadgeState[] { ors.nextTier, ors.nextLevel };
 
             for (int i = 0; i < 2; i++) {
-                BadgeState[] badge$$ = new BadgeState[] { current, badge$[i] };
+                BadgeState[] badge$$ = new BadgeState[] { ors.current, badge$[i] };
                 for (int j = 0; j < 2; j++) {
                     int x = x$[i];
                     int y = y$[j];
@@ -225,17 +215,10 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             // render total points
             ms.translate(0, TOWER_SECTION_HEIGHT * offsetSteps, 0);
 
-            Locale locale = Locale.forLanguageTag(mc.getLanguageManager().getSelected());
-            NumberFormat numberFormat = NumberFormat.getInstance(locale);
-            int totalPoints = sequence.getCostUpTo(currentTier) + tier.getCostUpTo(currentLevel)
-                + summary.levelingState().levelPoints() + summary.levelingState().surplusPoints();
-
-            Component progressComponent = Component.literal(numberFormat.format(totalPoints));
-            FormattedCharSequence progressText = progressComponent.getVisualOrderText();
-            int textWidth = font.width(progressText);
+            int textWidth = font.width(ors.progressText);
             //noinspection IntegerDivisionInFloatingPointContext
             font.drawInBatch(
-                progressText,
+                ors.progressText,
                 (TOWER_SECTION_WIDTH - textWidth) / 2, 3,
                 textColor, false,
                 ms.last().pose(),

@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-12T23:55:10.563562785	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-11-14T12:54:25.569945669	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 1dbf3b3234b7336bf5edbf912c0d950eb671c590 assets/tier_tower/models/block/eminent_deepslate_tiles.json
 e44b7ebbae421404e2e0081dbccdccafd264beeb assets/tier_tower/models/block/eminent_deepslate_pillar_horizontal.json
 0afaf7b1c0ce22edf1849275080292bf396b3dba assets/tier_tower/models/item/eminent_deepslate_tiles.json
@@ -15,7 +15,7 @@ befc1bb7c82ac8e4355c2a117360815430110189 assets/tier_tower/models/block/eminent_
 113771819cfd950d4df83c366c9ef823d13d1892 assets/tier_tower/blockstates/item_sink.json
 23a52e38bcecda6bdd060a723e066bcc208905e7 data/tier_tower/loot_tables/blocks/deepslate_pillar.json
 8a55790eb961ff6933ea30cf1a0fdbfef7a5f1a0 data/tier_tower/loot_tables/blocks/obelisk.json
-200dcea938ac79632c160e483d7f26a037ac8200 assets/tier_tower/blockstates/obelisk.json
+865ef27f3a1a4360c242f43037980a00accd5e96 assets/tier_tower/blockstates/obelisk.json
 18924d163c0cd1825fd0ec2fec41cc3b9f66a6f6 data/tier_tower/loot_tables/blocks/eminent_deepslate_bricks.json
 f5e29af0c2dcc2271a64e70f7fc8f78953b2bbaf assets/tier_tower/models/block/deepslate_pillar.json
 da5cd78f7bf3181fdc3b91cff0fce4d1bfcf9fef assets/tier_tower/models/block/obelisk.json
