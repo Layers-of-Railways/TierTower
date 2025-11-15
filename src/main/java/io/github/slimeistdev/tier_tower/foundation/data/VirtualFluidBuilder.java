@@ -1,0 +1,30 @@
+package io.github.slimeistdev.tier_tower.foundation.data;
+
+import com.tterrag.registrate.AbstractRegistrate;
+import com.tterrag.registrate.builders.BuilderCallback;
+import com.tterrag.registrate.builders.FluidBuilder;
+import com.tterrag.registrate.fabric.SimpleFlowableFluid;
+import com.tterrag.registrate.fabric.SimpleFlowableFluid.Properties;
+import com.tterrag.registrate.util.nullness.NonNullFunction;
+import com.tterrag.registrate.util.nullness.NonNullSupplier;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * For registering fluids with no buckets/blocks
+ */
+public class VirtualFluidBuilder<T extends SimpleFlowableFluid, P> extends FluidBuilder<T, P> {
+    public VirtualFluidBuilder(AbstractRegistrate<?> owner, P parent, String name, BuilderCallback callback,
+        ResourceLocation stillTexture, ResourceLocation flowingTexture,
+        NonNullFunction<Properties, T> sourceFactory,
+        NonNullFunction<Properties, T> flowingFactory
+    ) {
+        super(owner, parent, name, callback, stillTexture, flowingTexture, flowingFactory);
+        source(sourceFactory);
+    }
+
+    @Override
+    public @NotNull NonNullSupplier<T> asSupplier() {
+        return this::getEntry;
+    }
+}

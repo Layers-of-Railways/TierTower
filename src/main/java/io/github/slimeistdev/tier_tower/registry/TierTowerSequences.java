@@ -20,8 +20,8 @@ package io.github.slimeistdev.tier_tower.registry;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import io.github.slimeistdev.tier_tower.TierTower;
-import io.github.slimeistdev.tier_tower.base.data.api.TierGen.GenEntry;
-import io.github.slimeistdev.tier_tower.base.data.api.TierGen.SequenceBuilder;
+import io.github.slimeistdev.tier_tower.foundation.data.SequenceBuilder;
+import io.github.slimeistdev.tier_tower.foundation.data.SimpleGenEntry;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -39,9 +39,9 @@ import static io.github.slimeistdev.tier_tower.registry.TierTowerTiers.*;
 @SuppressWarnings({"SameParameterValue", "unused"})
 public class TierTowerSequences {
     private static final HashMap<String, String> LANG = new HashMap<>();
-    private static final List<GenEntry<Sequence>> SEQUENCES = new ArrayList<>();
+    private static final List<SimpleGenEntry<Sequence>> SEQUENCES = new ArrayList<>();
 
-    static GenEntry<Sequence> MAIN_SEQUENCE = sequence(TierTower.MAIN_SEQUENCE.location(), b -> b
+    static SimpleGenEntry<Sequence> MAIN_SEQUENCE = sequence(TierTower.MAIN_SEQUENCE.location(), b -> b
         .defaultBaseLevelingCost(1)
         .tiers(
             COPPER,
@@ -65,11 +65,11 @@ public class TierTowerSequences {
         LANG.forEach(langConsumer);
     }
 
-    private static GenEntry<Sequence> sequence(ResourceLocation id, String langName, UnaryOperator<SequenceBuilder> builder) {
+    private static SimpleGenEntry<Sequence> sequence(ResourceLocation id, String langName, UnaryOperator<SequenceBuilder> builder) {
         ResourceKey<Sequence> key = ResourceKey.create(TierTowerRegistries.SEQUENCE, id);
         LANG.put(id.toLanguageKey("tier_tower.sequence"), langName);
 
-        var entry = new GenEntry<Sequence>(
+        var entry = new SimpleGenEntry<Sequence>(
             key,
             () -> builder.apply(new SequenceBuilder()).build()
         );
@@ -77,15 +77,15 @@ public class TierTowerSequences {
         return entry;
     }
 
-    private static GenEntry<Sequence> sequence(String id, String langName, UnaryOperator<SequenceBuilder> builder) {
+    private static SimpleGenEntry<Sequence> sequence(String id, String langName, UnaryOperator<SequenceBuilder> builder) {
         return sequence(TierTower.asResource(id), langName, builder);
     }
 
-    private static GenEntry<Sequence> sequence(ResourceLocation id, UnaryOperator<SequenceBuilder> builder) {
+    private static SimpleGenEntry<Sequence> sequence(ResourceLocation id, UnaryOperator<SequenceBuilder> builder) {
         return sequence(id, RegistrateLangProvider.toEnglishName(id.getPath()), builder);
     }
 
-    private static GenEntry<Sequence> sequence(String id, UnaryOperator<SequenceBuilder> builder) {
+    private static SimpleGenEntry<Sequence> sequence(String id, UnaryOperator<SequenceBuilder> builder) {
         return sequence(id, RegistrateLangProvider.toEnglishName(id), builder);
     }
 

@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "tier_tower:fluid/eminence_flow"
+    },
+    {
+      "type": "single",
+      "resource": "tier_tower:fluid/eminence_still"
+    }
+  ]
+}

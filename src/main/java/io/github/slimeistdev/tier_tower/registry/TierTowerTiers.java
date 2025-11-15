@@ -19,8 +19,8 @@
 package io.github.slimeistdev.tier_tower.registry;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
-import io.github.slimeistdev.tier_tower.base.data.api.TierGen;
-import io.github.slimeistdev.tier_tower.base.data.api.TierGen.TierBuilder;
+import io.github.slimeistdev.tier_tower.foundation.data.SimpleGenEntry;
+import io.github.slimeistdev.tier_tower.foundation.data.TierBuilder;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierPackData;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -36,9 +36,9 @@ import java.util.function.UnaryOperator;
 @SuppressWarnings({"SameParameterValue", "unused"})
 public class TierTowerTiers {
     private static final HashMap<String, String> LANG = new HashMap<>();
-    private static final List<TierGen.GenEntry<TierPackData>> TIERS = new ArrayList<>();
+    private static final List<SimpleGenEntry<TierPackData>> TIERS = new ArrayList<>();
 
-    static TierGen.GenEntry<TierPackData> START = null,
+    static SimpleGenEntry<TierPackData> START = null,
 
     COPPER = tier("copper", b -> b
         .baseLevelingCost(16)
@@ -106,11 +106,11 @@ public class TierTowerTiers {
         LANG.forEach(langConsumer);
     }
 
-    private static TierGen.GenEntry<TierPackData> tier(ResourceLocation id, String langName, UnaryOperator<TierBuilder> builder) {
+    private static SimpleGenEntry<TierPackData> tier(ResourceLocation id, String langName, UnaryOperator<TierBuilder> builder) {
         ResourceKey<TierPackData> key = ResourceKey.create(TierTowerRegistries.TIER, id);
         LANG.put(id.toLanguageKey("tier_tower.tier"), langName);
 
-        var entry = new TierGen.GenEntry<TierPackData>(
+        var entry = new SimpleGenEntry<TierPackData>(
             key,
             () -> builder.apply(new TierBuilder()).build()
         );
@@ -118,15 +118,15 @@ public class TierTowerTiers {
         return entry;
     }
 
-    private static TierGen.GenEntry<TierPackData> tier(String id, String langName, UnaryOperator<TierBuilder> builder) {
+    private static SimpleGenEntry<TierPackData> tier(String id, String langName, UnaryOperator<TierBuilder> builder) {
         return tier(new ResourceLocation(id), langName, builder);
     }
 
-    private static TierGen.GenEntry<TierPackData> tier(ResourceLocation id, UnaryOperator<TierBuilder> builder) {
+    private static SimpleGenEntry<TierPackData> tier(ResourceLocation id, UnaryOperator<TierBuilder> builder) {
         return tier(id, RegistrateLangProvider.toEnglishName(id.getPath()), builder);
     }
 
-    private static TierGen.GenEntry<TierPackData> tier(String id, UnaryOperator<TierBuilder> builder) {
+    private static SimpleGenEntry<TierPackData> tier(String id, UnaryOperator<TierBuilder> builder) {
         return tier(id, RegistrateLangProvider.toEnglishName(id), builder);
     }
 

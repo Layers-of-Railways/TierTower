@@ -1,0 +1,26 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ],
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "minecraft:honeycomb"
+    },
+    {
+      "amount": 27000,
+      "fluid": "tier_tower:eminence",
+      "nbt": {}
+    }
+  ],
+  "results": [
+    {
+      "item": "tier_tower:eminence_nugget"
+    }
+  ]
+}

@@ -40,6 +40,6 @@ public class TierTowerItemSinkRecipeGen extends TierTowerRecipeProvider {
 
     @Override
     public @NotNull String getName() {
-        return "Tier Tower Item Sink Recipes";
+        return "Item Sink Recipes";
     }
 }

@@ -18,16 +18,17 @@
 
 package io.github.slimeistdev.tier_tower;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.providers.ProviderType;
 import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import io.github.slimeistdev.tier_tower.base.data.TierTowerGeneratedEntriesProvider;
 import io.github.slimeistdev.tier_tower.base.data.TierTowerSoundDefinitionsProvider;
 import io.github.slimeistdev.tier_tower.base.data.lang.LangGen;
 import io.github.slimeistdev.tier_tower.base.data.recipe.TierTowerItemSinkRecipeGen;
+import io.github.slimeistdev.tier_tower.base.data.recipe.TierTowerStandardRecipeGen;
 import io.github.slimeistdev.tier_tower.content.backend.GlobalTowerManager;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.events.CommonEvents;
+import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
@@ -53,7 +54,7 @@ public class TierTower implements ModInitializer {
     public static final ResourceLocation BADGE_FONT = asResource("badge");
     public static final ResourceKey<Sequence> MAIN_SEQUENCE = asKey(TierTowerRegistries.SEQUENCE, "main");
 
-    private static final Registrate REGISTRATE = Registrate.create(MOD_ID);
+    private static final TierTowerRegistrate REGISTRATE = TierTowerRegistrate.create(MOD_ID);
 
     @Override
     public void onInitialize() {
@@ -80,10 +81,11 @@ public class TierTower implements ModInitializer {
         //noinspection UnnecessaryLocalVariable
         DataGenerator.PackGenerator baseGen = gen;
         baseGen.addProvider(TierTowerItemSinkRecipeGen::new);
+        baseGen.addProvider(TierTowerStandardRecipeGen::new);
         baseGen.addProvider(output -> new TierTowerSoundDefinitionsProvider(output, helper));
     }
 
-    public static Registrate registrate() {
+    public static TierTowerRegistrate registrate() {
         return REGISTRATE;
     }
 

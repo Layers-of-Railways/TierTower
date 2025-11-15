@@ -18,6 +18,7 @@
 
 package io.github.slimeistdev.tier_tower.foundation.block_entity;
 
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,7 +27,8 @@ public interface ClientTickingBlockEntity extends TickingBlockEntity {
     @ApiStatus.NonExtendable
     @Override
     default void tick() {
-        tickClient();
+        //noinspection Convert2MethodRef
+        EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> tickClient());
     }
 
     @ApiStatus.OverrideOnly

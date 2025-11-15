@@ -43,9 +43,12 @@ repositories {
     exclusiveMaven("https://maven.parchmentmc.org", "org.parchmentmc.data") // Parchment mappings
     maven("https://maven.terraformersmc.com/releases/") // Mod Menu, EMI
     exclusiveMaven("https://api.modrinth.com/maven", "maven.modrinth") // LazyDFU
-    maven("https://mvn.devos.one/snapshots/") // Porting Lib, Forge Tags, Milk Lib, Registrate Fabric
+    maven("https://mvn.devos.one/snapshots/") // Create Fabric, Porting Lib, Forge Tags, Milk Lib, Registrate Fabric
     maven("https://mvn.devos.one/releases") // Porting Lib Releases
     maven("https://jitpack.io/") // Mixin Extras, Fabric ASM
+    maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // forge config api port
+    exclusiveMaven("https://maven.jamieswhiteshirt.com/libs-release", "com.jamieswhiteshirt") // Reach Entity Attributes
+    exclusiveMaven("https://maven.tterrag.com/", "com.jozufozu.flywheel") // Flywheel
 }
 
 val loom = project.extensions.getByType<LoomGradleExtensionAPI>()
@@ -113,6 +116,12 @@ dependencies {
     modLocalRuntime("com.terraformersmc:modmenu:${"modmenu_version"()}")
 
     modLocalRuntime("dev.emi:emi-fabric:${"emi_version"()}")
+
+    // Compat
+    if ("enable_create"().toBoolean()) {
+        // Create - dependencies are added transitively
+        modLocalRuntime("com.simibubi.create:create-fabric-${"minecraft_version"()}:${"create_fabric_version"()}")
+    }
 }
 
 tasks.processResources {

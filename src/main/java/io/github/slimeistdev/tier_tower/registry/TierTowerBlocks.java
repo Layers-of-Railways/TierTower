@@ -18,11 +18,11 @@
 
 package io.github.slimeistdev.tier_tower.registry;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.ItemSinkBlock;
 import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlock;
+import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -31,7 +31,7 @@ import static io.github.slimeistdev.tier_tower.base.data.BuilderTransformers.*;
 
 @SuppressWarnings("unused")
 public class TierTowerBlocks {
-    private static final Registrate REGISTRATE = TierTower.registrate();
+    private static final TierTowerRegistrate REGISTRATE = TierTower.registrate();
 
     public static final BlockEntry<RotatedPillarBlock> DEEPSLATE_PILLAR = REGISTRATE.block("deepslate_pillar", RotatedPillarBlock::new)
         .initialProperties(() -> Blocks.POLISHED_DEEPSLATE)

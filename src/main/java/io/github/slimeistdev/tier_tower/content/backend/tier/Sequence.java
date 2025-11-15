@@ -193,8 +193,9 @@ public final class Sequence {
     }
 
     public @Nullable ResourceKey<Sequence> getNextSequenceKey() {
-        ensureFrozen();
-        return nextSequence != null ? nextSequence.unwrapKey().orElse(null) : null;
+        return unfrozenTiers != null
+            ? unfrozenNextSequence
+            : nextSequence != null ? nextSequence.unwrapKey().orElse(null) : null;
     }
 
     public record LevelingState(int tierIndex, int levelIndex, int levelPoints, int surplusPoints) {

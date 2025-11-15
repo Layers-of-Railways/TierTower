@@ -40,7 +40,7 @@ import java.util.UUID;
 public class EminentSnake {
     public static final int DEBOUNCE = 10;
     private static final boolean DEBUG_PATHFINDING = Boolean.getBoolean("tier_tower.debug.eminent_snake.pathfinding");
-    private static final int[] COLORS = {
+    public static final int[] COLORS = {
         0x7a000a,
         0xa8002c,
         0xc10033,

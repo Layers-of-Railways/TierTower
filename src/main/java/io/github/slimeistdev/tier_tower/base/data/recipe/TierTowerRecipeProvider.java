@@ -19,6 +19,7 @@
 package io.github.slimeistdev.tier_tower.base.data.recipe;
 
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.registry.TierTowerItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -56,6 +57,14 @@ public abstract class TierTowerRecipeProvider extends RecipeProvider {
     public static class I {
         public static ItemLike diamond() {
             return Items.DIAMOND;
+        }
+
+        public static ItemLike honeycomb() {
+            return Items.HONEYCOMB;
+        }
+
+        public static ItemLike bottledEminence() {
+            return TierTowerItems.BOTTLED_EMINENCE;
         }
     }
 }

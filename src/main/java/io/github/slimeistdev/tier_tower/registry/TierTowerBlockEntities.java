@@ -18,16 +18,16 @@
 
 package io.github.slimeistdev.tier_tower.registry;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.ItemSinkBlockEntity;
 import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlockEntity;
 import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlockEntityRenderer;
+import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
 
 @SuppressWarnings("unused")
 public class TierTowerBlockEntities {
-    private static final Registrate REGISTRATE = TierTower.registrate();
+    private static final TierTowerRegistrate REGISTRATE = TierTower.registrate();
 
     public static final BlockEntityEntry<ItemSinkBlockEntity> ITEM_SINK = REGISTRATE.blockEntity("item_sink", ItemSinkBlockEntity::new)
         .validBlocks(TierTowerBlocks.ITEM_SINK)

@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 public class EminentSnakeParticle extends DustParticleBase<EminentSnakeParticleOptions> {
     protected EminentSnakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, EminentSnakeParticleOptions options, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed, options, sprites);
+        this.gravity = -0.1f;
     }
 
     @Environment(EnvType.CLIENT)

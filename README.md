@@ -9,3 +9,5 @@ Description Todo
 Tier Tower is licensed under the LGPL-3.0 license. See [LICENSE.LESSER](LICENSE.LESSER) for more details.
 
 A modified version of the [Kiwi Soda](https://www.dafont.com/kiwisoda.font) font was used in the icon.
+
+Sections of [Create's](https://github.com/Creators-of-Create/Create) creative tab and virtual fluid code were used under the MIT license.
