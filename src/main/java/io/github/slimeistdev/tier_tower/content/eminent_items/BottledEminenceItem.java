@@ -30,8 +30,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class BottledEminenceItem extends Item {
-    public static final int EMINENCE_PER_BOTTLE = 10;
-
     public BottledEminenceItem(Properties properties) {
         super(properties);
     }

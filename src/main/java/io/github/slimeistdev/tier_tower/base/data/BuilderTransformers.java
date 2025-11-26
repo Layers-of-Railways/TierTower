@@ -19,13 +19,26 @@
 package io.github.slimeistdev.tier_tower.base.data;
 
 import com.tterrag.registrate.builders.BlockBuilder;
+import com.tterrag.registrate.builders.BlockEntityBuilder;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import io.github.slimeistdev.tier_tower.foundation.block_entity.FluidStorageBlockEntity;
+import io.github.slimeistdev.tier_tower.foundation.block_entity.ItemStorageBlockEntity;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiFunction;
+import java.util.function.ToIntFunction;
+
+@SuppressWarnings("UnstableApiUsage")
 public class BuilderTransformers {
     private static ResourceLocation extend(ResourceLocation rl, String suffix) {
         return new ResourceLocation(rl.getNamespace(), rl.getPath() + suffix);
@@ -48,6 +61,10 @@ public class BuilderTransformers {
         return b -> b.properties(p -> p.lightLevel(s -> level));
     }
 
+    public static <T extends Block, P> NonNullUnaryOperator<BlockBuilder<T, P>> lightLevel(ToIntFunction<BlockState> lightEmission) {
+        return b -> b.properties(p -> p.lightLevel(lightEmission));
+    }
+
     public static <T extends Block, P> NonNullUnaryOperator<BlockBuilder<T, P>> eminentBlock() {
         return b -> b.transform(lightLevel(7));
     }
@@ -58,5 +75,21 @@ public class BuilderTransformers {
             extend(p.blockTexture(c.get()), "_side"),
             extend(p.blockTexture(c.get()), "_top")
         ));
+    }
+
+    public static <T extends BlockEntity, P, A, C> NonNullUnaryOperator<BlockEntityBuilder<T, P>> blockEntityApi(
+        BlockApiLookup<A, C> lookup,
+        BiFunction<? super T, C, @Nullable A> apiProvider
+    ) {
+        return b -> b.onRegister(bet ->
+            lookup.registerForBlockEntity(apiProvider, bet));
+    }
+
+    public static <T extends BlockEntity & ItemStorageBlockEntity, P> NonNullUnaryOperator<BlockEntityBuilder<T, P>> itemStorage() {
+        return blockEntityApi(ItemStorage.SIDED, ItemStorageBlockEntity::getItemStorage);
+    }
+
+    public static <T extends BlockEntity & FluidStorageBlockEntity, P> NonNullUnaryOperator<BlockEntityBuilder<T, P>> fluidStorage() {
+        return blockEntityApi(FluidStorage.SIDED, FluidStorageBlockEntity::getFluidStorage);
     }
 }

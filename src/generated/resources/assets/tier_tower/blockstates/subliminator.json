@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "tier_tower:block/subliminator"
+    },
+    "lit=true": {
+      "model": "tier_tower:block/subliminator_lit"
+    }
+  }
+}

@@ -19,6 +19,7 @@
 package io.github.slimeistdev.tier_tower.content.eminent_items;
 
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.utils.EminenceConstants;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -30,8 +31,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class EminenceNuggetItem extends Item {
-    public static final int EMINENCE_PER_NUGGET = BottledEminenceItem.EMINENCE_PER_BOTTLE;
-
     public EminenceNuggetItem(Properties properties) {
         super(properties);
     }
@@ -52,7 +51,7 @@ public class EminenceNuggetItem extends Item {
 
         int amountUsed = player.isShiftKeyDown() ? 1 : stack.getCount();
 
-        TierTower.CITY.getOrCreateTower(player).addPoints(amountUsed * EMINENCE_PER_NUGGET);
+        TierTower.CITY.getOrCreateTower(player).addPoints(amountUsed * EminenceConstants.EMINENCE_PER_BOTTLE);
 
         stack.shrink(amountUsed);
         if (!stack.isEmpty())

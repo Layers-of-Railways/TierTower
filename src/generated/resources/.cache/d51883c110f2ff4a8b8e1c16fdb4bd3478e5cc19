@@ -1,15 +1,18 @@
-// 1.20.1	2025-11-15T10:05:20.830765628	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-11-17T07:31:40.087809739	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 1dbf3b3234b7336bf5edbf912c0d950eb671c590 assets/tier_tower/models/block/eminent_deepslate_tiles.json
+9413d6558e13906e17d6b7edbe0a7a2597e30645 assets/tier_tower/models/block/subliminator.json
 e44b7ebbae421404e2e0081dbccdccafd264beeb assets/tier_tower/models/block/eminent_deepslate_pillar_horizontal.json
 0afaf7b1c0ce22edf1849275080292bf396b3dba assets/tier_tower/models/item/eminent_deepslate_tiles.json
 407ef4262659d3c6c60a3403994935dfc95ba319 data/tier_tower/loot_tables/blocks/eminent_glass_bricks.json
 832964d64a2f3e32cc672a04caa308fff2bc9436 assets/tier_tower/blockstates/eminent_glass.json
-8c80a64bfb6b0ff548f0794e89cae001d1249f22 data/minecraft/tags/blocks/mineable/pickaxe.json
+14001233c7de8480151306adb29abf485e1f1d1d assets/tier_tower/blockstates/subliminator.json
+db81888beaa08bdd244764d87417e0869d1ec4f4 data/minecraft/tags/blocks/mineable/pickaxe.json
 2d1ed2ea486489d1e4446e51817036d30c583da2 assets/tier_tower/models/item/obelisk.json
 8c6b999c8eb617eab766283246e12a49f7b36843 data/tier_tower/loot_tables/blocks/item_sink.json
 c3ccfe392a0db20ee4351784bbf89a0a3874cbcf assets/tier_tower/blockstates/eminent_deepslate_bricks.json
 4e4db842c51ff939b128473f2a4877eb82c95247 data/tier_tower/loot_tables/blocks/eminent_glass.json
 2b6c81ba9f288a4cee217f8ac175634961b5e679 assets/tier_tower/blockstates/deepslate_pillar.json
+713108891cefcc2ff29945451acd8538be09d153 data/tier_tower/loot_tables/blocks/subliminator.json
 11a83030770c1d94eb1152a52c7418c508a418d2 data/create/tags/items/upright_on_belt.json
 f2001b942ecbc4def43c445108fd53bad8fb3258 assets/tier_tower/models/block/eminent_glass_bricks.json
 befc1bb7c82ac8e4355c2a117360815430110189 assets/tier_tower/models/block/eminent_deepslate_pillar.json
@@ -19,14 +22,16 @@ befc1bb7c82ac8e4355c2a117360815430110189 assets/tier_tower/models/block/eminent_
 1b7fafa3fb48188dcddc9adead8b792c30015243 assets/tier_tower/models/item/eminence_nugget.json
 c49d1bc2658e5d7d79a90d20c2b393d93a88e87a data/c/tags/items/nuggets.json
 865ef27f3a1a4360c242f43037980a00accd5e96 assets/tier_tower/blockstates/obelisk.json
+a40e1a307656bccb0da69fe4c7efa1d0cd0046cb assets/tier_tower/models/block/subliminator_lit.json
 18924d163c0cd1825fd0ec2fec41cc3b9f66a6f6 data/tier_tower/loot_tables/blocks/eminent_deepslate_bricks.json
 f5e29af0c2dcc2271a64e70f7fc8f78953b2bbaf assets/tier_tower/models/block/deepslate_pillar.json
 da5cd78f7bf3181fdc3b91cff0fce4d1bfcf9fef assets/tier_tower/models/block/obelisk.json
 af3824e4b6b70503fde7c4b222c53d61014e3d84 assets/tier_tower/blockstates/eminent_deepslate_tiles.json
 ccd1a14c6c910e8416b204b6b3a633f2f73007b2 assets/tier_tower/models/item/eminent_deepslate_pillar.json
-d05e7b7108816b3bf8394d6fb94ca78e3dbf910f assets/tier_tower/lang/en_us.json
+8de414e9cae33700349e6c98c066f0661cc168e5 assets/tier_tower/lang/en_us.json
 b89801644412cecde4f94fe26c2c5fc91dad11ea assets/tier_tower/models/block/eminent_glass.json
 3214b1b9a6883bca18d16f4cd2e9bc804d79779e assets/tier_tower/models/item/eminent_deepslate_bricks.json
+ece59900c1b868f6d4eaad583e3402f0a83d8a8d assets/tier_tower/models/item/subliminator.json
 99a5d633bcb2e1c3f1dae2423e20f87c64b7a103 assets/tier_tower/models/block/item_sink.json
 95399b2bd22a8588e8b64d34b17abe70f2f35d33 assets/tier_tower/models/item/deepslate_pillar.json
 1a5579fe3d80d17bc5ef5a2cf6ef0be26e9a31e5 assets/tier_tower/models/block/eminent_deepslate_bricks.json
@@ -40,4 +45,4 @@ e9c3660b21546ad77607aacc8c95cc851fb03ec0 assets/tier_tower/models/block/deepslat
 5e0e35e7e34543a7a673dc84e353f80b7fb9e4c7 data/tier_tower/loot_tables/blocks/eminent_deepslate_pillar.json
 f47a5e863ae7cdacd041b2b6e3ba419bf444671a data/tier_tower/loot_tables/blocks/eminent_deepslate_tiles.json
 00fc816234db9f4e49053eb539c960471166620c assets/tier_tower/blockstates/eminent_glass_bricks.json
-3ce4339f41e6564cf3e95ed5c8575e18e3dfccba assets/tier_tower/lang/en_ud.json
+cf2c0dff9b50d91146c8042bbc0d7b737bf4c91e assets/tier_tower/lang/en_ud.json

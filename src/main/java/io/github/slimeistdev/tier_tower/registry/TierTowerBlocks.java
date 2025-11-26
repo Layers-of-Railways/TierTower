@@ -19,9 +19,11 @@
 package io.github.slimeistdev.tier_tower.registry;
 
 import com.tterrag.registrate.util.entry.BlockEntry;
+import io.github.fabricators_of_create.porting_lib.models.generators.ConfiguredModel;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.ItemSinkBlock;
 import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlock;
+import io.github.slimeistdev.tier_tower.content.subliminator.SubliminatorBlock;
 import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -101,6 +103,26 @@ public class TierTowerBlocks {
                 p.modLoc("block/item_sink_top")
             )
         ))
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<SubliminatorBlock> SUBLIMINATOR = REGISTRATE.block("subliminator", SubliminatorBlock::new)
+        .lang("Subliminator")
+        .initialProperties(() -> Blocks.DEEPSLATE_BRICKS)
+        .transform(pickaxeOnly())
+        .transform(lightLevel(SubliminatorBlock::getLightLevel))
+        .blockstate((c, p) -> p.getVariantBuilder(c.get())
+            .forAllStatesExcept(state -> {
+                boolean lit = state.getValue(SubliminatorBlock.LIT);
+                return ConfiguredModel.builder()
+                    .modelFile(p.models().cubeBottomTop(
+                        c.getName() + (lit ? "_lit" : ""),
+                        p.modLoc("block/subliminator_side" + (lit ? "_on": "")),
+                        p.modLoc("block/subliminator_bottom"),
+                        p.modLoc("block/subliminator_top" + (lit ? "_on": "_off"))
+                    )).build();
+            }, SubliminatorBlock.FACING)
+        )
         .simpleItem()
         .register();
 

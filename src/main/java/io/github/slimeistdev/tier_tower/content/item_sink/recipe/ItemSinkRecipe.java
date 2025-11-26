@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeSerializers;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeTypes;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -39,6 +40,11 @@ public record ItemSinkRecipe(ResourceLocation id, Ingredient ingredient, int poi
     @Override
     public boolean matches(@NotNull Container container, @NotNull Level level) {
         return ingredient.test(container.getItem(0));
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public boolean matches(@NotNull ItemVariant itemVariant) {
+        return ingredient.test(itemVariant.toStack());
     }
 
     @Override

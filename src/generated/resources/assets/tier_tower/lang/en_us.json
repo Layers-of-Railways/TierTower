@@ -7,6 +7,7 @@
   "block.tier_tower.eminent_glass_bricks": "Eminent Glass Bricks",
   "block.tier_tower.item_sink": "Vortex",
   "block.tier_tower.obelisk": "Obelisk",
+  "block.tier_tower.subliminator": "Subliminator",
   "commands.tier_tower.lock.no_change.multiple": "All selected players' towers are already locked",
   "commands.tier_tower.lock.no_change.single": "%s's tower is already locked",
   "commands.tier_tower.lock.success.multiple": "Locked %s players' towers",
