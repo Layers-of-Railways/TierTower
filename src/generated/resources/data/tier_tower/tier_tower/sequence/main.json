@@ -1,5 +1,7 @@
 {
   "default_base_leveling_cost": 1,
+  "prestige_multiplier_function": "(1.0 + (prestige_points / 5000.0))",
+  "prestige_value_function": "(points - 5000.0)",
   "tiers": [
     "minecraft:copper",
     "create:zinc",

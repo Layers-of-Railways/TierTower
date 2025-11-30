@@ -22,8 +22,10 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.base.events.ProgressionCallback;
 import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
+import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence.LevelingState;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
@@ -32,6 +34,8 @@ import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +59,8 @@ public class PlayerTower {
     private boolean locked = false;
 
     // cache variables
-    private @Nullable Sequence.LevelingState $levelingState = null;
+    private @Nullable LevelingState $levelingState = null;
+    private double $prestigeMultiplier = Double.NaN;
 
     @Nullable RegistryAccess registryAccess;
 
@@ -76,7 +81,7 @@ public class PlayerTower {
         return playerId;
     }
 
-    private @NotNull Sequence.LevelingState ensureCurrent() {
+    private @NotNull LevelingState ensureCurrent() {
         SequenceState state = sequences.get(currentSequence);
 
         Sequence sequence;
@@ -89,7 +94,8 @@ public class PlayerTower {
         boolean needsAdd = false;
 
         if (state == null) {
-            state = new SequenceState(currentSequence, 0);
+            state = new SequenceState(currentSequence);
+            $prestigeMultiplier = Double.NaN;
             needsAdd = true;
         }
 
@@ -101,7 +107,8 @@ public class PlayerTower {
             sequences.remove(currentSequence);
 
             currentSequence = TierTower.MAIN_SEQUENCE;
-            state = sequences.computeIfAbsent(currentSequence, k -> new SequenceState(k, 0));
+            state = sequences.computeIfAbsent(currentSequence, SequenceState::new);
+            $prestigeMultiplier = Double.NaN;
             needsAdd = true;
         }
 
@@ -124,7 +131,7 @@ public class PlayerTower {
         SequenceState state = sequences.get(id);
 
         if (state == null) {
-            state = new SequenceState(id, 0);
+            state = new SequenceState(id);
         }
 
         Sequence sequence = state.getSequence(registryAccess);
@@ -138,6 +145,7 @@ public class PlayerTower {
         currentSequence = id;
         sequences.put(currentSequence, state);
         $levelingState = null; // reset the cached leveling state
+        $prestigeMultiplier = Double.NaN;
         markDirty();
         syncData();
         return Pair.of(state, sequence);
@@ -154,7 +162,45 @@ public class PlayerTower {
         return Objects.requireNonNull(sequences.get(currentSequence).getSequence(registryAccess));
     }
 
-    public void addPoints(int points) {
+    public boolean doPrestige(@NotNull ServerPlayer player) {
+        final LevelingState levelingState = ensureCurrent();
+        final SequenceState sequenceState = getSequenceState();
+        final Sequence sequence = getSequence();
+
+        int prestigePoints = sequence.calculatePrestigePoints(sequenceState.totalPoints, levelingState);
+        if (prestigePoints <= 0)
+            return false;
+
+        sequenceState.prestigePoints += prestigePoints;
+        sequenceState.totalPoints = 0;
+        $levelingState = sequence.getLevelingState(0);
+        $prestigeMultiplier = Double.NaN;
+
+        markDirty();
+
+        ProgressionCallback.PRESTIGE.invoker().onLevelUp(player, this);
+
+        return true;
+    }
+
+    public double getPrestigeMultiplier() {
+        final SequenceState sequenceState = getSequenceState();
+        final Sequence sequence = getSequence();
+
+        if (Double.isNaN($prestigeMultiplier)) {
+            $prestigeMultiplier = sequence.calculatePrestigeMultiplier(sequenceState.prestigePoints);
+        }
+
+        return $prestigeMultiplier;
+    }
+
+    public int applyPrestigeToPoints(int basePoints, @NotNull RandomSource random) {
+        double maxMultiplier = getPrestigeMultiplier();
+        double multiplier = 1.0 + (random.nextDouble() * (maxMultiplier - 1.0));
+        return (int)Math.round(basePoints * multiplier);
+    }
+
+    public void addPoints(int points, @NotNull ServerPlayer player) {
         if (points <= 0) return;
 
         final var levelState = ensureCurrent();
@@ -165,6 +211,9 @@ public class PlayerTower {
         int levelIndex = levelState.levelIndex();
         int levelPoints = levelState.levelPoints();
         int surplusPoints = levelState.surplusPoints();
+
+        boolean leveledUp = false;
+        boolean tieredUp = false;
 
         // distribute points, first to the current level, then to the current tier
         while (points > 0) {
@@ -178,10 +227,12 @@ public class PlayerTower {
                 points -= (levelingCost - levelPoints);
                 levelPoints = 0;
                 levelIndex++;
+                leveledUp = true;
 
                 if (levelIndex >= tier.getLevelCount()) { // move up a tier
                     levelIndex = 0;
                     tierIndex++;
+                    tieredUp = true;
 
                     if (tierIndex >= sequence.getTierCount()) { // move up to the next sequence
                         ResourceKey<Sequence> nextSequence = sequence.getNextSequenceKey();
@@ -191,6 +242,7 @@ public class PlayerTower {
                             tierIndex--;
                             levelIndex = tier.getLevelCount() - 1;
                             levelPoints = levelingCost;
+                            tieredUp = false;
                             break;
                         }
                         sequenceState = newSeq.getFirst();
@@ -213,7 +265,7 @@ public class PlayerTower {
             + levelPoints
             + surplusPoints;
 
-        $levelingState = new Sequence.LevelingState(
+        $levelingState = new LevelingState(
             tierIndex,
             levelIndex,
             levelPoints,
@@ -222,6 +274,14 @@ public class PlayerTower {
 
         markDirty();
         syncData();
+
+        if (player != null) {
+            if (tieredUp) {
+                ProgressionCallback.TIER.invoker().onLevelUp(player, this);
+            } else if (leveledUp) {
+                ProgressionCallback.LEVEL.invoker().onLevelUp(player, this);
+            }
+        }
     }
 
     public boolean removePoints(int points) {
@@ -272,7 +332,7 @@ public class PlayerTower {
 
         sequenceState.totalPoints = sequence.getCostUpTo(tierIndex) + tier.getCostUpTo(level) + points;
 
-        $levelingState = new Sequence.LevelingState(
+        $levelingState = new LevelingState(
             tierIndex,
             level,
             points,
@@ -303,7 +363,7 @@ public class PlayerTower {
     }
 
     public @NotNull TowerSummary summarize() {
-        Sequence.LevelingState levelingState = ensureCurrent();
+        LevelingState levelingState = ensureCurrent();
         return new TowerSummary(currentSequence, levelingState);
     }
 
@@ -314,17 +374,24 @@ public class PlayerTower {
     protected static class SequenceState {
         public static final Codec<SequenceState> CODEC = RecordCodecBuilder.create(i -> i.group(
             TierTowerRegistries.SEQUENCE_CODEC.fieldOf("sequence_id").forGetter(s -> s.sequenceId),
-            Codec.INT.fieldOf("total_points").forGetter(s -> s.totalPoints)
+            Codec.INT.fieldOf("total_points").forGetter(s -> s.totalPoints),
+            Codec.INT.optionalFieldOf("prestige_points", 0).forGetter(s -> s.prestigePoints)
         ).apply(i, SequenceState::new));
 
         private final ResourceKey<Sequence> sequenceId;
         private @Nullable Sequence cachedSequence;
 
         private int totalPoints;
+        private int prestigePoints;
 
-        private SequenceState(ResourceKey<Sequence> sequenceId, int totalPoints) {
+        private SequenceState(ResourceKey<Sequence> sequenceId) {
+            this(sequenceId, 0, 0);
+        }
+
+        private SequenceState(ResourceKey<Sequence> sequenceId, int totalPoints, int prestigePoints) {
             this.sequenceId = sequenceId;
             this.totalPoints = totalPoints;
+            this.prestigePoints = prestigePoints;
         }
 
         /**

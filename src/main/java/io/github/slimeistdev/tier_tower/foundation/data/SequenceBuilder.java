@@ -18,6 +18,8 @@
 
 package io.github.slimeistdev.tier_tower.foundation.data;
 
+import io.github.slimeistdev.tier_tower.base.math.MathPreconditions;
+import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierPackData;
 import net.minecraft.resources.ResourceKey;
@@ -30,6 +32,8 @@ import java.util.List;
 public class SequenceBuilder {
     private final List<ResourceKey<TierPackData>> tiers = new ArrayList<>();
     private @Nullable Integer defaultBaseLevelingCost = null;
+    private @Nullable String prestigeValueFunction = null;
+    private @Nullable String prestigeMultiplierFunction = null;
     private @Nullable ResourceKey<Sequence> nextSequence = null;
 
     public SequenceBuilder() {
@@ -71,6 +75,24 @@ public class SequenceBuilder {
         return this;
     }
 
+    public SequenceBuilder penaltyPrestigeValueFunction(int penaltyPoints) {
+        return customPrestigeValueFunction("points - " + penaltyPoints);
+    }
+
+    public SequenceBuilder customPrestigeValueFunction(@NotNull String prestigeValueFunction) {
+        this.prestigeValueFunction = prestigeValueFunction;
+        return this;
+    }
+
+    public SequenceBuilder dividingPrestigeMultiplierFunction(int divisor) {
+        return customPrestigeMultiplierFunction("1 + (prestige_points / " + divisor + ")");
+    }
+
+    public SequenceBuilder customPrestigeMultiplierFunction(@NotNull String prestigeMultiplierFunction) {
+        this.prestigeMultiplierFunction = prestigeMultiplierFunction;
+        return this;
+    }
+
     public SequenceBuilder nextSequence(@NotNull SimpleGenEntry<Sequence> nextSequence) {
         return nextSequence(nextSequence.getKey());
     }
@@ -88,9 +110,26 @@ public class SequenceBuilder {
             throw new IllegalArgumentException("Default base leveling cost must be defined and greater than 0");
         }
 
+        if (prestigeValueFunction == null) {
+            throw new IllegalArgumentException("Prestige value function must be defined");
+        }
+
+        Node parsedValueFn = MathPreconditions.checkAndEvaluateFunction("prestige value function", prestigeValueFunction,
+            ctx -> ctx
+                .set("points", 10000)
+                .set("tier", 1)
+                .set("level", 1)
+                .set("level_points", 50));
+
+        Node parsedMultiplierFn = MathPreconditions.checkAndEvaluateFunction("prestige multiplier function", prestigeMultiplierFunction,
+            ctx -> ctx
+                .set("prestige_points", 5000));
+
         return new Sequence(
             tiers,
             defaultBaseLevelingCost,
+            parsedValueFn,
+            parsedMultiplierFn,
             nextSequence
         );
     }

@@ -171,7 +171,7 @@ public class EminentSnake {
                     yield true;
                 }
                 case SEEK_TERMINAL -> {
-                    TierTower.CITY.getOrCreateTower(ownerId).addPoints(points);
+                    TierTower.CITY.getOrCreateTower(ownerId).addPoints(points, owner);
                     intermediateTarget = null;
                     age = -1;
                     level.playSeededSound(null, pos.x, pos.y, pos.z, TierTowerSoundEvents.EMINENT_SNAKE_STRIKE, SoundSource.BLOCKS, 0.3f, 1.0f, level.random.nextLong());

@@ -21,17 +21,13 @@ package io.github.slimeistdev.tier_tower.foundation.data;
 import com.mojang.datafixers.util.Either;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
-import io.github.slimeistdev.tier_tower.base.math.ParseException;
+import io.github.slimeistdev.tier_tower.base.math.MathPreconditions;
 import io.github.slimeistdev.tier_tower.base.math.ast.Node;
-import io.github.slimeistdev.tier_tower.base.math.ast.VariableNode;
-import io.github.slimeistdev.tier_tower.base.math.parser.Parser;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierPackData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 public class TierBuilder {
     private int levelCount = 10;
@@ -97,36 +93,11 @@ public class TierBuilder {
             throw new IllegalArgumentException("Leveling cost function must be set");
         }
 
-        Either<Integer, Node> baseLevelingCost = this.baseLevelingCost == null ? null : this.baseLevelingCost.mapRight(fn -> {
-            Node parsed;
-            try {
-                parsed = Parser.parse(fn);
-            } catch (ParseException e) {
-                throw new IllegalArgumentException("Failed to parse base leveling cost function: " + fn, e);
-            }
-
-            // Check
-            Set<String> variables = new HashSet<>();
-            parsed.visitSelfAndChildren(node -> {
-                if (node instanceof VariableNode variableNode) {
-                    variables.add(variableNode.name());
-                }
-            });
-            variables.remove("prev");
-            if (!variables.isEmpty()) {
-                throw new IllegalArgumentException("Base leveling cost function contains unsupported variables: " + variables);
-            }
-
-            try {
-                parsed.evaluate(new EvaluationContext()
-                    .setFinal("prev", 1)
-                );
-            } catch (EvaluationException e) {
-                throw new IllegalArgumentException("Failed to evaluate base leveling cost function: " + fn, e);
-            }
-
-            return parsed;
-        });
+        Either<Integer, Node> baseLevelingCost = this.baseLevelingCost == null ? null : this.baseLevelingCost.mapRight(
+            fn -> MathPreconditions.checkAndEvaluateFunction(
+                "base leveling cost function", fn,
+                ctx -> ctx.setFinal("prev", 1)
+            ));
 
         int testBaseLevelingCost = baseLevelingCost == null ? 1 : baseLevelingCost.map(i -> i, n -> {
             EvaluationContext ctx = new EvaluationContext()
@@ -138,35 +109,13 @@ public class TierBuilder {
             }
         });
 
-        Node parsedFunction;
-        try {
-            parsedFunction = Parser.parse(levelingCostFunction);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("Failed to parse leveling cost function: " + levelingCostFunction, e);
-        }
-
-        // Check
-        Set<String> variables = new HashSet<>();
-        parsedFunction.visitSelfAndChildren(node -> {
-            if (node instanceof VariableNode variableNode) {
-                variables.add(variableNode.name());
-            }
-        });
-        variables.removeAll(Set.of("levels", "base", "prev", "level"));
-        if (!variables.isEmpty()) {
-            throw new IllegalArgumentException("Leveling cost function contains unsupported variables: " + variables);
-        }
-
-        try {
-            parsedFunction.evaluate(new EvaluationContext()
+        Node parsedFunction = MathPreconditions.checkAndEvaluateFunction(
+            "leveling cost function", levelingCostFunction,
+            ctx -> ctx
                 .setFinal("levels", levelCount)
                 .setFinal("base", testBaseLevelingCost)
                 .set("prev", testBaseLevelingCost)
-                .set("level", 1)
-            );
-        } catch (EvaluationException e) {
-            throw new IllegalArgumentException("Failed to evaluate leveling cost function: " + levelingCostFunction, e);
-        }
+                .set("level", 1));
 
         return new TierPackData(levelCount, Optional.ofNullable(baseLevelingCost), parsedFunction);
     }

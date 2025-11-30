@@ -26,10 +26,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
 public class TierTowerSoundEvents {
-    public static final Holder.Reference<SoundEvent> EMINENT_SNAKE_AMBIENT = registerForHolder("eminent_snake.ambient");
-    public static final Holder.Reference<SoundEvent> EMINENT_SNAKE_SWOOP = registerForHolder("eminent_snake.swoop");
-    public static final Holder.Reference<SoundEvent> EMINENT_SNAKE_STRIKE = registerForHolder("eminent_snake.strike");
-    public static final Holder.Reference<SoundEvent> EMINENCE_PICKUP = registerForHolder("eminence.pickup");
+    public static final Holder.Reference<SoundEvent>
+        EMINENT_SNAKE_AMBIENT = registerForHolder("eminent_snake.ambient"),
+        EMINENT_SNAKE_SWOOP = registerForHolder("eminent_snake.swoop"),
+        EMINENT_SNAKE_STRIKE = registerForHolder("eminent_snake.strike"),
+        EMINENCE_PICKUP = registerForHolder("eminence.pickup"),
+        LEVEL_UP = registerForHolder("progression.level_up"),
+        TIER_UP = registerForHolder("progression.tier_up"),
+        PRESTIGE_THUNDER = registerForHolder("progression.prestige_thunder"),
+        PRESTIGE_POWER_DOWN = registerForHolder("progression.prestige_power_down")
+    ;
 
     private static SoundEvent register(String id) {
         return register(TierTower.asResource(id));

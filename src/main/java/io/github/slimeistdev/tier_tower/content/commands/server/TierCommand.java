@@ -179,7 +179,7 @@ public class TierCommand {
 
     private static int $modify(CommandSourceStack source, ServerPlayer target, int amount, ModifyAspect aspect, ModifyMode mode) throws CommandSyntaxException {
         PlayerTower tower = TierTower.CITY.getOrCreateTower(target);
-        mode.apply(aspect, tower, amount);
+        mode.apply(aspect, tower, amount, target);
 
         source.sendSuccess(() -> Component.translatable(
             "commands.tier_tower.tier."+mode.name+"." + aspect.name + ".success",
@@ -202,20 +202,20 @@ public class TierCommand {
             this.modifier = modifier;
         }
 
-        public void apply(ModifyAspect aspect, PlayerTower tower, int amount) throws CommandSyntaxException {
-            modifier.apply(aspect).apply(tower, amount);
+        public void apply(ModifyAspect aspect, PlayerTower tower, int amount, ServerPlayer player) throws CommandSyntaxException {
+            modifier.apply(aspect).apply(tower, amount, player);
         }
     }
 
     private enum ModifyAspect {
-        POINTS("points", PlayerTower::addPoints, (tower, amount) -> {
+        POINTS("points", PlayerTower::addPoints, (SimpleModifier) (tower, amount) -> {
             if (amount <= 0) return;
 
             if (!tower.removePoints(amount)) {
                 throw ERROR_SET_INVALID_POINTS_NEGATIVE.create();
             }
         }),
-        LEVELS("levels", (tower, amount) -> {
+        LEVELS("levels", (SimpleModifier) (tower, amount) -> {
             if (amount <= 0) return;
 
             Sequence sequence = tower.getSequence();
@@ -228,7 +228,7 @@ public class TierCommand {
             }
 
             tower.setTierLevelAndPoints(levelingState.tierIndex(), targetLevel, 0);
-        }, (tower, amount) -> {
+        }, (SimpleModifier) (tower, amount) -> {
             if (amount <= 0) return;
 
             TowerSummary summary = tower.summarize();
@@ -253,7 +253,16 @@ public class TierCommand {
         }
 
         public interface Modifier {
+            void apply(PlayerTower tower, int amount, ServerPlayer player) throws CommandSyntaxException;
+        }
+
+        public interface SimpleModifier extends Modifier {
             void apply(PlayerTower tower, int amount) throws CommandSyntaxException;
+
+            @Override
+            default void apply(PlayerTower tower, int amount, ServerPlayer player) throws CommandSyntaxException {
+                apply(tower, amount);
+            }
         }
     }
 

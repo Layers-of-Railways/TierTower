@@ -2,5 +2,8 @@
   "subtitles.tier_tower.eminent_snake.ambient": "Eminent Snake screeches",
   "subtitles.tier_tower.eminent_snake.swoop": "Eminent Snake swoops",
   "subtitles.tier_tower.eminent_snake.strike": "Eminent Snake strikes",
-  "subtitles.tier_tower.eminence.pickup": "Eminence gained"
+  "subtitles.tier_tower.eminence.pickup": "Eminence gained",
+  "subtitles.tier_tower.progression.level_up": "Leveled Up",
+  "subtitles.tier_tower.progression.tier_up": "Tiered Up",
+  "subtitles.tier_tower.progression.prestige": "Prestiged"
 }

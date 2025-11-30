@@ -20,19 +20,24 @@ package io.github.slimeistdev.tier_tower.events;
 
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.events.DynamicRegistryFreezeCallback;
+import io.github.slimeistdev.tier_tower.base.events.ProgressionCallback;
 import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
 import io.github.slimeistdev.tier_tower.content.backend.PlayerTower;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.network.packets.s2c.TowerSummaryPacket;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import io.github.slimeistdev.tier_tower.registry.TierTowerSoundEvents;
 import io.github.slimeistdev.tier_tower.utils.Utils;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.LevelAccessor;
 
 public class CommonEvents {
@@ -40,6 +45,17 @@ public class CommonEvents {
         ServerWorldEvents.LOAD.register((server, level) -> onLoadLevel(level));
         ServerPlayConnectionEvents.JOIN.register((connection, packetSender, server) -> onPlayerJoin(connection.player));
         DynamicRegistryFreezeCallback.POST.register(CommonEvents::onDynamicRegistryFreeze);
+
+        registerProgressionSound(ProgressionCallback.LEVEL, TierTowerSoundEvents.LEVEL_UP, 0.5f, 0.9f);
+        registerProgressionSound(ProgressionCallback.TIER, TierTowerSoundEvents.TIER_UP, 0.5f, 0.9f);
+        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_THUNDER, 0.5f, 1.0f);
+        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_POWER_DOWN, 0.7f, 0.8f);
+    }
+
+    private static void registerProgressionSound(Event<ProgressionCallback> event, Holder.Reference<SoundEvent> sound, float volume, float pitch) {
+        event.register((player, $) -> {
+            player.playSound(sound.value(), volume, pitch);
+        });
     }
 
     private static void onLoadLevel(LevelAccessor level) {

@@ -63,4 +63,8 @@ public class EvaluationContext {
         }
         return variables.getDouble(name);
     }
+
+    public String[] getVariables() {
+        return variables.keySet().toArray(new String[0]);
+    }
 }

@@ -34,5 +34,40 @@
       }
     ],
     "subtitle": "subtitles.tier_tower.eminent_snake.swoop"
+  },
+  "progression.level_up": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.player.levelup"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.progression.level_up"
+  },
+  "progression.prestige_power_down": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "block.respawn_anchor.deplete"
+      }
+    ]
+  },
+  "progression.prestige_thunder": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.lightning_bolt.thunder"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.progression.prestige"
+  },
+  "progression.tier_up": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "ui.toast.challenge_complete"
+      }
+    ],
+    "subtitle": "subtitles.tier_tower.progression.tier_up"
   }
 }

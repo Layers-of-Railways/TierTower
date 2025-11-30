@@ -43,6 +43,8 @@ public class TierTowerSequences {
 
     static SimpleGenEntry<Sequence> MAIN_SEQUENCE = sequence(TierTower.MAIN_SEQUENCE.location(), b -> b
         .defaultBaseLevelingCost(1)
+        .penaltyPrestigeValueFunction(5000)
+        .dividingPrestigeMultiplierFunction(5000)
         .tiers(
             COPPER,
             ZINC,

@@ -21,7 +21,10 @@ package io.github.slimeistdev.tier_tower.content.backend.tier;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
+import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
+import io.github.slimeistdev.tier_tower.utils.MathUtils;
 import io.github.slimeistdev.tier_tower.utils.SearchUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -47,26 +50,39 @@ public final class Sequence {
             .forGetter(Sequence::getTierKeys),
         Codec.INT.fieldOf("default_base_leveling_cost")
             .forGetter(s -> s.defaultBaseLevelingCost),
+        Node.limitedCodec("points", "tier", "level", "level_points").fieldOf("prestige_value_function")
+            .forGetter(s -> s.prestigeValueFunction),
+        Node.limitedCodec("prestige_points").fieldOf("prestige_multiplier_function")
+            .forGetter(s -> s.prestigeMultiplierFunction),
         TierTowerRegistries.SEQUENCE_CODEC.optionalFieldOf("next_sequence")
             .forGetter(s -> Optional.ofNullable(s.getNextSequenceKey()))
-    ).apply(i, (t, c, s) -> new Sequence(t, c, s.orElse(null))));
+    ).apply(i, Sequence::new));
 
     private @Nullable List<ResourceKey<TierPackData>> unfrozenTiers;
     private @Nullable ResourceKey<Sequence> unfrozenNextSequence;
 
     private final Tier[] tiers;
     private final int defaultBaseLevelingCost;
+    private final Node prestigeValueFunction;
+    private final Node prestigeMultiplierFunction;
     private @Nullable Holder<Sequence> nextSequence;
     // derived values
     /** How many points are needed to get to level 1 (index 0) of a tier */
     private final int[] tierBaseCosts;
     private final Object2IntMap<ResourceLocation> idMap;
 
-    public Sequence(@NotNull List<ResourceKey<TierPackData>> tiers, int defaultBaseLevelingCost, @Nullable ResourceKey<Sequence> nextSequence) {
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private Sequence(@NotNull List<ResourceKey<TierPackData>> tiers, int defaultBaseLevelingCost, @NotNull Node prestigeValueFunction, @NotNull Node prestigeMultiplierFunction, @NotNull Optional<ResourceKey<Sequence>> nextSequence) {
+        this(tiers, defaultBaseLevelingCost, prestigeValueFunction, prestigeMultiplierFunction, nextSequence.orElse(null));
+    }
+
+    public Sequence(@NotNull List<ResourceKey<TierPackData>> tiers, int defaultBaseLevelingCost, @NotNull Node prestigeValueFunction, @NotNull Node prestigeMultiplierFunction, @Nullable ResourceKey<Sequence> nextSequence) {
         this.unfrozenTiers = List.copyOf(tiers);
         this.unfrozenNextSequence = nextSequence;
 
         this.defaultBaseLevelingCost = defaultBaseLevelingCost;
+        this.prestigeValueFunction = prestigeValueFunction;
+        this.prestigeMultiplierFunction = prestigeMultiplierFunction;
 
         this.tiers = new Tier[tiers.size()];
         this.idMap = new Object2IntOpenHashMap<>();
@@ -128,6 +144,25 @@ public final class Sequence {
 
     private List<ResourceKey<TierPackData>> getTierKeys() {
         return unfrozenTiers != null ? unfrozenTiers : Arrays.stream(tiers).map(Tier::getKey).toList();
+    }
+
+    public int calculatePrestigePoints(int totalPoints, LevelingState levelingState) {
+        ensureFrozen();
+        return (int) Math.max(0, prestigeValueFunction.evaluateOrDefault(new EvaluationContext()
+            .setFinal("points", totalPoints)
+            .setFinal("tier", levelingState.tierIndex())
+            .setFinal("level", levelingState.levelIndex())
+            .setFinal("level_points", levelingState.levelPoints() + levelingState.surplusPoints()),
+            0
+        ));
+    }
+
+    public double calculatePrestigeMultiplier(int prestigePoints) {
+        ensureFrozen();
+        return MathUtils.roundTo(Math.max(1, prestigeMultiplierFunction.evaluateOrDefault(new EvaluationContext()
+            .setFinal("prestige_points", prestigePoints),
+            1
+        )), 4);
     }
 
     public LevelingState getLevelingState(final int totalPoints) {

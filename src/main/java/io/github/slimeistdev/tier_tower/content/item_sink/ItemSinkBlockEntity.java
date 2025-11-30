@@ -18,6 +18,7 @@
 
 package io.github.slimeistdev.tier_tower.content.item_sink;
 
+import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.recipe.ItemSinkRecipe;
 import io.github.slimeistdev.tier_tower.foundation.block_entity.TickingBlockEntity;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeTypes;
@@ -84,6 +85,11 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
             recent.age /= 2;
             setChanged();
             return;
+        }
+
+        var tower = TierTower.CITY.getTower(beneficiary);
+        if (tower != null) {
+            points = tower.applyPrestigeToPoints(points, beneficiary.getRandom());
         }
 
         EminentSnake snake = new EminentSnake(uuid, points);

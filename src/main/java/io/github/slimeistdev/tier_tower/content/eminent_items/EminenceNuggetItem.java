@@ -20,6 +20,7 @@ package io.github.slimeistdev.tier_tower.content.eminent_items;
 
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.utils.EminenceConstants;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -43,7 +44,7 @@ public class EminenceNuggetItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
-        if (level.isClientSide) {
+        if (level.isClientSide || !(player instanceof ServerPlayer serverPlayer)) {
             level.playSound(player, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS,
                 .5f, 1);
             return InteractionResultHolder.consume(stack);
@@ -51,7 +52,7 @@ public class EminenceNuggetItem extends Item {
 
         int amountUsed = player.isShiftKeyDown() ? 1 : stack.getCount();
 
-        TierTower.CITY.getOrCreateTower(player).addPoints(amountUsed * EminenceConstants.EMINENCE_PER_BOTTLE);
+        TierTower.CITY.getOrCreateTower(player).addPoints(amountUsed * EminenceConstants.EMINENCE_PER_BOTTLE, serverPlayer);
 
         stack.shrink(amountUsed);
         if (!stack.isEmpty())

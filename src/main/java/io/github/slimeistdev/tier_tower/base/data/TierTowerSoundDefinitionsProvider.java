@@ -25,29 +25,43 @@ import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.registry.TierTowerSoundEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import org.jetbrains.annotations.Nullable;
 
 public class TierTowerSoundDefinitionsProvider extends SoundDefinitionsProvider {
     public TierTowerSoundDefinitionsProvider(PackOutput output, ExistingFileHelper helper) {
         super(output, TierTower.MOD_ID, helper);
     }
 
-    protected void addRedirect(Holder.Reference<SoundEvent> event, String subtitle, SoundEvent target) {
+    protected void addRedirect(Holder.Reference<SoundEvent> event, @Nullable String subtitle, ResourceLocation target) {
         addRedirect(event.value(), subtitle, target);
     }
 
-    protected void addRedirect(SoundEvent event, String subtitle, SoundEvent target) {
+    protected void addRedirect(SoundEvent event, @Nullable String subtitle, ResourceLocation target) {
         add(event, definition()
-            .with(sound(target.getLocation(), SoundDefinition.SoundType.EVENT))
-            .subtitle("subtitles." + TierTower.MOD_ID + "." + subtitle));
+            .with(sound(target, SoundDefinition.SoundType.EVENT))
+            .subtitle(subtitle == null ? null : "subtitles." + TierTower.MOD_ID + "." + subtitle));
+    }
+
+    private static ResourceLocation l(SoundEvent event) {
+        return event.getLocation();
+    }
+
+    public static ResourceLocation l(Holder.Reference<SoundEvent> event) {
+        return event.key().location();
     }
 
     @Override
     public void registerSounds() {
-        addRedirect(TierTowerSoundEvents.EMINENT_SNAKE_AMBIENT, "eminent_snake.ambient", SoundEvents.PHANTOM_AMBIENT);
-        addRedirect(TierTowerSoundEvents.EMINENT_SNAKE_SWOOP, "eminent_snake.swoop", SoundEvents.PHANTOM_SWOOP);
-        addRedirect(TierTowerSoundEvents.EMINENT_SNAKE_STRIKE, "eminent_snake.strike", SoundEvents.PHANTOM_BITE);
-        addRedirect(TierTowerSoundEvents.EMINENCE_PICKUP, "eminence.pickup", SoundEvents.EXPERIENCE_ORB_PICKUP);
+        addRedirect(TierTowerSoundEvents.EMINENT_SNAKE_AMBIENT, "eminent_snake.ambient", l(SoundEvents.PHANTOM_AMBIENT));
+        addRedirect(TierTowerSoundEvents.EMINENT_SNAKE_SWOOP, "eminent_snake.swoop", l(SoundEvents.PHANTOM_SWOOP));
+        addRedirect(TierTowerSoundEvents.EMINENT_SNAKE_STRIKE, "eminent_snake.strike", l(SoundEvents.PHANTOM_BITE));
+        addRedirect(TierTowerSoundEvents.EMINENCE_PICKUP, "eminence.pickup", l(SoundEvents.EXPERIENCE_ORB_PICKUP));
+        addRedirect(TierTowerSoundEvents.LEVEL_UP, "progression.level_up", l(SoundEvents.PLAYER_LEVELUP));
+        addRedirect(TierTowerSoundEvents.TIER_UP, "progression.tier_up", l(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE));
+        addRedirect(TierTowerSoundEvents.PRESTIGE_THUNDER, "progression.prestige", l(SoundEvents.LIGHTNING_BOLT_THUNDER));
+        addRedirect(TierTowerSoundEvents.PRESTIGE_POWER_DOWN, null, l(SoundEvents.RESPAWN_ANCHOR_DEPLETE));
     }
 }

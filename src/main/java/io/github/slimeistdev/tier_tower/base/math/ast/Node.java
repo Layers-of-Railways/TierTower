@@ -40,6 +40,14 @@ public interface Node {
         consumer.accept(this);
     }
 
+    default double evaluateOrDefault(EvaluationContext context, double defaultValue) {
+        try {
+            return evaluate(context);
+        } catch (EvaluationException e) {
+            return defaultValue;
+        }
+    }
+
     Codec<Node> CODEC = Codec.STRING.comapFlatMap(
         s -> {
             try {
