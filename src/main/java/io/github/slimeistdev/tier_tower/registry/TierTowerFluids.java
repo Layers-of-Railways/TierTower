@@ -20,6 +20,7 @@ package io.github.slimeistdev.tier_tower.registry;
 
 import com.tterrag.registrate.util.entry.FluidEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.content.eminent_items.EminenceBucketItem;
 import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
 import io.github.slimeistdev.tier_tower.foundation.fluids.VirtualFluid;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -43,7 +44,7 @@ public class TierTowerFluids {
     public static final FluidEntry<VirtualFluid> WISPY_EMINENCE = REGISTRATE.virtualFluid("eminence")
         .lang("Wispy Eminence")
         .fluidAttributes(() -> new TierTowerAttributeHandler("fluid.tier_tower.eminence", FluidConstants.WATER_VISCOSITY, -100))
-        .bucket()
+        .bucket(EminenceBucketItem::new)
         .lang("Bucket of Wispy Eminence")
         .build()
         .onRegisterAfter(Registries.ITEM, eminence -> {

@@ -18,8 +18,13 @@
 
 package io.github.slimeistdev.tier_tower.content.subliminator;
 
+import io.github.slimeistdev.tier_tower.compat.Mods;
 import io.github.slimeistdev.tier_tower.foundation.block_entity.IBE;
 import io.github.slimeistdev.tier_tower.registry.TierTowerBlockEntities;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,7 +36,6 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -51,6 +55,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SubliminatorBlock extends BaseEntityBlock implements IBE<SubliminatorBlockEntity> {
+    private static final boolean IGNORE_CREATE = Boolean.getBoolean("tier_tower.subliminator.ignore_create");
+
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
@@ -81,13 +87,20 @@ public class SubliminatorBlock extends BaseEntityBlock implements IBE<Subliminat
         }
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "UnstableApiUsage"})
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
             return onBlockEntityUse(level, pos, sbe -> {
+                if (!Mods.CREATE.isLoaded || IGNORE_CREATE) {
+                    Storage<FluidVariant> itemStorage = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
+                    if (itemStorage != null && sbe.fillItemStorage(itemStorage)) {
+                        return InteractionResult.CONSUME;
+                    }
+                }
+
                 player.openMenu(sbe);
                 return InteractionResult.CONSUME;
             });
@@ -119,7 +132,11 @@ public class SubliminatorBlock extends BaseEntityBlock implements IBE<Subliminat
     @SuppressWarnings("deprecation")
     @Override
     public int getAnalogOutputSignal(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos) {
-        return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
+        int[] signal = new int[]{0};
+        withBlockEntityDo(level, pos, sbe -> {
+            signal[0] = sbe.getAnalogOutputSignal();
+        });
+        return signal[0];
     }
 
     @Override

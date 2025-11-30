@@ -22,6 +22,7 @@ import io.github.slimeistdev.tier_tower.content.backend.ClientTowerManager;
 import io.github.slimeistdev.tier_tower.events.ClientEvents;
 import io.github.slimeistdev.tier_tower.network.TierTowerPackets;
 import io.github.slimeistdev.tier_tower.utils.CacheInvalidationReloadListener;
+import io.github.slimeistdev.tier_tower.utils.FluidFormatter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
@@ -39,5 +40,8 @@ public class TierTowerClient implements ClientModInitializer {
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES)
             .registerReloadListener(CacheInvalidationReloadListener.CLIENT_RESOURCES);
+
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES)
+            .registerReloadListener(FluidFormatter.NUMBER_FORMAT);
     }
 }

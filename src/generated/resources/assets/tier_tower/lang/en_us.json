@@ -35,6 +35,7 @@
   "commands.tier_tower.unlock.success.single": "Unlocked %s's tower",
   "entity.tier_tower.bottled_eminence": "Thrown Stoppered Wispy Eminence",
   "fluid.tier_tower.eminence": "Wispy Eminence",
+  "gui.tier_tower.subliminator.stored_eminence": "Eminence: %s",
   "item.tier_tower.bottled_eminence": "Stoppered Wispy Eminence",
   "item.tier_tower.eminence_bucket": "Bucket of Wispy Eminence",
   "item.tier_tower.eminence_nugget": "Nugget of Eminence",
@@ -63,5 +64,8 @@
   "tier_tower.tier.minecraft.netherite": "Netherite",
   "tier_tower.tier.minecraft.prismarine": "Prismarine",
   "tier_tower.tier.minecraft.quartz": "Quartz",
-  "tier_tower.tier.minecraft.redstone": "Redstone"
+  "tier_tower.tier.minecraft.redstone": "Redstone",
+  "unit.tier_tower.fluid.buckets": "%s B",
+  "unit.tier_tower.fluid.buckets.millibuckets": "%s B %s mB",
+  "unit.tier_tower.fluid.millibuckets": "%s mB"
 }

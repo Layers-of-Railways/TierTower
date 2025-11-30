@@ -35,6 +35,7 @@
   "commands.tier_tower.unlock.success.single": "ɹǝʍoʇ s,%s pǝʞɔoןu∩",
   "entity.tier_tower.bottled_eminence": "ǝɔuǝuıɯƎ ʎdsıM pǝɹǝddoʇS uʍoɹɥ⟘",
   "fluid.tier_tower.eminence": "ǝɔuǝuıɯƎ ʎdsıM",
+  "gui.tier_tower.subliminator.stored_eminence": "%s :ǝɔuǝuıɯƎ",
   "item.tier_tower.bottled_eminence": "ǝɔuǝuıɯƎ ʎdsıM pǝɹǝddoʇS",
   "item.tier_tower.eminence_bucket": "ǝɔuǝuıɯƎ ʎdsıM ɟo ʇǝʞɔnᗺ",
   "item.tier_tower.eminence_nugget": "ǝɔuǝuıɯƎ ɟo ʇǝbbnN",
@@ -63,5 +64,8 @@
   "tier_tower.tier.minecraft.netherite": "ǝʇıɹǝɥʇǝN",
   "tier_tower.tier.minecraft.prismarine": "ǝuıɹɐɯsıɹԀ",
   "tier_tower.tier.minecraft.quartz": "zʇɹɐnὉ",
-  "tier_tower.tier.minecraft.redstone": "ǝuoʇspǝᴚ"
+  "tier_tower.tier.minecraft.redstone": "ǝuoʇspǝᴚ",
+  "unit.tier_tower.fluid.buckets": "ᗺ %s",
+  "unit.tier_tower.fluid.buckets.millibuckets": "ᗺɯ %s ᗺ %s",
+  "unit.tier_tower.fluid.millibuckets": "ᗺɯ %s"
 }

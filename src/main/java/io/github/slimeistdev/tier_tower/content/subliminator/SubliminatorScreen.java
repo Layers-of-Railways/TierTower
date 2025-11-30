@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Divisor;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.registry.TierTowerFluids;
+import io.github.slimeistdev.tier_tower.utils.FluidFormatter;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -71,16 +72,23 @@ public class SubliminatorScreen extends AbstractContainerScreen<SubliminatorMenu
         }
 
         int subliminationProgress = this.menu.getSubliminationProgress();
-        guiGraphics.blit(TEXTURE, x + 79, y + 34, 176, 14, subliminationProgress + 1, 16);
+        guiGraphics.blit(TEXTURE, x + 79 + 4, y + 34, 176, 14, subliminationProgress + 1, 16);
 
         // render tank
-        renderEminence(guiGraphics);
+        renderEminence(guiGraphics, mouseX, mouseY);
         guiGraphics.blit(TEXTURE, x + 114, y + 8, 2, 176, 30, 36, 68, 256, 256);
     }
 
-    private void renderEminence(@NotNull GuiGraphics guiGraphics) {
+    private void renderEminence(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         long amount = this.menu.getStoredFluid();
         if (amount <= 0) return;
+
+        if (isHovering(115, 9, 34, 66, mouseX, mouseY)) {
+            setTooltipForNextRenderPass(Component.translatable(
+                "gui.tier_tower.subliminator.stored_eminence",
+                FluidFormatter.formatFluid(amount)
+            ));
+        }
 
         int storedFluidHeight = (int) (amount * 64 / SubliminatorBlockEntity.MAX_STORED_FLUID);
         TextureAtlasSprite sprite = FluidVariantRendering.getSprite(eminenceVariant);

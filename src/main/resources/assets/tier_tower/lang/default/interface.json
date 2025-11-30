@@ -1,4 +1,9 @@
 {
   "itemGroup.tier_tower.base": "Tier Tower",
-  "tier_tower.badge.hover": "%s %s"
+  "tier_tower.badge.hover": "%s %s",
+
+  "gui.tier_tower.subliminator.stored_eminence": "Eminence: %s",
+  "unit.tier_tower.fluid.buckets": "%s B",
+  "unit.tier_tower.fluid.millibuckets": "%s mB",
+  "unit.tier_tower.fluid.buckets.millibuckets": "%s B %s mB"
 }

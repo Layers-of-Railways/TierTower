@@ -23,6 +23,8 @@ import io.github.slimeistdev.tier_tower.foundation.block_entity.FluidStorageBloc
 import io.github.slimeistdev.tier_tower.foundation.block_entity.ItemStorageBlockEntity;
 import io.github.slimeistdev.tier_tower.foundation.block_entity.TickingBlockEntity;
 import io.github.slimeistdev.tier_tower.foundation.fluids.SingleFluidTypeTank;
+import io.github.slimeistdev.tier_tower.foundation.storage.CustomInventoryStorage;
+import io.github.slimeistdev.tier_tower.foundation.storage.UpdateFreeSimpleContainer;
 import io.github.slimeistdev.tier_tower.foundation.storage.WrappedSingleSlotStorage;
 import io.github.slimeistdev.tier_tower.registry.TierTowerFluids;
 import io.github.slimeistdev.tier_tower.registry.TierTowerMenuTypes;
@@ -31,8 +33,8 @@ import io.github.slimeistdev.tier_tower.utils.EminenceConstants;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
@@ -48,7 +50,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -103,7 +104,7 @@ public class SubliminatorBlockEntity extends BlockEntity implements ExtendedScre
         }
     }, 1, 1);
 
-    final SimpleContainer inventory = new SimpleContainer(2) {
+    final UpdateFreeSimpleContainer inventory = new UpdateFreeSimpleContainer(2) {
         @Override
         public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
             if (index == SLOT_FUEL)
@@ -123,10 +124,21 @@ public class SubliminatorBlockEntity extends BlockEntity implements ExtendedScre
 
             if (slot == SLOT_INPUT && !same) {
                 cookingTotalTime = getTotalCookTime(level, SubliminatorBlockEntity.this);
-                cookingProgress = 0; // fixme this is getting called as part of abort callbacks
+                cookingProgress = 0;
             }
 
             this.setChanged();
+        }
+
+        @Override
+        public void finalizeSetItem(int slot, @NotNull ItemStack original, @NotNull ItemStack stack) {
+            boolean same = !stack.isEmpty() && ItemStack.isSameItemSameTags(original, stack);
+            if (slot == SLOT_INPUT && !same) {
+                cookingTotalTime = getTotalCookTime(level, SubliminatorBlockEntity.this);
+                cookingProgress = 0;
+            }
+
+            super.finalizeSetItem(slot, original, stack);
         }
 
         @Override
@@ -173,6 +185,27 @@ public class SubliminatorBlockEntity extends BlockEntity implements ExtendedScre
         }
     };
 
+    public boolean fillItemStorage(Storage<FluidVariant> itemStorage) {
+        try (Transaction tx = Transaction.openOuter()) {
+            FluidVariant variant = eminenceTank.getNonBlankVariant();
+            long inserted = itemStorage.insert(variant, eminenceTank.getAmount(), tx);
+            if (inserted == 0) return false;
+            if (inserted != eminenceTank.extract(variant, inserted, tx)) return false;
+            tx.commit();
+            return true;
+        }
+    }
+
+    public boolean removeBottleAmount() {
+        try (Transaction tx = Transaction.openOuter()) {
+            FluidVariant variant = eminenceTank.getNonBlankVariant();
+            long extracted = eminenceTank.extract(variant, FluidConstants.BOTTLE, tx);
+            if (extracted != FluidConstants.BOTTLE) return false;
+            tx.commit();
+            return true;
+        }
+    }
+
     private record CookingData(int cookingProgress, int cookingTotalTime) {}
 
     private class CookingDataParticipant extends SnapshotParticipant<CookingData> {
@@ -192,7 +225,7 @@ public class SubliminatorBlockEntity extends BlockEntity implements ExtendedScre
         }
     }
 
-    private final InventoryStorage inventoryWrapper = InventoryStorage.of(inventory, null);
+    private final SlottedStorage<ItemVariant> inventoryWrapper = CustomInventoryStorage.of(inventory, null);
     private final SingleSlotStorage<ItemVariant> inputStorage = new WrappedSingleSlotStorage<>(
         inventoryWrapper.getSlot(SLOT_INPUT),
         new CookingDataParticipant()
@@ -278,6 +311,13 @@ public class SubliminatorBlockEntity extends BlockEntity implements ExtendedScre
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, @NotNull Inventory inventory, @NotNull Player player) {
         return new SubliminatorMenu(TierTowerMenuTypes.SUBLIMINATOR.get(), containerId, inventory, this.inventory, this.dataAccess);
+    }
+
+    int getAnalogOutputSignal() {
+        long signal = getStoredEminenceFluid() / FluidConstants.BOTTLE;
+        if (signal > 15) return 15;
+        if (signal < 0) return 0;
+        return (int) signal;
     }
 
     @Override
