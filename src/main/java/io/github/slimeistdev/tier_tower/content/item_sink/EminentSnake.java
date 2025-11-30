@@ -102,6 +102,12 @@ public class EminentSnake {
         return new Vector3f(r / 255.0f, g / 255.0f, b / 255.0f);
     }
 
+    private boolean isOwnerLocked() {
+        if (owner == null) return false;
+        var tower = TierTower.CITY.getOrCreateTower(owner);
+        return tower != null && tower.isLocked();
+    }
+
     /**
      * Step the snake
      * @param level the level of the sink
@@ -122,7 +128,7 @@ public class EminentSnake {
             vel = Vec3.ZERO;
         }
 
-        if (owner == null || age <= DEBOUNCE || owner.isSpectator() || owner.getEyePosition().distanceToSqr(pos) > 128*128) {
+        if (owner == null || age <= DEBOUNCE || owner.isSpectator() || owner.getEyePosition().distanceToSqr(pos) > 128*128 || isOwnerLocked()) {
             pathfindingState = PathfindingState.RETURN_TO_SINK;
         } else if (pathfindingState == PathfindingState.RETURN_TO_SINK) {
             pathfindingState = PathfindingState.SEEK_FAR;

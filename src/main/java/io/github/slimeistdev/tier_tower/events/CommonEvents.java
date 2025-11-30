@@ -35,9 +35,11 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 
 public class CommonEvents {
@@ -46,15 +48,21 @@ public class CommonEvents {
         ServerPlayConnectionEvents.JOIN.register((connection, packetSender, server) -> onPlayerJoin(connection.player));
         DynamicRegistryFreezeCallback.POST.register(CommonEvents::onDynamicRegistryFreeze);
 
-        registerProgressionSound(ProgressionCallback.LEVEL, TierTowerSoundEvents.LEVEL_UP, 0.5f, 0.9f);
-        registerProgressionSound(ProgressionCallback.TIER, TierTowerSoundEvents.TIER_UP, 0.5f, 0.9f);
-        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_THUNDER, 0.5f, 1.0f);
-        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_POWER_DOWN, 0.7f, 0.8f);
+        registerProgressionSound(ProgressionCallback.LEVEL, TierTowerSoundEvents.LEVEL_UP, 0.5f, 0.9f, true);
+        registerProgressionSound(ProgressionCallback.TIER, TierTowerSoundEvents.TIER_UP, 0.5f, 0.9f, true);
+        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_THUNDER, 1.0f, 1.0f, false);
+        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_POWER_DOWN, 0.7f, 0.8f, false);
     }
 
-    private static void registerProgressionSound(Event<ProgressionCallback> event, Holder.Reference<SoundEvent> sound, float volume, float pitch) {
+    private static void registerProgressionSound(Event<ProgressionCallback> event, Holder.Reference<SoundEvent> sound, float volume, float pitch, boolean onlySelf) {
         event.register((player, $) -> {
-            player.playSound(sound.value(), volume, pitch);
+            var level = player.level();
+            var pos = player.position();
+            if (onlySelf) {
+                player.connection.send(new ClientboundSoundEntityPacket(sound, SoundSource.PLAYERS, player, volume, pitch, level.random.nextLong()));
+            } else {
+                level.playSeededSound(null, pos.x, pos.y, pos.z, sound, SoundSource.PLAYERS, volume, pitch, level.random.nextLong());
+            }
         });
     }
 
