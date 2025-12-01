@@ -177,6 +177,7 @@ public class PlayerTower {
         $prestigeMultiplier = Double.NaN;
 
         markDirty();
+        syncData();
 
         ProgressionCallback.PRESTIGE.invoker().onLevelUp(player, this);
 

@@ -6,10 +6,12 @@
     "common.MixinChatType",
     "common.MixinDispenseItemBehaviour_Bottle",
     "common.MixinRegistryDataLoader",
+    "common.MixinServerPlayer",
     "common.MixinStyle",
     "common.MixinTranslatableContents"
   ],
   "client": [
+    "client.MixinFogRenderer_BlindnessFogFunction",
     "client.MixinPlayerRenderer",
     "client.MixinPlayerTabOverlay",
     "client.MixinStringRenderOutput"

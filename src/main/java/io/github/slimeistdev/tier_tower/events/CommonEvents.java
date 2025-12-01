@@ -48,10 +48,10 @@ public class CommonEvents {
         ServerPlayConnectionEvents.JOIN.register((connection, packetSender, server) -> onPlayerJoin(connection.player));
         DynamicRegistryFreezeCallback.POST.register(CommonEvents::onDynamicRegistryFreeze);
 
-        registerProgressionSound(ProgressionCallback.LEVEL, TierTowerSoundEvents.LEVEL_UP, 0.5f, 0.9f, true);
-        registerProgressionSound(ProgressionCallback.TIER, TierTowerSoundEvents.TIER_UP, 0.5f, 0.9f, true);
+        registerProgressionSound(ProgressionCallback.LEVEL, TierTowerSoundEvents.LEVEL_UP, 0.8f, 0.9f, true);
+        registerProgressionSound(ProgressionCallback.TIER, TierTowerSoundEvents.TIER_UP, 1.0f, 0.9f, true);
         registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_THUNDER, 1.0f, 1.0f, false);
-        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_POWER_DOWN, 0.7f, 0.8f, false);
+        registerProgressionSound(ProgressionCallback.PRESTIGE, TierTowerSoundEvents.PRESTIGE_POWER_DOWN, 1.0f, 0.8f, false);
     }
 
     private static void registerProgressionSound(Event<ProgressionCallback> event, Holder.Reference<SoundEvent> sound, float volume, float pitch, boolean onlySelf) {

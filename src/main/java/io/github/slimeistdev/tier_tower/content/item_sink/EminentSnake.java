@@ -48,6 +48,14 @@ public class EminentSnake {
         0xf2005c,
         0xff2374
     };
+    public static final int[] BLUE_COLORS = {
+        0x001a7a,
+        0x0032a8,
+        0x0041c1,
+        0x005adb,
+        0x0066f2,
+        0x247aff
+    };
 
     final @NotNull UUID ownerId;
     int points;
@@ -89,22 +97,33 @@ public class EminentSnake {
         return intermediateTarget;
     }
 
-    private Vector3f getColor() {
-        int idx = (age / 10) % COLORS.length;
-        int nextIdx = (idx + 1) % COLORS.length;
-        float t = (age % 10) / 10.0f;
+    public static Vector3f lerpedColor(int[] colors, int idx, float t) {
+        int nextIdx = (idx + 1) % colors.length;
 
-        int c1 = COLORS[idx];
-        int c2 = COLORS[nextIdx];
+        int c1 = colors[idx];
+        int c2 = colors[nextIdx];
         float r = ((c1 >> 16) & 0xFF) * (1 - t) + ((c2 >> 16) & 0xFF) * t;
         float g = ((c1 >> 8) & 0xFF) * (1 - t) + ((c2 >> 8) & 0xFF) * t;
         float b = (c1 & 0xFF) * (1 - t) + (c2 & 0xFF) * t;
         return new Vector3f(r / 255.0f, g / 255.0f, b / 255.0f);
     }
 
+    public static Vector3f randomColor(int[] colors, RandomSource random) {
+        return lerpedColor(colors, random.nextInt(colors.length), random.nextFloat());
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private Vector3f getColor(int[] colors) {
+        return lerpedColor(colors, (age / 10) % colors.length, (age % 10) / 10.0f);
+    }
+
+    private Vector3f getColor() {
+        return getColor(COLORS);
+    }
+
     private boolean isOwnerLocked() {
         if (owner == null) return false;
-        var tower = TierTower.CITY.getOrCreateTower(owner);
+        var tower = TierTower.CITY.getTower(owner);
         return tower != null && tower.isLocked();
     }
 
