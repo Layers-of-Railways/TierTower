@@ -14,7 +14,8 @@
     "client.MixinFogRenderer_BlindnessFogFunction",
     "client.MixinPlayerRenderer",
     "client.MixinPlayerTabOverlay",
-    "client.MixinStringRenderOutput"
+    "client.MixinStringRenderOutput",
+    "compat.client.MixinItemDrainRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
