@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower.base.data.lang;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
+import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.registry.TierTowerSequences;
 import io.github.slimeistdev.tier_tower.registry.TierTowerTiers;
 import io.github.slimeistdev.tier_tower.utils.FilesHelper;
@@ -40,8 +41,8 @@ public class LangGen {
         TierTowerSequences.provideLang(langConsumer);
 
         // just to have fallbacks
-        provider.add("tier_tower.special.badge", "!");
-        provider.add("tier_tower.special.badge.static", "!");
+        provider.add("tier_tower.special.badge", TierTower.BADGE_PLACEHOLDER);
+        provider.add("tier_tower.special.badge.static", TierTower.BADGE_PLACEHOLDER);
         provider.add("tier_tower.special.badge.hover", "");
         provider.add("tier_tower.special.badge.hover.static", "");
     }

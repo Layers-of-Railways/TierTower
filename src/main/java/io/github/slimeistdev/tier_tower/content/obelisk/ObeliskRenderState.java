@@ -23,6 +23,7 @@ import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TowerSummary;
 import io.github.slimeistdev.tier_tower.content.cosmetics.BadgeState;
+import io.github.slimeistdev.tier_tower.utils.FluidFormatter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.phys.Vec3;
 
 import java.text.NumberFormat;
-import java.util.Locale;
 
 @Environment(EnvType.CLIENT)
 class ObeliskRenderState {
@@ -52,6 +52,8 @@ class ObeliskRenderState {
     BadgeState nextLevel;
 
     FormattedCharSequence progressText;
+    FormattedCharSequence prestigeText;
+    FormattedCharSequence prestigeMultiplierText;
 
     ObeliskRenderState() {
         valid = false;
@@ -107,12 +109,21 @@ class ObeliskRenderState {
 
         // progress text
 
-        Locale locale = Locale.forLanguageTag(mc.getLanguageManager().getSelected());
-        NumberFormat numberFormat = NumberFormat.getInstance(locale);
+        NumberFormat numberFormat = FluidFormatter.NUMBER_FORMAT.get();
         int totalPoints = sequence.getCostUpTo(currentTier) + tier.getCostUpTo(currentLevel)
             + summary.levelingState().levelPoints() + summary.levelingState().surplusPoints();
 
         Component progressComponent = Component.literal(numberFormat.format(totalPoints));
         progressText = progressComponent.getVisualOrderText();
+
+        // prestige text
+        prestigeText = Component.translatable(
+            "gui.tier_tower.obelisk.prestige",
+            numberFormat.format(summary.prestige().points())
+        ).getVisualOrderText();
+        prestigeMultiplierText = Component.translatable(
+            "gui.tier_tower.obelisk.prestige_multiplier",
+            numberFormat.format(summary.prestige().multiplier())
+        ).getVisualOrderText();
     }
 }

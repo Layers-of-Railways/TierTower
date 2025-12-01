@@ -184,6 +184,23 @@ public class PlayerTower {
         return true;
     }
 
+    public int getPrestigePoints() {
+        return getSequenceState().prestigePoints;
+    }
+
+    public void setPrestigePoints(int points) {
+        if (points < 0) {
+            points = 0;
+        }
+
+        SequenceState sequenceState = getSequenceState();
+        sequenceState.prestigePoints = points;
+        $prestigeMultiplier = Double.NaN;
+
+        markDirty();
+        syncData();
+    }
+
     public double getPrestigeMultiplier() {
         final SequenceState sequenceState = getSequenceState();
         final Sequence sequence = getSequence();

@@ -32,6 +32,6 @@ import java.util.UUID;
 public record ChatBadgeContents(Either<UUID, BadgeState> playerOrBadge) implements ComponentContents {
     @Override
     public <T> @NotNull Optional<T> visit(FormattedText.StyledContentConsumer<T> styledContentConsumer, @NotNull Style style) {
-        return styledContentConsumer.accept(((Style_Duck) style.withFont(TierTower.BADGE_FONT)).tt$withBadge(playerOrBadge), "!");
+        return styledContentConsumer.accept(((Style_Duck) style.withFont(TierTower.BADGE_FONT)).tt$withBadge(playerOrBadge), TierTower.BADGE_PLACEHOLDER);
     }
 }

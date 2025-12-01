@@ -30,5 +30,8 @@
   "commands.tier_tower.sequence.set.invalid_sequence": "Failed to set %s's sequence to '%s'",
   "commands.tier_tower.sequence.set.success":  "Set %s's sequence to %s",
 
-  "commands.tier_tower.sequence.query.success": "%s's current sequence is %s"
+  "commands.tier_tower.sequence.query.success": "%s's current sequence is %s",
+
+  "commands.tier_tower.prestige.query.success": "%s has %s prestige points (multiplier: %sx)",
+  "commands.tier_tower.prestige.set.success": "Set %s's prestige points to %s (multiplier: %sx)"
 }

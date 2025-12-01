@@ -50,6 +50,7 @@ public class TierTower implements ModInitializer {
     public static final String NAME = "Tier Tower";
     public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
     public static final GlobalTowerManager CITY = new GlobalTowerManager();
+    public static final String BADGE_PLACEHOLDER = "\u200c";
 
     public static final ResourceLocation BADGE_FONT = asResource("badge");
     public static final ResourceKey<Sequence> MAIN_SEQUENCE = asKey(TierTowerRegistries.SEQUENCE, "main");

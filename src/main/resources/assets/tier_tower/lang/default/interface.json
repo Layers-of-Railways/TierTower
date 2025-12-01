@@ -5,5 +5,8 @@
   "gui.tier_tower.subliminator.stored_eminence": "Eminence: %s",
   "unit.tier_tower.fluid.buckets": "%s B",
   "unit.tier_tower.fluid.millibuckets": "%s mB",
-  "unit.tier_tower.fluid.buckets.millibuckets": "%s B %s mB"
+  "unit.tier_tower.fluid.buckets.millibuckets": "%s B %s mB",
+
+  "gui.tier_tower.obelisk.prestige": "Prestige: %s",
+  "gui.tier_tower.obelisk.prestige_multiplier": "Prestige Multiplier: %sx"
 }

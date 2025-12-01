@@ -231,6 +231,42 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             ms.popPose();
         }
 
+        // render prestige state
+        {
+            ms.pushPose();
+            ms.translate(width * 16f / 2f, 12f, 0.125f);
+            ms.scale(3/8f, -3/8f, 3/8f);
+
+            int textWidth1 = font.width(ors.prestigeText);
+            //noinspection IntegerDivisionInFloatingPointContext
+            font.drawInBatch(
+                ors.prestigeText,
+                -textWidth1 / 2, 0f,
+                0xFFFFFF, true,
+                ms.last().pose(),
+                buffer,
+                Font.DisplayMode.NORMAL,
+                0,
+                frontPackedLight
+            );
+
+            ms.scale(3/4f, 3/4f, 3/4f);
+            int textWidth2 = font.width(ors.prestigeMultiplierText);
+            //noinspection IntegerDivisionInFloatingPointContext
+            font.drawInBatch(
+                ors.prestigeMultiplierText,
+                -textWidth2 / 2, 16f,
+                0xFFFFFF, true,
+                ms.last().pose(),
+                buffer,
+                Font.DisplayMode.NORMAL,
+                0,
+                frontPackedLight
+            );
+
+            ms.popPose();
+        }
+
         ms.popPose();
     }
 
