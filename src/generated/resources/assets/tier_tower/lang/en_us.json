@@ -68,6 +68,7 @@
   "tier_tower.tier.minecraft.prismarine": "Prismarine",
   "tier_tower.tier.minecraft.quartz": "Quartz",
   "tier_tower.tier.minecraft.redstone": "Redstone",
+  "tooltip.tier_tower.item_sink.unbreakable": "Places as Unbreakable",
   "unit.tier_tower.fluid.buckets": "%s B",
   "unit.tier_tower.fluid.buckets.millibuckets": "%s B %s mB",
   "unit.tier_tower.fluid.millibuckets": "%s mB"

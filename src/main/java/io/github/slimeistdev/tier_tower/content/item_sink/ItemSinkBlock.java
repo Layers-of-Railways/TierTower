@@ -24,8 +24,11 @@ import io.github.slimeistdev.tier_tower.foundation.block_entity.IBE;
 import io.github.slimeistdev.tier_tower.mixin_ducks.common.ServerPlayer_Duck;
 import io.github.slimeistdev.tier_tower.registry.TierTowerBlockEntities;
 import io.github.slimeistdev.tier_tower.registry.TierTowerSoundEvents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -37,16 +40,23 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.DismountHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.CollisionGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ItemSinkBlock extends BaseEntityBlock implements IBE<ItemSinkBlockEntity> {
@@ -172,6 +182,35 @@ public class ItemSinkBlock extends BaseEntityBlock implements IBE<ItemSinkBlockE
     public void tryAbsorbItem(@NotNull Level level, @NotNull BlockPos pos, @NotNull ItemEntity itemEntity) {
         if (itemEntity.getOwner() instanceof ServerPlayer serverPlayer) {
             withBlockEntityDo(level, pos, be -> be.tryAbsorbItem(itemEntity, serverPlayer));
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState state, LootParams.Builder params) {
+        if (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof ItemSinkBlockEntity be) {
+            if (be.isUnbreakable()) return List.of();
+        }
+        return super.getDrops(state, params);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public float getDestroyProgress(@NotNull BlockState state, @NotNull Player player, @NotNull BlockGetter level, @NotNull BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof ItemSinkBlockEntity be) {
+            if (be.isUnbreakable()) return 0.0f;
+        }
+
+        return super.getDestroyProgress(state, player, level, pos);
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable BlockGetter level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+
+        CompoundTag beTag = stack.getTagElement("BlockEntityTag");
+        if (beTag != null && beTag.getBoolean("Unbreakable")) {
+            tooltip.add(Component.translatable("tooltip.tier_tower.item_sink.unbreakable").withStyle(ChatFormatting.BLUE));
         }
     }
 

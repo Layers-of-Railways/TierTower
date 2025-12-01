@@ -62,10 +62,15 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
 
     private final List<EminentSnake> snakes = new ArrayList<>();
     private final Map<UUID, EminentSnake> recentSnakes = new HashMap<>();
+    private boolean isUnbreakable;
 
     public ItemSinkBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
         quickCheck = RecipeManager.createCheck(TierTowerRecipeTypes.ITEM_SINK);
+    }
+
+    public boolean isUnbreakable() {
+        return isUnbreakable;
     }
 
     @Override
@@ -124,6 +129,8 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
                 this.snakes.add(EminentSnake.load(snakes.getCompound(i), worldPosition));
             }
         }
+
+        isUnbreakable = tag.getBoolean("Unbreakable");
     }
 
     @Override
@@ -139,5 +146,7 @@ public class ItemSinkBlockEntity extends BlockEntity implements TickingBlockEnti
             }
             tag.put("Snakes", snakes);
         }
+
+        tag.putBoolean("Unbreakable", isUnbreakable);
     }
 }

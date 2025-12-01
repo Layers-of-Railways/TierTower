@@ -36,6 +36,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
@@ -232,6 +233,16 @@ public class TierTowerCreativeModeTabs {
             private static void outputAll(CreativeModeTab.Output output, List<Item> items, Function<Item, ItemStack> stackFunc, Function<Item, CreativeModeTab.TabVisibility> visibilityFunc) {
                 for (Item item : items) {
                     output.accept(stackFunc.apply(item), visibilityFunc.apply(item));
+                }
+
+                {
+                    ItemStack unbreakableItemSink = TierTowerBlocks.ITEM_SINK.asStack();
+                    CompoundTag beTag = unbreakableItemSink.getOrCreateTagElement("BlockEntityTag");
+                    beTag.putBoolean("Unbreakable", true);
+                    output.accept(
+                        unbreakableItemSink,
+                        CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY
+                    );
                 }
             }
 

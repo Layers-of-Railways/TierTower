@@ -25,15 +25,29 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 
 // Intended for the client's view of a player's progression
-public record TowerSummary(ResourceKey<Sequence> sequenceId, LevelingState levelingState) {
-    public static final TowerSummary ZERO = new TowerSummary(TierTower.MAIN_SEQUENCE, LevelingState.ZERO);
+public record TowerSummary(ResourceKey<Sequence> sequenceId, LevelingState levelingState, Prestige prestige) {
+    public static final TowerSummary ZERO = new TowerSummary(TierTower.MAIN_SEQUENCE, LevelingState.ZERO, Prestige.ZERO);
 
     public static TowerSummary read(FriendlyByteBuf buf) {
-        return new TowerSummary(buf.readResourceKey(TierTowerRegistries.SEQUENCE), LevelingState.read(buf));
+        return new TowerSummary(buf.readResourceKey(TierTowerRegistries.SEQUENCE), LevelingState.read(buf), Prestige.read(buf));
     }
 
     public void write(FriendlyByteBuf buf) {
         buf.writeResourceKey(sequenceId);
         levelingState.write(buf);
+        prestige.write(buf);
+    }
+
+    public record Prestige(int points, double multiplier) {
+        public static final Prestige ZERO = new Prestige(0, 1.0);
+
+        public static Prestige read(FriendlyByteBuf buf) {
+            return new Prestige(buf.readVarInt(), buf.readDouble());
+        }
+
+        public void write(FriendlyByteBuf buf) {
+            buf.writeVarInt(points);
+            buf.writeDouble(multiplier);
+        }
     }
 }

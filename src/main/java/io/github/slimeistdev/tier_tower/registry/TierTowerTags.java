@@ -22,8 +22,11 @@ import io.github.slimeistdev.tier_tower.TierTower;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -33,6 +36,7 @@ import static io.github.slimeistdev.tier_tower.registry.TierTowerTags.NameSpace.
 public class TierTowerTags {
     public enum NameSpace {
         MOD(TierTower.MOD_ID),
+        FORGE("c"),
         CREATE("create");
 
         public final String id;
@@ -48,6 +52,43 @@ public class TierTowerTags {
         public ResourceLocation id(Enum<?> entry, @Nullable String pathOverride) {
             return this.id(pathOverride != null ? pathOverride : entry.name().toLowerCase(Locale.ROOT));
         }
+    }
+
+    public enum AllBlockTags {
+        NON_MOVABLE(CREATE),
+        RELOCATION_NOT_SUPPORTED(FORGE),
+        ;
+
+        public final TagKey<Block> tag;
+
+        AllBlockTags() {
+            this(MOD);
+        }
+
+        AllBlockTags(NameSpace namespace) {
+            this(namespace, null);
+        }
+
+        AllBlockTags(NameSpace namespace, @Nullable String pathOverride) {
+            this.tag = TagKey.create(Registries.BLOCK, namespace.id(this, pathOverride));
+        }
+
+        @SuppressWarnings("deprecation")
+        public boolean matches(Block block) {
+            return block.builtInRegistryHolder()
+                .is(tag);
+        }
+
+        public boolean matches(ItemStack stack) {
+            return stack != null && stack.getItem() instanceof BlockItem blockItem && matches(blockItem.getBlock());
+        }
+
+        public boolean matches(BlockState state) {
+            return state.is(tag);
+        }
+
+        private static void init() {}
+
     }
 
     public enum AllItemTags {
@@ -76,5 +117,12 @@ public class TierTowerTags {
         public boolean matches(ItemStack stack) {
             return stack.is(tag);
         }
+
+        public static void init() {}
+    }
+
+    public static void init() {
+        AllBlockTags.init();
+        AllItemTags.init();
     }
 }

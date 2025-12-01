@@ -343,7 +343,7 @@ public class PlayerTower {
         markDirty();
         syncData();
 
-        return new TowerSummary(currentSequence, $levelingState);
+        return new TowerSummary(currentSequence, $levelingState, new TowerSummary.Prestige(sequenceState.prestigePoints, getPrestigeMultiplier()));
     }
 
     public boolean isLocked() {
@@ -365,7 +365,7 @@ public class PlayerTower {
 
     public @NotNull TowerSummary summarize() {
         LevelingState levelingState = ensureCurrent();
-        return new TowerSummary(currentSequence, levelingState);
+        return new TowerSummary(currentSequence, levelingState, new TowerSummary.Prestige(getSequenceState().prestigePoints, getPrestigeMultiplier()));
     }
 
     public int totalPoints() {

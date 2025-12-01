@@ -33,6 +33,7 @@ public class LangGen {
         BiConsumer<String, String> langConsumer = provider::add;
 
         provideDefaultLang("interface", langConsumer);
+        provideDefaultLang("tooltips", langConsumer);
         provideDefaultLang("commands", langConsumer);
         provideDefaultLang("sounds", langConsumer);
         TierTowerTiers.provideLang(langConsumer);

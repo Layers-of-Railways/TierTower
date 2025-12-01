@@ -25,6 +25,7 @@ import io.github.slimeistdev.tier_tower.content.item_sink.ItemSinkBlock;
 import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlock;
 import io.github.slimeistdev.tier_tower.content.subliminator.SubliminatorBlock;
 import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
+import io.github.slimeistdev.tier_tower.registry.TierTowerTags.AllBlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -94,6 +95,8 @@ public class TierTowerBlocks {
         .initialProperties(() -> Blocks.DEEPSLATE_BRICKS)
         .transform(pickaxeOnly())
         .transform(lightLevel(15))
+        .tag(AllBlockTags.RELOCATION_NOT_SUPPORTED.tag)
+        .tag(AllBlockTags.NON_MOVABLE.tag)
         .blockstate((c, p) -> p.simpleBlock(
             c.get(),
             p.models().cubeBottomTop(
