@@ -23,9 +23,18 @@ import io.github.fabricators_of_create.porting_lib.tags.Tags;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.eminent_items.BottledEminenceItem;
 import io.github.slimeistdev.tier_tower.content.eminent_items.EminenceNuggetItem;
+import io.github.slimeistdev.tier_tower.content.eminent_items.ThrownBottledEminence;
 import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
+import net.minecraft.Util;
+import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class TierTowerItems {
@@ -35,6 +44,25 @@ public class TierTowerItems {
         .lang("Stoppered Wispy Eminence")
         .properties(p -> p.craftRemainder(Items.GLASS_BOTTLE))
         .tag(TierTowerTags.AllItemTags.UPRIGHT_ON_BELT.tag)
+        .onRegister(i -> DispenserBlock.registerBehavior(i, new AbstractProjectileDispenseBehavior() {
+            @Override
+            protected @NotNull Projectile getProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack stack) {
+                return Util.make(
+                    new ThrownBottledEminence(level, position.x(), position.y(), position.z()),
+                    projectile -> projectile.setItem(stack)
+                );
+            }
+
+            @Override
+            protected float getUncertainty() {
+                return super.getUncertainty() * 0.5F;
+            }
+
+            @Override
+            protected float getPower() {
+                return super.getPower() * 1.25F;
+            }
+        }))
         .register();
 
     public static final ItemEntry<EminenceNuggetItem> EMINENCE_NUGGET = REGISTRATE.item("eminence_nugget", EminenceNuggetItem::new)

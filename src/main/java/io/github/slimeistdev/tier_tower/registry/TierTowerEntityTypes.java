@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower.registry;
 import com.tterrag.registrate.util.entry.EntityEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.eminent_items.ThrownBottledEminence;
+import io.github.slimeistdev.tier_tower.content.item_sink.EminentSnakeEntity;
 import io.github.slimeistdev.tier_tower.foundation.TierTowerRegistrate;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.world.entity.EntityDimensions;
@@ -31,7 +32,7 @@ public class TierTowerEntityTypes {
     private static final TierTowerRegistrate REGISTRATE = TierTower.registrate();
 
     public static final EntityEntry<ThrownBottledEminence> BOTTLED_EMINENCE = REGISTRATE.<ThrownBottledEminence>entity(
-        "bottled_eminence",
+            "bottled_eminence",
             ThrownBottledEminence::new,
             MobCategory.MISC
         )
@@ -41,6 +42,17 @@ public class TierTowerEntityTypes {
             .trackedUpdateRate(10)
             .dimensions(EntityDimensions.fixed(0.25f, 0.25f)))
         .renderer(() -> ThrownItemRenderer::new)
+        .register();
+
+    public static final EntityEntry<EminentSnakeEntity> EMINENT_SNAKE = REGISTRATE.entity(
+            "eminent_snake",
+            EminentSnakeEntity::new,
+            MobCategory.MISC
+        )
+        .lang("Eminent Snake")
+        .properties(b -> b
+            .trackRangeChunks(0)
+            .dimensions(EntityDimensions.fixed(0.25f, 0.25f)))
         .register();
 
     public static void register() {

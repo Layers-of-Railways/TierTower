@@ -1,4 +1,4 @@
-// 1.20.1	2025-12-01T05:39:21.078694586	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-26T11:35:36.871279072	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 e44b7ebbae421404e2e0081dbccdccafd264beeb assets/tier_tower/models/block/eminent_deepslate_pillar_horizontal.json
 407ef4262659d3c6c60a3403994935dfc95ba319 data/tier_tower/loot_tables/blocks/eminent_glass_bricks.json
 832964d64a2f3e32cc672a04caa308fff2bc9436 assets/tier_tower/blockstates/eminent_glass.json
@@ -37,7 +37,7 @@ befc1bb7c82ac8e4355c2a117360815430110189 assets/tier_tower/models/block/eminent_
 18924d163c0cd1825fd0ec2fec41cc3b9f66a6f6 data/tier_tower/loot_tables/blocks/eminent_deepslate_bricks.json
 da5cd78f7bf3181fdc3b91cff0fce4d1bfcf9fef assets/tier_tower/models/block/obelisk.json
 af3824e4b6b70503fde7c4b222c53d61014e3d84 assets/tier_tower/blockstates/eminent_deepslate_tiles.json
-b71f3e9cf5d69383d444af1fa9a9f593df2209a8 assets/tier_tower/lang/en_us.json
+316a257305a836d34da7fbf3b2231e4126d4def4 assets/tier_tower/lang/en_us.json
 b89801644412cecde4f94fe26c2c5fc91dad11ea assets/tier_tower/models/block/eminent_glass.json
 3214b1b9a6883bca18d16f4cd2e9bc804d79779e assets/tier_tower/models/item/eminent_deepslate_bricks.json
 99a5d633bcb2e1c3f1dae2423e20f87c64b7a103 assets/tier_tower/models/block/item_sink.json
@@ -47,4 +47,4 @@ b89801644412cecde4f94fe26c2c5fc91dad11ea assets/tier_tower/models/block/eminent_
 9a69b2dd154570ef4a13e98f90ac199f11cd1dc6 assets/tier_tower/blockstates/eminent_deepslate_pillar.json
 e9c3660b21546ad77607aacc8c95cc851fb03ec0 assets/tier_tower/models/block/deepslate_pillar_horizontal.json
 5e0e35e7e34543a7a673dc84e353f80b7fb9e4c7 data/tier_tower/loot_tables/blocks/eminent_deepslate_pillar.json
-14ffb4e31dda48e962d7d4e0101c9b76a3f06e23 assets/tier_tower/lang/en_ud.json
+8da1008ee41955ccf2a5a546a5e8958254c827cd assets/tier_tower/lang/en_ud.json

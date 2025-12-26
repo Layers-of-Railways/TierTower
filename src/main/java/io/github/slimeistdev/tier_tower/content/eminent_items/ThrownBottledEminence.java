@@ -19,11 +19,14 @@
 package io.github.slimeistdev.tier_tower.content.eminent_items;
 
 import io.github.slimeistdev.tier_tower.content.item_sink.EminentSnake;
+import io.github.slimeistdev.tier_tower.content.item_sink.EminentSnakeEntity;
 import io.github.slimeistdev.tier_tower.content.item_sink.EminentSnakeParticleOptions;
 import io.github.slimeistdev.tier_tower.registry.TierTowerEntityTypes;
 import io.github.slimeistdev.tier_tower.registry.TierTowerItems;
+import io.github.slimeistdev.tier_tower.utils.EminenceConstants;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -76,6 +79,25 @@ public class ThrownBottledEminence extends ThrowableItemProjectile {
             Vec3 pos = position();
             level.sendParticles(new EminentSnakeParticleOptions(vectorColor, 2), pos.x, pos.y, pos.z, value * 2, 0.25, 0.25, 0.25, 0.5);
             level.sendParticles(new DustParticleOptions(vectorColor, 1.5f), pos.x, pos.y, pos.z, value, 0.25, 0.25, 0.25, 0.5);
+
+            ServerPlayer owner;
+            if (getOwner() instanceof ServerPlayer player) {
+                owner = player;
+            } else if (level.getNearestPlayer(this, 64) instanceof ServerPlayer player) {
+                owner = player;
+            } else {
+                owner = null;
+            }
+
+            if (owner != null) {
+                EminentSnake snake = new EminentSnake(owner.getUUID(), EminenceConstants.EMINENCE_PER_BOTTLE);
+                EminentSnakeEntity snakeEntity = TierTowerEntityTypes.EMINENT_SNAKE.create(level);
+                if (snakeEntity != null) {
+                    snakeEntity.init(snake, this.blockPosition());
+                    snakeEntity.moveTo(this.position());
+                    level.addFreshEntity(snakeEntity);
+                }
+            }
 
             this.discard();
         }

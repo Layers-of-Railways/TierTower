@@ -36,6 +36,7 @@
   "commands.tier_tower.unlock.success.multiple": "Unlocked %s players' towers",
   "commands.tier_tower.unlock.success.single": "Unlocked %s's tower",
   "entity.tier_tower.bottled_eminence": "Thrown Stoppered Wispy Eminence",
+  "entity.tier_tower.eminent_snake": "Eminent Snake",
   "fluid.tier_tower.eminence": "Wispy Eminence",
   "gui.tier_tower.obelisk.prestige": "Prestige: %s",
   "gui.tier_tower.obelisk.prestige_multiplier": "Prestige Multiplier: %sx",
