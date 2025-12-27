@@ -30,6 +30,7 @@ import io.github.slimeistdev.tier_tower.content.cosmetics.ChatBadgeUtil;
 import io.github.slimeistdev.tier_tower.content.obelisk.ObeliskBlock.DisplayFace;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -49,6 +50,8 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBlockEntity> {
@@ -242,7 +245,7 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             font.drawInBatch(
                 ors.prestigeText,
                 -textWidth1 / 2, 0f,
-                0xFFFFFF, true,
+                Objects.requireNonNull(ChatFormatting.GREEN.getColor()), true,
                 ms.last().pose(),
                 buffer,
                 Font.DisplayMode.NORMAL,
@@ -256,7 +259,7 @@ public class ObeliskBlockEntityRenderer implements BlockEntityRenderer<ObeliskBl
             font.drawInBatch(
                 ors.prestigeMultiplierText,
                 -textWidth2 / 2, 16f,
-                0xFFFFFF, true,
+                ChatFormatting.GREEN.getColor(), true,
                 ms.last().pose(),
                 buffer,
                 Font.DisplayMode.NORMAL,
