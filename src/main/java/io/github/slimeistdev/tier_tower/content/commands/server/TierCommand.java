@@ -22,6 +22,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.backend.PlayerTower;
@@ -48,8 +49,8 @@ public class TierCommand {
     private static final Dynamic2CommandExceptionType ERROR_SET_INVALID_TIER = new Dynamic2CommandExceptionType((tier, sequence) ->
         Component.translatable("commands.tier_tower.tier.set.invalid_tier", tier, sequence)
     );
-    private static final SimpleCommandExceptionType ERROR_SET_INVALID_LEVEL = new SimpleCommandExceptionType(
-        Component.translatable("commands.tier_tower.tier.set.invalid_level")
+    private static final DynamicCommandExceptionType ERROR_SET_INVALID_LEVEL = new DynamicCommandExceptionType(
+        maxLevel -> Component.translatable("commands.tier_tower.tier.set.invalid_level", maxLevel)
     );
     private static final SimpleCommandExceptionType ERROR_SET_INVALID_LEVEL_NEGATIVE = new SimpleCommandExceptionType(
         Component.translatable("commands.tier_tower.tier.set.invalid_level.negative")
@@ -119,8 +120,9 @@ public class TierCommand {
             throw ERROR_SET_INVALID_TIER.create(tier.key().location(), summary.sequenceId().location());
         }
 
-        if (level > tier.value().levelCount()) {
-            throw ERROR_SET_INVALID_LEVEL.create();
+        int levelCount = tier.value().levelCount();
+        if (level >= levelCount) {
+            throw ERROR_SET_INVALID_LEVEL.create(levelCount - 1);
         }
 
         TowerSummary newSummary = tower.setTierLevelAndPoints(tierIndex, level, points);
@@ -223,8 +225,9 @@ public class TierCommand {
             Sequence.LevelingState levelingState = summary.levelingState();
 
             int targetLevel = levelingState.levelIndex() + amount;
-            if (targetLevel >= sequence.getTier(levelingState.tierIndex()).getLevelCount()) {
-                throw ERROR_SET_INVALID_LEVEL.create();
+            int levelCount = sequence.getTier(levelingState.tierIndex()).getLevelCount();
+            if (targetLevel >= levelCount) {
+                throw ERROR_SET_INVALID_LEVEL.create(levelCount - 1);
             }
 
             tower.setTierLevelAndPoints(levelingState.tierIndex(), targetLevel, 0);
