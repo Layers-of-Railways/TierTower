@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NodeTest {
     private static final EvaluationContext EMPTY = new EvaluationContext();
+    private static final double EPSILON = 1e-9;
 
     void testCalculation(String expression, double expected) {
         testCalculation(expression, EMPTY, expected);
@@ -45,7 +46,7 @@ class NodeTest {
 
         try {
             double result = node.evaluate(ctx);
-            assertEquals(expected, result);
+            assertEquals(expected, result, EPSILON);
         } catch (EvaluationException e) {
             fail("Failed to evaluate expression '" + expression + "'", e);
         }
@@ -84,6 +85,26 @@ class NodeTest {
             () -> testCalculation("x * y", ctx, -6.0),
             () -> testCalculation("x ^ y", ctx, 0.125),
             () -> testCalculation("(x + y) * 2", ctx, -2.0)
+        );
+    }
+
+    @Test
+    void functionMath() {
+        assertAll(
+            () -> testCalculation("sin(pi() / 2)", 1.0),
+            () -> testCalculation("cos(0)", 1.0),
+            () -> testCalculation("tan(pi() / 4)", 1.0),
+            () -> testCalculation("atan2(1, 1)", Math.PI / 4)
+        );
+    }
+
+    @Test
+    void varargMath() {
+        assertAll(
+            () -> testCalculation("min(1)", 1.0),
+            () -> testCalculation("min(3, 1, 2)", 1.0),
+            () -> testCalculation("max(2)", 2.0),
+            () -> testCalculation("max(1, 3, 2)", 3.0)
         );
     }
 }

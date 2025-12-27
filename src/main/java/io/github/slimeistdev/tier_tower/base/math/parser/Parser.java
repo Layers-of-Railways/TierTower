@@ -19,14 +19,23 @@
 package io.github.slimeistdev.tier_tower.base.math.parser;
 
 import io.github.slimeistdev.tier_tower.base.math.ParseException;
+import io.github.slimeistdev.tier_tower.base.math.ast.CallNode;
 import io.github.slimeistdev.tier_tower.base.math.ast.LiteralNode;
 import io.github.slimeistdev.tier_tower.base.math.ast.Node;
 import io.github.slimeistdev.tier_tower.base.math.ast.OpNode;
 import io.github.slimeistdev.tier_tower.base.math.ast.VariableNode;
 import io.github.slimeistdev.tier_tower.base.math.lexer.Lexer;
-import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.*;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.Comma;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.End;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.Literal;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.Operator;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.ParenClose;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.ParenOpen;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.Token;
+import io.github.slimeistdev.tier_tower.base.math.lexer.tokens.Variable;
 import io.github.slimeistdev.tier_tower.base.math.operations.BiOp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -43,6 +52,28 @@ public class Parser {
         return parsed;
     }
 
+    private static Node parseCall(TokenStream tokens, Variable functionName) throws ParseException {
+        if (tokens.peek() instanceof ParenClose) {
+            tokens.next();
+            return new CallNode(functionName.name(), new Node[0]);
+        }
+
+        List<Node> args = new ArrayList<>();
+        while (true) {
+            Node arg = parse(tokens, 0);
+            args.add(arg);
+
+            Token next = tokens.next();
+            if (next instanceof ParenClose) {
+                break;
+            } else if (!(next instanceof Comma)) {
+                throw new ParseException("Expected ',' or ')', got: " + next);
+            }
+        }
+
+        return new CallNode(functionName.name(), args.toArray(new Node[0]));
+    }
+
     // Recursive Pratt parser https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
     @SuppressWarnings("InfiniteRecursion") // silly IntelliJ, can't figure out that tokens.next() will eventually exhaust the tokens
     static Node parse(TokenStream tokens, int minBP) throws ParseException {
@@ -53,7 +84,12 @@ public class Parser {
         if (token instanceof Literal literal) {
             lhs = new LiteralNode(literal.value());
         } else if (token instanceof Variable variable) {
-            lhs = new VariableNode(variable.name());
+            if (tokens.peek() instanceof ParenOpen) {
+                tokens.next();
+                lhs = parseCall(tokens, variable);
+            } else {
+                lhs = new VariableNode(variable.name());
+            }
         } else if (token instanceof ParenOpen) {
             lhs = parse(tokens, 0);
             if (!tokens.hasNext() || !(tokens.next() instanceof ParenClose)) {
@@ -70,7 +106,7 @@ public class Parser {
             }
 
             Token nextToken = tokens.peek();
-            if (nextToken instanceof ParenClose) {
+            if (nextToken instanceof ParenClose || nextToken instanceof Comma) {
                 break;
             }
             if (!(nextToken instanceof Operator op)) {
@@ -117,9 +153,10 @@ public class Parser {
             return tokens.get(position++);
         }
 
+        @SuppressWarnings("RedundantThrows")
         public Token peek() throws ParseException {
             if (position >= tokens.size()) {
-                throw new ParseException("No more tokens available");
+                return End.INSTANCE;
             }
             return tokens.get(position);
         }

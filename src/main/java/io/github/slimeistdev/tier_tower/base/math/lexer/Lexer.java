@@ -40,6 +40,7 @@ public class Lexer {
                 case " " -> null;
 
                 case "(" -> ParenOpen.INSTANCE;
+                case "," -> Comma.INSTANCE;
                 case ")" -> ParenClose.INSTANCE;
 
                 case "+", "-" -> new Operator(c, 10, 11);

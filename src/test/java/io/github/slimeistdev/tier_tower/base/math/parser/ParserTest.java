@@ -129,4 +129,25 @@ class ParserTest {
             () -> testParseFail("dolor$sit", "Invalid character: $")
         );
     }
+
+    @Test
+    void parseFunctionCalls() {
+        assertAll(
+            () -> testParse("f()", "(fn<f>)"),
+            () -> testParse("h(1)", "(fn<h> 1.0)"),
+            () -> testParse("max(1, 2)", "(fn<max> 1.0 2.0)"),
+            () -> testParse("sum(a, b, c + d)", "(fn<sum> a b (+ c d))"),
+            () -> testParse("outer(inner(1, 2), 3)", "(fn<outer> (fn<inner> 1.0 2.0) 3.0)")
+        );
+    }
+
+    @Test
+    void parseFunctionCallsInExpressions() {
+        assertAll(
+            () -> testParse("1 + f(2) * 3", "(+ 1.0 (* (fn<f> 2.0) 3.0))"),
+            () -> testParse("g(1 + 2, 3 * 4)", "(fn<g> (+ 1.0 2.0) (* 3.0 4.0))"),
+            () -> testParse("h(x) ^ 2", "(^ (fn<h> x) 2.0)"),
+            () -> testParse("a + outer(b, inner(c + d, e * f))", "(+ a (fn<outer> b (fn<inner> (+ c d) (* e f))))")
+        );
+    }
 }

@@ -18,14 +18,51 @@
 
 package io.github.slimeistdev.tier_tower.base.math;
 
+import io.github.slimeistdev.tier_tower.base.math.ast.CallNode.CallEvaluator;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class EvaluationContext {
+    private static final Map<String, CallEvaluator> BUILT_IN_FUNCTIONS = new HashMap<>();
+    static {
+        BUILT_IN_FUNCTIONS.put("sqrt", CallEvaluator.op(Math::sqrt));
+        BUILT_IN_FUNCTIONS.put("log", CallEvaluator.op(Math::log));
+        BUILT_IN_FUNCTIONS.put("exp", CallEvaluator.op(Math::exp));
+        BUILT_IN_FUNCTIONS.put("pow", CallEvaluator.op2(Math::pow));
+
+        BUILT_IN_FUNCTIONS.put("abs", CallEvaluator.op(Math::abs));
+        BUILT_IN_FUNCTIONS.put("min", CallEvaluator.many1(args -> {
+            double min = args[0];
+            for (int i = 1; i < args.length; i++) {
+                if (args[i] < min) {
+                    min = args[i];
+                }
+            }
+            return min;
+        }));
+        BUILT_IN_FUNCTIONS.put("max", CallEvaluator.many1(args -> {
+            double max = args[0];
+            for (int i = 1; i < args.length; i++) {
+                if (args[i] > max) {
+                    max = args[i];
+                }
+            }
+            return max;
+        }));
+
+        BUILT_IN_FUNCTIONS.put("pi", CallEvaluator.constant(Math.PI));
+        BUILT_IN_FUNCTIONS.put("sin", CallEvaluator.op(Math::sin));
+        BUILT_IN_FUNCTIONS.put("cos", CallEvaluator.op(Math::cos));
+        BUILT_IN_FUNCTIONS.put("tan", CallEvaluator.op(Math::tan));
+        BUILT_IN_FUNCTIONS.put("atan2", CallEvaluator.op2(Math::atan2));
+    }
+
     private final Object2DoubleMap<String> variables;
     private final Set<String> finalVariables;
 
@@ -62,6 +99,13 @@ public class EvaluationContext {
             throw new EvaluationException("Variable '" + name + "' not found in context.");
         }
         return variables.getDouble(name);
+    }
+
+    public CallEvaluator getFunction(@NotNull String name) throws EvaluationException {
+        if (!BUILT_IN_FUNCTIONS.containsKey(name)) {
+            throw new EvaluationException("Function '" + name + "' not found in context.");
+        }
+        return BUILT_IN_FUNCTIONS.get(name);
     }
 
     public String[] getVariables() {

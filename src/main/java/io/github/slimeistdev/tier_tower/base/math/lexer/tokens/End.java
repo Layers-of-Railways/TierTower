@@ -18,4 +18,13 @@
 
 package io.github.slimeistdev.tier_tower.base.math.lexer.tokens;
 
-public sealed interface Token permits Literal, Operator, ParenOpen, Comma, ParenClose, Variable, End {}
+import org.jetbrains.annotations.NotNull;
+
+public enum End implements Token {
+    INSTANCE;
+
+    @Override
+    public @NotNull String toString() {
+        return "!#!@#!@END@#!@#!";
+    }
+}
