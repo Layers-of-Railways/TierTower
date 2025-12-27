@@ -45,6 +45,7 @@ repositories {
     exclusiveMaven("https://api.modrinth.com/maven", "maven.modrinth") // LazyDFU
     maven("https://mvn.devos.one/snapshots/") // Create Fabric, Porting Lib, Forge Tags, Milk Lib, Registrate Fabric
     maven("https://mvn.devos.one/releases") // Porting Lib Releases
+    exclusiveMaven("https://maven.createmod.net", "net.createmod", "dev.engine-room") // Ponder
     maven("https://jitpack.io/") // Mixin Extras, Fabric ASM
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // forge config api port
     exclusiveMaven("https://maven.jamieswhiteshirt.com/libs-release", "com.jamieswhiteshirt") // Reach Entity Attributes
@@ -121,10 +122,15 @@ dependencies {
 
     modCompileOnly("dev.emi:emi-fabric:${"emi_version"()}:api")
 
-    modCompileOnly("com.simibubi.create:create-fabric-${"minecraft_version"()}:${"create_fabric_version"()}")
+    val createCoordinates = if ("create6"().toBoolean()) {
+        "com.simibubi.create:create-fabric:${"create_fabric6_version"()}"
+    } else {
+        "com.simibubi.create:create-fabric-${"minecraft_version"()}:${"create_fabric_version"()}"
+    }
+    modCompileOnly(createCoordinates)
     if ("enable_create"().toBoolean()) {
         // Create - dependencies are added transitively
-        modLocalRuntime("com.simibubi.create:create-fabric-${"minecraft_version"()}:${"create_fabric_version"()}")
+        modLocalRuntime(createCoordinates)
     }
 }
 
@@ -206,7 +212,8 @@ fun RepositoryHandler.exclusiveMaven(url: String, vararg groups: String) {
         forRepository { maven(url) }
         filter {
             groups.forEach {
-                includeGroup(it)
+                @Suppress("UnstableApiUsage")
+                includeGroupAndSubgroups(it)
             }
         }
     }

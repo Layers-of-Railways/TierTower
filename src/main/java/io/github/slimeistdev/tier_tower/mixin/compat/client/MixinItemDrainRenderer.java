@@ -48,13 +48,16 @@ public class MixinItemDrainRenderer {
         return constant;
     }
 
+    // this injector is both broken and unnecessary in Create 6, but absolutely necessary in Create 0.5
+    @SuppressWarnings({"MixinAnnotationTarget", "InvalidInjectorMethodSignature", "RedundantSuppression"})
     @WrapOperation(
         method = "renderFluid",
         at = @At(
             value = "INVOKE",
             target = "Lcom/simibubi/create/foundation/fluid/FluidRenderer;renderFluidBox(Lio/github/fabricators_of_create/porting_lib/fluids/FluidStack;FFFFFFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;IZ)V",
             ordinal = 0
-        )
+        ),
+        require = 0
     )
     private void fixEminenceRender(
         FluidStack fluidStack,
