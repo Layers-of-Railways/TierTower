@@ -26,6 +26,9 @@
 		],
 		"fabric-datagen": [
 			"io.github.slimeistdev.tier_tower.TierTowerDatagen"
+		],
+		"emi": [
+			"io.github.slimeistdev.tier_tower.compat.emi.TierTowerEmiPlugin"
 		]
 	},
 	"accessWidener": "tier_tower.accesswidener",

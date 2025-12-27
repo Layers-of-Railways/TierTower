@@ -35,6 +35,8 @@
   "commands.tier_tower.unlock.no_change.single": "%s's tower is already unlocked",
   "commands.tier_tower.unlock.success.multiple": "Unlocked %s players' towers",
   "commands.tier_tower.unlock.success.single": "Unlocked %s's tower",
+  "emi.category.tier_tower.item_sink": "Sublimination",
+  "emi.recipe.tier_tower.item_sink.points": "%s Em",
   "entity.tier_tower.bottled_eminence": "Thrown Stoppered Wispy Eminence",
   "entity.tier_tower.eminent_snake": "Eminent Snake",
   "fluid.tier_tower.eminence": "Wispy Eminence",

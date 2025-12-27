@@ -8,5 +8,8 @@
   "unit.tier_tower.fluid.buckets.millibuckets": "%s B %s mB",
 
   "gui.tier_tower.obelisk.prestige": "Prestige: %s",
-  "gui.tier_tower.obelisk.prestige_multiplier": "Prestige Multiplier: %sx"
+  "gui.tier_tower.obelisk.prestige_multiplier": "Prestige Multiplier: %sx",
+
+  "emi.category.tier_tower.item_sink": "Sublimination",
+  "emi.recipe.tier_tower.item_sink.points": "%s Em"
 }

@@ -35,6 +35,8 @@
   "commands.tier_tower.unlock.no_change.single": "pǝʞɔoןun ʎpɐǝɹןɐ sı ɹǝʍoʇ s,%s",
   "commands.tier_tower.unlock.success.multiple": "sɹǝʍoʇ ,sɹǝʎɐןd %s pǝʞɔoןu∩",
   "commands.tier_tower.unlock.success.single": "ɹǝʍoʇ s,%s pǝʞɔoןu∩",
+  "emi.category.tier_tower.item_sink": "uoıʇɐuıɯıןqnS",
+  "emi.recipe.tier_tower.item_sink.points": "ɯƎ %s",
   "entity.tier_tower.bottled_eminence": "ǝɔuǝuıɯƎ ʎdsıM pǝɹǝddoʇS uʍoɹɥ⟘",
   "entity.tier_tower.eminent_snake": "ǝʞɐuS ʇuǝuıɯƎ",
   "fluid.tier_tower.eminence": "ǝɔuǝuıɯƎ ʎdsıM",

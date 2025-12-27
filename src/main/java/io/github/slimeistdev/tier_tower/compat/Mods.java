@@ -24,7 +24,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public enum Mods {
-    CREATE("create");
+    CREATE("create"),
+    EMI("emi");
 
     public final String id;
     public final boolean isLoaded;

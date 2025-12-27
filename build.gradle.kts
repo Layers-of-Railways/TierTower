@@ -118,6 +118,9 @@ dependencies {
     modLocalRuntime("dev.emi:emi-fabric:${"emi_version"()}")
 
     // Compat
+
+    modCompileOnly("dev.emi:emi-fabric:${"emi_version"()}:api")
+
     modCompileOnly("com.simibubi.create:create-fabric-${"minecraft_version"()}:${"create_fabric_version"()}")
     if ("enable_create"().toBoolean()) {
         // Create - dependencies are added transitively
