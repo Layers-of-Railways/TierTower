@@ -35,8 +35,12 @@ public class EvaluationContext {
         BUILT_IN_FUNCTIONS.put("log", CallEvaluator.op(Math::log));
         BUILT_IN_FUNCTIONS.put("exp", CallEvaluator.op(Math::exp));
         BUILT_IN_FUNCTIONS.put("pow", CallEvaluator.op2(Math::pow));
+        BUILT_IN_FUNCTIONS.put("e", CallEvaluator.constant(Math.E));
 
         BUILT_IN_FUNCTIONS.put("abs", CallEvaluator.op(Math::abs));
+        BUILT_IN_FUNCTIONS.put("floor", CallEvaluator.op(Math::floor));
+        BUILT_IN_FUNCTIONS.put("ceil", CallEvaluator.op(Math::ceil));
+        BUILT_IN_FUNCTIONS.put("round", CallEvaluator.op(Math::round));
         BUILT_IN_FUNCTIONS.put("min", CallEvaluator.many1(args -> {
             double min = args[0];
             for (int i = 1; i < args.length; i++) {

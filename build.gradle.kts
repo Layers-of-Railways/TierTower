@@ -1,14 +1,12 @@
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import java.io.ByteArrayOutputStream
-import dev.ithundxr.silk.ChangelogText
 
 plugins {
     java
     `maven-publish`
     id("fabric-loom") version "1.7-SNAPSHOT"
-    id("me.modmuss50.mod-publish-plugin") version "0.3.4" // https://github.com/modmuss50/mod-publish-plugin
-    id("dev.ithundxr.silk") version "0.11.15" // https://github.com/IThundxr/silk
     id("net.kyori.blossom") version "2.1.0" // https://github.com/KyoriPowered/blossom
+    id("com.modrinth.minotaur") version "2.+"
 }
 
 println("Tier Tower v${"mod_version"()}")
@@ -49,7 +47,8 @@ repositories {
     maven("https://jitpack.io/") // Mixin Extras, Fabric ASM
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // forge config api port
     exclusiveMaven("https://maven.jamieswhiteshirt.com/libs-release", "com.jamieswhiteshirt") // Reach Entity Attributes
-    exclusiveMaven("https://maven.tterrag.com/", "com.jozufozu.flywheel") // Flywheel
+    //exclusiveMaven("https://maven.tterrag.com/", "com.jozufozu.flywheel") // Flywheel
+    exclusiveMaven("https://modmaven.dev/", "com.jozufozu.flywheel") // Flywheel
 }
 
 val loom = project.extensions.getByType<LoomGradleExtensionAPI>()
@@ -219,21 +218,19 @@ fun RepositoryHandler.exclusiveMaven(url: String, vararg groups: String) {
     }
 }
 
-publishMods {
-    file = tasks.remapJar.get().archiveFile
-    version.set(project.version.toString())
-    changelog = ChangelogText.getChangelogText(rootProject).toString()
-    type = BETA
-    displayName = "Tier Tower v${"mod_version"()} Fabric ${"minecraft_version"()}"
-    modLoaders.add("fabric")
-
-    modrinth {
-        projectId = "modrinth_id"()
-        accessToken = System.getenv("MODRINTH_TOKEN")
-        minecraftVersions.add("minecraft_version"())
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "modrinth_id"()
+    versionName = "Tier Tower v${"mod_version"()} Fabric ${"minecraft_version"()}"
+    versionNumber = project.version.toString()
+    versionType = System.getenv().getOrDefault("RELEASE_TYPE", "release")
+    uploadFile = tasks.remapJar.get()
+    gameVersions.add("minecraft_version"())
+    loaders.add("fabric")
+    changelog = System.getenv("CHANGELOG")
+    syncBodyFrom = "<!--DO NOT EDIT MANUALLY: synced from gh readme-->\n" + rootProject.file("README.md").readText()
+    dependencies {
+        required.project("fabric-api")
+        embedded.project("fabric-permissions-api")
     }
-}
-
-tasks.create("TierTowerPublish") {
-    dependsOn(":build", ":publishMods")
 }
