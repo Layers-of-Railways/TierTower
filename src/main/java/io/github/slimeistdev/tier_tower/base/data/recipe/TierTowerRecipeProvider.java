@@ -61,6 +61,30 @@ public abstract class TierTowerRecipeProvider extends RecipeProvider {
             return Items.DIAMOND;
         }
 
+        public static ItemLike heartOfTheSea() {
+            return Items.HEART_OF_THE_SEA;
+        }
+
+        public static ItemLike totemOfUndying() {
+            return Items.TOTEM_OF_UNDYING;
+        }
+
+        public static ItemLike echoShard() {
+            return Items.ECHO_SHARD;
+        }
+
+        public static ItemLike netherStar() {
+            return Items.NETHER_STAR;
+        }
+
+        public static ItemLike dragonHead() {
+            return Items.DRAGON_HEAD;
+        }
+
+        public static ItemLike elytra() {
+            return Items.ELYTRA;
+        }
+
         public static ItemLike honeycomb() {
             return Items.HONEYCOMB;
         }

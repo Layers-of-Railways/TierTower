@@ -34,9 +34,38 @@ public class TierTowerItemSinkRecipeGen extends TierTowerRecipeProvider {
             transform.apply(new ItemSinkRecipeBuilder(TierTower.asResource("item_sink/"+name))).build(c));
     }
 
-    GeneratedRecipe DIAMOND = create("diamond", b -> b
-        .require(I.diamond())
-        .points(5));
+    GeneratedRecipe
+        START = null,
+
+        DIAMOND = create("diamond", b -> b
+            .require(I.diamond())
+            .points(5)),
+
+        NETHER_STAR = create("nether_star", b -> b
+            .require(I.netherStar())
+            .points(10)),
+
+        TOTEM_OF_UNDYING = create("totem_of_undying", b -> b
+            .require(I.totemOfUndying())
+            .points(20)),
+
+        ECHO_SHARD = create("echo_shard", b -> b
+            .require(I.echoShard())
+            .points(25)),
+
+        HEART_OF_THE_SEA = create("heart_of_the_sea", b -> b
+            .require(I.heartOfTheSea())
+            .points(50)),
+
+        DRAGON_HEAD = create("dragon_head", b -> b
+            .require(I.dragonHead())
+            .points(100)),
+
+        ELYTRA = create("elytra", b -> b
+            .require(I.elytra())
+            .points(100)),
+
+        END = null;
 
     @Override
     public @NotNull String getName() {

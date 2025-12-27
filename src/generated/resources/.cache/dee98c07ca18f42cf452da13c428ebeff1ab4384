@@ -1,2 +1,8 @@
-// 1.20.1	2025-12-26T22:57:45.010926145	Tier Tower/Item Sink Recipes
+// 1.20.1	2025-12-27T00:05:50.926321648	Tier Tower/Item Sink Recipes
 97da8678bc8d9d11c187d4a2438461c1a6b00b2b data/tier_tower/recipes/item_sink/diamond.json
+88dbc45f306b5c071c6c7795c163c609b07801ca data/tier_tower/recipes/item_sink/dragon_head.json
+7b76f9449727406810242e9f5f33d8b25b5ecc11 data/tier_tower/recipes/item_sink/elytra.json
+936c84785bbbe82052f35fbb4f37d74858d327b9 data/tier_tower/recipes/item_sink/heart_of_the_sea.json
+de46ffbfa717467e2aea1cf3d01d10e1d25c05a9 data/tier_tower/recipes/item_sink/totem_of_undying.json
+5e1859827c89b7c6f2ac5370f759825421fd2817 data/tier_tower/recipes/item_sink/nether_star.json
+fa1f2d36d3423b1d86f86dfa8d4a0cf7c563b0c0 data/tier_tower/recipes/item_sink/echo_shard.json

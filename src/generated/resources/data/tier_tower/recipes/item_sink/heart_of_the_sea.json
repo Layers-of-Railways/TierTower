@@ -1,0 +1,7 @@
+{
+  "type": "tier_tower:item_sink",
+  "ingredient": {
+    "item": "minecraft:heart_of_the_sea"
+  },
+  "points": 50
+}

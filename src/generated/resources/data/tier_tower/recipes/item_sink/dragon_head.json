@@ -1,0 +1,7 @@
+{
+  "type": "tier_tower:item_sink",
+  "ingredient": {
+    "item": "minecraft:dragon_head"
+  },
+  "points": 100
+}
