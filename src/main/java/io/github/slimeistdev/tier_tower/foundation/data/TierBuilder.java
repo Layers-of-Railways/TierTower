@@ -23,6 +23,7 @@ import io.github.slimeistdev.tier_tower.base.math.EvaluationContext;
 import io.github.slimeistdev.tier_tower.base.math.EvaluationException;
 import io.github.slimeistdev.tier_tower.base.math.MathPreconditions;
 import io.github.slimeistdev.tier_tower.base.math.ast.Node;
+import io.github.slimeistdev.tier_tower.content.backend.tier.ErosionRate;
 import io.github.slimeistdev.tier_tower.content.backend.tier.TierPackData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +34,7 @@ public class TierBuilder {
     private int levelCount = 10;
     private @Nullable Either<Integer, String> baseLevelingCost = null;
     private @Nullable String levelingCostFunction;
+    private @Nullable ErosionRate erosionRate;
 
     public TierBuilder() {
     }
@@ -88,6 +90,15 @@ public class TierBuilder {
         return this;
     }
 
+    /** Make this tier decay over time.
+     * @param loss the number of *points* lost per interval
+     * @param interval the number of ticks between each loss
+     */
+    public TierBuilder erode(int loss, int interval) {
+        erosionRate = new ErosionRate(loss, interval);
+        return this;
+    }
+
     public TierPackData build() {
         if (levelingCostFunction == null) {
             throw new IllegalArgumentException("Leveling cost function must be set");
@@ -117,6 +128,6 @@ public class TierBuilder {
                 .set("prev", testBaseLevelingCost)
                 .set("level", 1));
 
-        return new TierPackData(levelCount, Optional.ofNullable(baseLevelingCost), parsedFunction);
+        return new TierPackData(levelCount, Optional.ofNullable(baseLevelingCost), parsedFunction, Optional.ofNullable(erosionRate));
     }
 }

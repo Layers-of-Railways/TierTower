@@ -1,4 +1,4 @@
-// 1.20.1	2025-12-26T11:35:36.871279072	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-26T20:29:47.545955992	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 e44b7ebbae421404e2e0081dbccdccafd264beeb assets/tier_tower/models/block/eminent_deepslate_pillar_horizontal.json
 407ef4262659d3c6c60a3403994935dfc95ba319 data/tier_tower/loot_tables/blocks/eminent_glass_bricks.json
 832964d64a2f3e32cc672a04caa308fff2bc9436 assets/tier_tower/blockstates/eminent_glass.json
@@ -21,8 +21,8 @@ ebf761c63bea802b538495a235688eaf7cd24277 assets/tier_tower/models/item/item_sink
 a8c381f7f7772bf911a6f5554810a15baaf151bd assets/tier_tower/models/item/bottled_eminence.json
 3f00ec06bf02d5d15e4ecc19b12596adf463e1a7 assets/tier_tower/models/item/eminent_glass_bricks.json
 4eda1adc0c086d67fd73f31bc62972e78b1e33a4 assets/tier_tower/models/item/eminent_glass.json
-00fc816234db9f4e49053eb539c960471166620c assets/tier_tower/blockstates/eminent_glass_bricks.json
 f47a5e863ae7cdacd041b2b6e3ba419bf444671a data/tier_tower/loot_tables/blocks/eminent_deepslate_tiles.json
+00fc816234db9f4e49053eb539c960471166620c assets/tier_tower/blockstates/eminent_glass_bricks.json
 1dbf3b3234b7336bf5edbf912c0d950eb671c590 assets/tier_tower/models/block/eminent_deepslate_tiles.json
 9413d6558e13906e17d6b7edbe0a7a2597e30645 assets/tier_tower/models/block/subliminator.json
 072675450d2fc53ea12893c7b80f66abdb2a56f8 data/c/tags/blocks/relocation_not_supported.json

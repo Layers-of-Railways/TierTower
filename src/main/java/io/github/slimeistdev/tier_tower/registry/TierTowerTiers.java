@@ -98,7 +98,8 @@ public class TierTowerTiers {
 
     NETHERITE = tier("netherite", b -> b
         .factoredBaseLevelingCost(0.75)
-        .multOffsetBoostCost(5, 610, 32)),
+        .multOffsetBoostCost(5, 610, 32)
+        .erode(1, 20)),
 
     END = null;
 

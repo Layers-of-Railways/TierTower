@@ -24,6 +24,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.base.events.ProgressionCallback;
 import io.github.slimeistdev.tier_tower.base.network.PlayerSelection;
+import io.github.slimeistdev.tier_tower.content.backend.tier.ErosionRate;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Sequence.LevelingState;
 import io.github.slimeistdev.tier_tower.content.backend.tier.Tier;
@@ -50,13 +51,15 @@ public class PlayerTower {
         UUIDUtil.CODEC.fieldOf("id").forGetter(p -> p.playerId),
         Codec.unboundedMap(TierTowerRegistries.SEQUENCE_CODEC, SequenceState.CODEC).fieldOf("sequences").forGetter(p -> p.sequences),
         TierTowerRegistries.SEQUENCE_CODEC.fieldOf("current_sequence").forGetter(p -> p.currentSequence),
-        Codec.BOOL.fieldOf("locked").forGetter(PlayerTower::isLocked)
+        Codec.BOOL.fieldOf("locked").forGetter(PlayerTower::isLocked),
+        Codec.INT.optionalFieldOf("decay_ticker", 0).forGetter(p -> p.decayTicker)
     ).apply(i, PlayerTower::new));
 
     private final UUID playerId;
     private final Map<ResourceKey<Sequence>, SequenceState> sequences = new HashMap<>();
     private @NotNull ResourceKey<Sequence> currentSequence = TierTower.MAIN_SEQUENCE;
     private boolean locked = false;
+    private int decayTicker = 0;
 
     // cache variables
     private @Nullable LevelingState $levelingState = null;
@@ -70,11 +73,12 @@ public class PlayerTower {
 
     // codec constructor
     private PlayerTower(UUID playerId, Map<ResourceKey<Sequence>, SequenceState> sequences,
-                        @NotNull ResourceKey<Sequence> currentSequence, boolean locked) {
+                        @NotNull ResourceKey<Sequence> currentSequence, boolean locked, int decayTicker) {
         this(playerId);
         this.sequences.putAll(sequences);
         this.currentSequence = currentSequence;
         this.locked = locked;
+        this.decayTicker = decayTicker;
     }
 
     public UUID getPlayerId() {
@@ -160,6 +164,12 @@ public class PlayerTower {
         ensureCurrent();
         // this is safe because ensureCurrent() guarantees that the sequence exists
         return Objects.requireNonNull(sequences.get(currentSequence).getSequence(registryAccess));
+    }
+
+    public @NotNull Tier getTier() {
+        LevelingState levelingState = ensureCurrent();
+        return Objects.requireNonNull(sequences.get(currentSequence).getSequence(registryAccess))
+            .getTier(levelingState.tierIndex());
     }
 
     public boolean doPrestige(@NotNull ServerPlayer player) {
@@ -387,6 +397,28 @@ public class PlayerTower {
 
     public int totalPoints() {
         return getSequenceState().totalPoints;
+    }
+
+    public void lazyTick(int elapsedTicks) {
+        if (locked)
+            return;
+
+        ErosionRate erosionRate = getTier().getErosionRate();
+        if (erosionRate == null)
+            return;
+
+        decayTicker += elapsedTicks;
+        while (decayTicker >= erosionRate.interval()) {
+            decayTicker -= erosionRate.interval();
+            if (!removePoints(erosionRate.loss()))
+                break;
+
+            erosionRate = getTier().getErosionRate();
+            if (erosionRate == null)
+                break;
+        }
+
+        markDirty();
     }
 
     protected static class SequenceState {

@@ -88,6 +88,16 @@ public class SequenceBuilder {
         return customPrestigeMultiplierFunction("1 + (prestige_points / " + divisor + ")");
     }
 
+    public SequenceBuilder capPrestigeMultiplierFunction(int cap) {
+        if (cap <= 1) {
+            throw new IllegalArgumentException("Cap must be greater than 1");
+        }
+        if (prestigeMultiplierFunction == null) {
+            throw new IllegalStateException("Prestige multiplier function must be defined before applying a cap");
+        }
+        return customPrestigeMultiplierFunction("min(" + cap + ", " + prestigeMultiplierFunction + ")");
+    }
+
     public SequenceBuilder customPrestigeMultiplierFunction(@NotNull String prestigeMultiplierFunction) {
         this.prestigeMultiplierFunction = prestigeMultiplierFunction;
         return this;

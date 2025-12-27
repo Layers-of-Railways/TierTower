@@ -45,6 +45,7 @@ public class TierTowerSequences {
         .defaultBaseLevelingCost(1)
         .penaltyPrestigeValueFunction(5000)
         .dividingPrestigeMultiplierFunction(5000)
+        .capPrestigeMultiplierFunction(8)
         .tiers(
             COPPER,
             ZINC,

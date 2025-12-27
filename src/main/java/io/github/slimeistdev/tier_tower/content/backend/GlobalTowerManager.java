@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GlobalTowerManager {
+    private static final Integer LAZY_TICK_INTERVAL = Integer.getInteger("tier_tower.global_tower_manager.lazy_tick_interval", 1);
+
     private TowerSavedData savedData;
     public Map<UUID, PlayerTower> towers;
     private RegistryAccess registryAccess;
@@ -110,5 +112,15 @@ public class GlobalTowerManager {
     public @Nullable PlayerTower getTower(UUID uuid) {
         warnIfClient();
         return towers.get(uuid);
+    }
+
+    public void tick(int tickCount) {
+        warnIfClient();
+        for (PlayerTower tower : towers.values()) {
+            if (LAZY_TICK_INTERVAL == 1 || (tower.getPlayerId().hashCode() + tickCount) % LAZY_TICK_INTERVAL == 0) {
+                tower.registryAccess = registryAccess;
+                tower.lazyTick(LAZY_TICK_INTERVAL);
+            }
+        }
     }
 }

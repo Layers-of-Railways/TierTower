@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record TierPackData(int levelCount, Optional<Either<Integer, Node>> baseLevelingCost, Node levelingCostFunction) {
+public record TierPackData(int levelCount, Optional<Either<Integer, Node>> baseLevelingCost, Node levelingCostFunction, Optional<ErosionRate> erosionRate) {
     private static final Codec<Either<Integer, Node>> BASE_COST_CODEC = Codec.either(
         Codec.intRange(1, Integer.MAX_VALUE),
         Node.limitedCodec("prev")
@@ -36,7 +36,8 @@ public record TierPackData(int levelCount, Optional<Either<Integer, Node>> baseL
     public static final Codec<TierPackData> CODEC = RecordCodecBuilder.create(i -> i.group(
         Codec.INT.fieldOf("level_count").forGetter(TierPackData::levelCount),
         BASE_COST_CODEC.optionalFieldOf("base_leveling_cost").forGetter(TierPackData::baseLevelingCost),
-        COST_FUNCTION_CODEC.fieldOf("leveling_cost_function").forGetter(TierPackData::levelingCostFunction)
+        COST_FUNCTION_CODEC.fieldOf("leveling_cost_function").forGetter(TierPackData::levelingCostFunction),
+        ErosionRate.CODEC.optionalFieldOf("erosion_rate").forGetter(TierPackData::erosionRate)
     ).apply(i, TierPackData::new));
 
     @Override
@@ -44,6 +45,7 @@ public record TierPackData(int levelCount, Optional<Either<Integer, Node>> baseL
         return "TierPackData[" +
             "levelCount=" + levelCount + ", " +
             "baseLevelingCost=" + baseLevelingCost.map(e -> e.mapRight(Node::repr)) + ", " +
-            "levelingCostFunction=" + levelingCostFunction.repr() + ']';
+            "levelingCostFunction=" + levelingCostFunction.repr() + ", " +
+            "erosionRate=" + erosionRate + ']';
     }
 }

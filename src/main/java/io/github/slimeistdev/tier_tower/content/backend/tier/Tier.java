@@ -27,6 +27,7 @@ import io.github.slimeistdev.tier_tower.utils.SearchUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 public final class Tier {
     private final ResourceKey<TierPackData> key;
@@ -35,9 +36,11 @@ public final class Tier {
     /** How many points, within this tier, are needed to get to a level */
     private final int[] levelBaseCosts;
     private final int totalCost;
+    private final @Nullable ErosionRate erosionRate;
 
     public Tier(Holder<TierPackData> definition, int[] levelingCosts) {
-        assert definition.value().levelCount() == levelingCosts.length :
+        TierPackData definition$ = definition.value();
+        assert definition$.levelCount() == levelingCosts.length :
             "Level count mismatch between definition and provided leveling costs";
 
         this.key = definition.unwrapKey().orElseThrow();
@@ -50,6 +53,7 @@ public final class Tier {
             levelBaseCosts[i] = levelBaseCosts[i - 1] + levelingCosts[i - 1];
         }
         this.totalCost = levelBaseCosts[levelCount - 1] + levelingCosts[levelCount - 1];
+        this.erosionRate = definition$.erosionRate().orElse(null);
     }
 
     /**
@@ -158,6 +162,14 @@ public final class Tier {
 
     public int getTotalLevelingCost() {
         return totalCost;
+    }
+
+    public boolean doesErode() {
+        return erosionRate != null;
+    }
+
+    public @Nullable ErosionRate getErosionRate() {
+        return erosionRate;
     }
 
     /*public void write(FriendlyByteBuf buf) {

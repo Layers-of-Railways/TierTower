@@ -30,6 +30,7 @@ import io.github.slimeistdev.tier_tower.registry.TierTowerRegistries;
 import io.github.slimeistdev.tier_tower.registry.TierTowerSoundEvents;
 import io.github.slimeistdev.tier_tower.utils.Utils;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Holder;
@@ -47,6 +48,7 @@ public class CommonEvents {
         ServerWorldEvents.LOAD.register((server, level) -> onLoadLevel(level));
         ServerPlayConnectionEvents.JOIN.register((connection, packetSender, server) -> onPlayerJoin(connection.player));
         DynamicRegistryFreezeCallback.POST.register(CommonEvents::onDynamicRegistryFreeze);
+        ServerTickEvents.START_SERVER_TICK.register(CommonEvents::serverTickStart);
 
         registerProgressionSound(ProgressionCallback.LEVEL, TierTowerSoundEvents.LEVEL_UP, 0.8f, 0.9f, true);
         registerProgressionSound(ProgressionCallback.TIER, TierTowerSoundEvents.TIER_UP, 1.0f, 0.9f, true);
@@ -95,5 +97,9 @@ public class CommonEvents {
                 sequence.freeze(lookupProvider);
             }
         }
+    }
+
+    private static void serverTickStart(MinecraftServer server) {
+        TierTower.CITY.tick(server.getTickCount());
     }
 }
