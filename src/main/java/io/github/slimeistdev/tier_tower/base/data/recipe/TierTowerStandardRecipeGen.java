@@ -21,6 +21,7 @@ package io.github.slimeistdev.tier_tower.base.data.recipe;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.foundation.data.load_conditions.LoadCondition;
+import io.github.slimeistdev.tier_tower.registry.TierTowerBlocks;
 import io.github.slimeistdev.tier_tower.registry.TierTowerItems;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.Registry;
@@ -44,13 +45,89 @@ import java.util.function.UnaryOperator;
 import static io.github.slimeistdev.tier_tower.foundation.data.ConditionalFinishedRecipe.wrap;
 import static io.github.slimeistdev.tier_tower.foundation.data.load_conditions.LoadCondition.modMissing;
 
+@SuppressWarnings("unused")
 public class TierTowerStandardRecipeGen extends TierTowerRecipeProvider {
-    GeneratedRecipe EMINENCE_NUGGET = create(TierTowerItems.EMINENCE_NUGGET)
-        .unlockedBy(I::honeycomb)
-        .loadWhen(modMissing("create"))
-        .viaShapeless(b -> b
-            .requires(I.honeycomb())
-            .requires(I.bottledEminence()));
+    GeneratedRecipe
+        START = null,
+
+        EMINENCE_NUGGET = create(TierTowerItems.EMINENCE_NUGGET)
+            .unlockedBy(I::honeycomb)
+            .loadWhen(modMissing("create"))
+            .viaShapeless(b -> b
+                .requires(I.honeycomb())
+                .requires(I.bottledEminence())),
+
+        SUBLIMINATOR = create(TierTowerBlocks.SUBLIMINATOR)
+            .unlockedBy(I::blastFurnace)
+            .viaShaped(b -> b
+                .pattern("@#@")
+                .pattern("-X-")
+                .pattern("@B@")
+                .define('@', I.ironBlock())
+                .define('#', I.ironBars())
+                .define('-', I.netheriteIngot())
+                .define('B', I.deepslateBricks())
+                .define('X', I.blastFurnace())),
+
+        OBELISK = create(TierTowerBlocks.OBELISK)
+            .unlockedBy(I::bottledEminence)
+            .viaShaped(b -> b
+                .pattern("###")
+                .pattern("-b-")
+                .pattern("@b@")
+                .define('#', I.deepslateTiles())
+                .define('-', I.goldIngot())
+                .define('b', I.bottledEminence())
+                .define('@', I.eminentGlass())),
+
+        DEEPSLATE_PILLAR = create(TierTowerBlocks.DEEPSLATE_PILLAR)
+            .returns(2)
+            .unlockedBy(I::deepslateBricks)
+            .viaShaped(b -> b
+                .pattern("#")
+                .pattern("#")
+                .define('#', I.deepslateBricks())),
+
+        EMINENT_GLASS = create(TierTowerBlocks.EMINENT_GLASS)
+            .returns(8)
+            .unlockedBy(I::bottledEminence)
+            .viaShaped(b -> b
+                .pattern("#/#")
+                .pattern("/b/")
+                .pattern("#/#")
+                .define('#', I.glass())
+                .define('/', I.amethystShard())
+                .define('b', I.bottledEminence())),
+
+        EMINENT_GLASS_BRICKS = create(TierTowerBlocks.EMINENT_GLASS_BRICKS)
+            .returns(4)
+            .unlockedBy(I::eminentGlass)
+            .viaShaped(b -> b
+                .pattern("##")
+                .pattern("##")
+                .define('#', I.eminentGlass())),
+
+        EMINENT_DEEPSLATE_PILLAR = eminentConversion(TierTowerBlocks.EMINENT_DEEPSLATE_PILLAR, I::deepslatePillar),
+        EMINENT_DEEPSLATE_BRICKS = eminentConversion(TierTowerBlocks.EMINENT_DEEPSLATE_BRICKS, I::deepslateBricks),
+        EMINENT_DEEPSLATE_TILES = eminentConversion(TierTowerBlocks.EMINENT_DEEPSLATE_TILES, I::deepslateTiles),
+
+        END = null;
+
+    GeneratedRecipe eminentConversion(Supplier<ItemLike> result, Supplier<ItemLike> base) {
+        return create(result)
+            .returns(4)
+            .unlockedBy(I::bottledEminence)
+            .viaShaped(b -> b
+                .pattern(" # ")
+                .pattern("#b#")
+                .pattern(" # ")
+                .define('#', base.get())
+                .define('b', I.bottledEminence()));
+    }
+
+    GeneratedRecipe eminentConversion(ItemProviderEntry<? extends ItemLike> result, Supplier<ItemLike> base) {
+        return eminentConversion(result::get, base);
+    }
 
     GeneratedRecipeBuilder create(Supplier<ItemLike> result) {
         return new GeneratedRecipeBuilder("/", result);

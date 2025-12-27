@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:deepslate_tiles"
+    },
+    "b": {
+      "item": "tier_tower:bottled_eminence"
+    }
+  },
+  "pattern": [
+    " # ",
+    "#b#",
+    " # "
+  ],
+  "result": {
+    "count": 4,
+    "item": "tier_tower:eminent_deepslate_tiles"
+  },
+  "show_notification": true
+}

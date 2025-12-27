@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:glass"
+    },
+    "/": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "b": {
+      "item": "tier_tower:bottled_eminence"
+    }
+  },
+  "pattern": [
+    "#/#",
+    "/b/",
+    "#/#"
+  ],
+  "result": {
+    "count": 8,
+    "item": "tier_tower:eminent_glass"
+  },
+  "show_notification": true
+}

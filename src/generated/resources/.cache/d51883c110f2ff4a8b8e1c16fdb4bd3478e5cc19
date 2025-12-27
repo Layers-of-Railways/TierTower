@@ -1,4 +1,4 @@
-// 1.20.1	2025-12-26T22:19:48.076878163	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-26T22:57:45.016656861	Tier Tower/Registrate Provider for tier_tower [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 e44b7ebbae421404e2e0081dbccdccafd264beeb assets/tier_tower/models/block/eminent_deepslate_pillar_horizontal.json
 407ef4262659d3c6c60a3403994935dfc95ba319 data/tier_tower/loot_tables/blocks/eminent_glass_bricks.json
 832964d64a2f3e32cc672a04caa308fff2bc9436 assets/tier_tower/blockstates/eminent_glass.json

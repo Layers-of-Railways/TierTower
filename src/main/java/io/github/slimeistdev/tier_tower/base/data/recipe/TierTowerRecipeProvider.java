@@ -19,12 +19,14 @@
 package io.github.slimeistdev.tier_tower.base.data.recipe;
 
 import io.github.slimeistdev.tier_tower.TierTower;
+import io.github.slimeistdev.tier_tower.registry.TierTowerBlocks;
 import io.github.slimeistdev.tier_tower.registry.TierTowerItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -65,6 +67,50 @@ public abstract class TierTowerRecipeProvider extends RecipeProvider {
 
         public static ItemLike bottledEminence() {
             return TierTowerItems.BOTTLED_EMINENCE;
+        }
+
+        public static ItemLike blastFurnace() {
+            return Blocks.BLAST_FURNACE;
+        }
+
+        public static ItemLike ironBlock() {
+            return Blocks.IRON_BLOCK;
+        }
+
+        public static ItemLike ironBars() {
+            return Blocks.IRON_BARS;
+        }
+
+        public static ItemLike netheriteIngot() {
+            return Items.NETHERITE_INGOT;
+        }
+
+        public static ItemLike deepslatePillar() {
+            return TierTowerBlocks.DEEPSLATE_PILLAR;
+        }
+
+        public static ItemLike deepslateBricks() {
+            return Blocks.DEEPSLATE_BRICKS;
+        }
+
+        public static ItemLike deepslateTiles() {
+            return Blocks.DEEPSLATE_TILES;
+        }
+
+        public static ItemLike glass() {
+            return Blocks.GLASS;
+        }
+
+        public static ItemLike amethystShard() {
+            return Items.AMETHYST_SHARD;
+        }
+
+        public static ItemLike goldIngot() {
+            return Items.GOLD_INGOT;
+        }
+
+        public static ItemLike eminentGlass() {
+            return TierTowerBlocks.EMINENT_GLASS;
         }
     }
 }

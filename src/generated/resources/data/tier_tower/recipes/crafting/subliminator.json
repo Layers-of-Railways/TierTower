@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:iron_bars"
+    },
+    "-": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "@": {
+      "item": "minecraft:iron_block"
+    },
+    "B": {
+      "item": "minecraft:deepslate_bricks"
+    },
+    "X": {
+      "item": "minecraft:blast_furnace"
+    }
+  },
+  "pattern": [
+    "@#@",
+    "-X-",
+    "@B@"
+  ],
+  "result": {
+    "item": "tier_tower:subliminator"
+  },
+  "show_notification": true
+}

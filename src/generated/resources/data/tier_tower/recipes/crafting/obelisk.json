@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:deepslate_tiles"
+    },
+    "-": {
+      "item": "minecraft:gold_ingot"
+    },
+    "@": {
+      "item": "tier_tower:eminent_glass"
+    },
+    "b": {
+      "item": "tier_tower:bottled_eminence"
+    }
+  },
+  "pattern": [
+    "###",
+    "-b-",
+    "@b@"
+  ],
+  "result": {
+    "item": "tier_tower:obelisk"
+  },
+  "show_notification": true
+}

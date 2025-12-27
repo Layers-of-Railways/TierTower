@@ -21,11 +21,14 @@ package io.github.slimeistdev.tier_tower.compat.emi;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiStack;
 import io.github.slimeistdev.tier_tower.TierTower;
 import io.github.slimeistdev.tier_tower.content.item_sink.recipe.ItemSinkRecipe;
 import io.github.slimeistdev.tier_tower.registry.TierTowerBlocks;
 import io.github.slimeistdev.tier_tower.registry.TierTowerRecipeTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class TierTowerEmiPlugin implements EmiPlugin {
     public static final EmiStack ITEM_SINK = EmiStack.of(TierTowerBlocks.ITEM_SINK);
@@ -43,5 +46,12 @@ public class TierTowerEmiPlugin implements EmiPlugin {
 
         for (ItemSinkRecipe recipe : registry.getRecipeManager().getAllRecipesFor(TierTowerRecipeTypes.ITEM_SINK))
             registry.addRecipe(new ItemSinkEmiRecipe(recipe));
+
+        {
+            ItemStack unbreakableItemSink = TierTowerBlocks.ITEM_SINK.asStack();
+            CompoundTag beTag = unbreakableItemSink.getOrCreateTagElement("BlockEntityTag");
+            beTag.putBoolean("Unbreakable", true);
+            registry.removeEmiStacks(EmiStack.of(unbreakableItemSink).comparison(Comparison.compareNbt()));
+        }
     }
 }
