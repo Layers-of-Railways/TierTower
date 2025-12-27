@@ -1,11 +1,12 @@
 ------------------------------------------------------
 Version 0.1.0
 ------------------------------------------------------
-Additions
+<!--Additions
 - None
 
 Changes
 - None
 
 Bug Fixes
-- None
+- None-->
+Initial release!
