@@ -18,6 +18,7 @@
 
 package io.github.slimeistdev.tier_tower.mixin.common;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.datafixers.util.Either;
@@ -70,6 +71,28 @@ public abstract class MixinStyle implements Style_Duck {
         Style out = original.call(color, bold, italic, underlined, strikethrough, obfuscated, clickEvent, hoverEvent, insertion, font);
         ((MixinStyle) (Object) out).tt$setBadge(tt$playerOrBadge);
         return out;
+    }
+
+    @ModifyReturnValue(
+        method = {
+            "withColor(Lnet/minecraft/network/chat/TextColor;)Lnet/minecraft/network/chat/Style;",
+            "withBold",
+            "withItalic",
+            "withUnderlined",
+            "withStrikethrough",
+            "withObfuscated",
+            "withClickEvent",
+            "withHoverEvent",
+            "withInsertion",
+            "withFont",
+            "applyFormat",
+            "applyLegacyFormat"
+        },
+        at = @At("RETURN")
+    )
+    private Style preserveBadgePlayer2(Style original) {
+        ((MixinStyle) (Object) original).tt$setBadge(tt$playerOrBadge);
+        return original;
     }
 
     @SuppressWarnings("InvalidInjectorMethodSignature")

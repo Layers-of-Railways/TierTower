@@ -49,6 +49,8 @@ repositories {
     exclusiveMaven("https://maven.jamieswhiteshirt.com/libs-release", "com.jamieswhiteshirt") // Reach Entity Attributes
     //exclusiveMaven("https://maven.tterrag.com/", "com.jozufozu.flywheel") // Flywheel
     exclusiveMaven("https://modmaven.dev/", "com.jozufozu.flywheel") // Flywheel
+    exclusiveMaven("https://maven.blamejared.com/", "com.samsthenerd.inline") // Inline
+    exclusiveMaven("https://maven.shedaniel.me/", "me.shedaniel") // Cloth Config
 }
 
 val loom = project.extensions.getByType<LoomGradleExtensionAPI>()
@@ -130,6 +132,10 @@ dependencies {
     if ("enable_create"().toBoolean()) {
         // Create - dependencies are added transitively
         modLocalRuntime(createCoordinates)
+    }
+
+    if ("enable_inline"().toBoolean()) {
+        modLocalRuntime("com.samsthenerd.inline:inline-fabric:${"minecraft_version"()}-${"inline_version"()}")
     }
 }
 
