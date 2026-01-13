@@ -26,11 +26,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.GlyphRenderTypes;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class FrameRenderer {
     }
 
     public static void renderFrame(
-        AbstractClientPlayer player,
+        Entity player,
         Component displayName,
         PoseStack ms,
         MultiBufferSource buffer,

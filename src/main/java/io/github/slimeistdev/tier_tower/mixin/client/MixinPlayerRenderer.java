@@ -18,6 +18,8 @@
 
 package io.github.slimeistdev.tier_tower.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.slimeistdev.tier_tower.content.cosmetics.FrameRenderer;
 import net.minecraft.client.model.PlayerModel;
@@ -27,18 +29,18 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerRenderer.class)
+// Higher priority means we render after Figura applies its (badge) modifications
+@Mixin(value = PlayerRenderer.class, priority = 1500)
 public abstract class MixinPlayerRenderer extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     private MixinPlayerRenderer(EntityRendererProvider.Context context, PlayerModel<AbstractClientPlayer> model, float shadowRadius) {
         super(context, model, shadowRadius);
     }
 
-    @Inject(
+    @WrapOperation(
         method = "renderNameTag(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
         at = @At(
             value = "INVOKE",
@@ -46,8 +48,9 @@ public abstract class MixinPlayerRenderer extends LivingEntityRenderer<AbstractC
             ordinal = 1
         )
     )
-    private void renderFrame(AbstractClientPlayer entity, Component displayName, PoseStack poseStack,
-                             MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
+    private void renderFrame(PlayerRenderer instance, Entity entity, Component displayName, PoseStack poseStack,
+                             MultiBufferSource buffer, int packedLight, Operation<Void> original) {
         FrameRenderer.renderFrame(entity, displayName, poseStack, buffer, packedLight, entityRenderDispatcher, getFont());
+        original.call(instance, entity, displayName, poseStack, buffer, packedLight);
     }
 }
