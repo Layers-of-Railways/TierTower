@@ -25,7 +25,8 @@ import java.util.function.Supplier;
 
 public enum Mods {
     CREATE("create"),
-    EMI("emi");
+    EMI("emi"),
+    STYLED_CHAT("styledchat");
 
     public final String id;
     public final boolean isLoaded;

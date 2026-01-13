@@ -24,6 +24,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.simibubi.create.content.fluids.drain.ItemDrainRenderer;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.slimeistdev.tier_tower.annotation.mixin.ConditionalMixin;
+import io.github.slimeistdev.tier_tower.compat.Mods;
 import io.github.slimeistdev.tier_tower.content.eminent_items.BottledEminenceItem;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -34,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @SuppressWarnings("UnstableApiUsage")
+@ConditionalMixin(mods = Mods.CREATE)
 @Mixin(ItemDrainRenderer.class)
 public class MixinItemDrainRenderer {
     @ModifyConstant(

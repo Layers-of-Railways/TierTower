@@ -51,6 +51,7 @@ repositories {
     exclusiveMaven("https://modmaven.dev/", "com.jozufozu.flywheel") // Flywheel
     exclusiveMaven("https://maven.blamejared.com/", "com.samsthenerd.inline") // Inline
     exclusiveMaven("https://maven.shedaniel.me/", "me.shedaniel") // Cloth Config
+    exclusiveMaven("https://maven.nucleoid.xyz/releases/", "eu.pb4") // Styled Chat libs
 }
 
 val loom = project.extensions.getByType<LoomGradleExtensionAPI>()
@@ -136,6 +137,15 @@ dependencies {
 
     if ("enable_inline"().toBoolean()) {
         modLocalRuntime("com.samsthenerd.inline:inline-fabric:${"minecraft_version"()}-${"inline_version"()}")
+    }
+
+    modCompileOnly("maven.modrinth:styled-chat:${"styled_chat_version"()}+${"minecraft_version"()}")
+    if ("enable_styled_chat"().toBoolean()) {
+        modLocalRuntime("eu.pb4:predicate-api:0.1.2+1.20")
+        modLocalRuntime("eu.pb4:placeholder-api:2.1.4+1.20.1")
+        //modLocalRuntime("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+        modLocalRuntime("eu.pb4:player-data-api:0.2.2+1.19.3")
+        modLocalRuntime("maven.modrinth:styled-chat:${"styled_chat_version"()}+${"minecraft_version"()}")
     }
 }
 

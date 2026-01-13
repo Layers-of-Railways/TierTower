@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "io.github.slimeistdev.tier_tower.mixin",
+  "plugin": "io.github.slimeistdev.tier_tower.mixin.TierTowerMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "common.MixinChatType",
@@ -8,7 +9,8 @@
     "common.MixinRegistryDataLoader",
     "common.MixinServerPlayer",
     "common.MixinStyle",
-    "common.MixinTranslatableContents"
+    "common.MixinTranslatableContents",
+    "compat.common.MixinChatStyle"
   ],
   "client": [
     "client.MixinFogRenderer_BlindnessFogFunction",
